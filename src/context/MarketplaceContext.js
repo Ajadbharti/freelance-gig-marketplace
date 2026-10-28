@@ -247,7 +247,12 @@ export function MarketplaceProvider({ children }) {
         return fail("Only the client of this order can complete it.");
       }
       if (order.status !== "delivered") return fail("Only delivered orders can be completed.");
-      applyOrderChange(orderId, "completed", "Order completed");
+            applyOrderChange(orderId, "completed", "Order completed");
+      setFreelancers((prev) =>
+        prev.map((f) =>
+          f.id === order.freelancerId ? { ...f, completedOrders: f.completedOrders + 1 } : f
+        )
+      );
       return ok();
     },
     [orders, user, applyOrderChange]

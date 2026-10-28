@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { categories } from "@/data/categories";
+import ResetDemoButton from "@/components/layout/ResetDemoButton";
 
 export default function Footer() {
   return (
@@ -49,6 +50,13 @@ export default function Footer() {
               </Link>
             </li>
           </ul>
+        </div>
+                <div>
+          <h3 className="text-sm font-semibold text-slate-900">Demo notice</h3>
+          <p className="mt-4 text-sm text-slate-600">
+            This is a frontend-only demo. ... are processed.
+          </p>
+          <ResetDemoButton />
         </div>
 
         <div>

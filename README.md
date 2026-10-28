@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# GigNest: Freelance Gig Marketplace (Demo)
 
-## Getting Started
+A frontend-only freelance marketplace built with Next.js (App Router), React, JavaScript and Tailwind CSS.
+Clients browse gigs, place demo orders, request revisions and leave reviews. Freelancers publish gigs,
+deliver work and track demo earnings.
 
-First, run the development server:
+## Run the project
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build check
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Requires Node.js 18.18 or newer. Images use picsum.photos and pravatar.cc, so an internet connection is needed
+to see them (a placeholder is shown if an image fails to load).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Demo accounts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Password for every demo account: `demo123`
 
-## Learn More
+| Role       | Email                                                                  |
+| ---------- | ---------------------------------------------------------------------- |
+| Client     | rohan@demo.com, lisa@demo.com                                          |
+| Freelancer | aarav@demo.com, sofia@demo.com, daniel@demo.com, priya@demo.com, emma@demo.com, kenji@demo.com |
 
-To learn more about Next.js, take a look at the following resources:
+You can also register your own client or freelancer account. Use "Reset demo data" in the footer to restore
+the original sample data.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Search, category, price and rating filters, sorting and "show more" on `/gigs` (state lives in the URL)
+- Gig details, related gigs, freelancer profiles with portfolio and reviews
+- Demo login and registration with validation and role selection
+- Freelancer: create, edit and delete gigs, edit profile, deliver work, cancel orders
+- Client: place orders, request revisions, approve work, cancel orders, leave one review per completed order
+- Order status changes show up in both dashboards (shared state saved in LocalStorage)
 
-## Deploy on Vercel
+## Project structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/          routes (App Router)
+  components/   layout, gigs, freelancers, dashboard, orders, reviews, auth, ui
+  context/      AuthContext (demo auth), MarketplaceContext (gigs, orders, reviews logic)
+  data/         mock JSON-style data (categories, gigs, freelancers, users, orders, reviews)
+  lib/          storage.js (LocalStorage helpers), utils.js, users.js
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Limitations (please read)
+
+- **Mock data only.** There is no server and no database.
+- **LocalStorage persistence.** Data exists only in the current browser on the current device. Clearing site
+  data, using private mode or switching browsers resets or hides it. Two users on different devices never see
+  each other's data.
+- **Demo authentication is not secure.** Accounts and plain-text passwords are stored in LocalStorage. Never
+  enter a real password. Role checks run in the browser and can be bypassed by editing LocalStorage.
+- **No real payments, messaging, emails or notifications.** Prices and earnings are demo numbers.
+- **No file uploads.** Delivery uses a link and a text note. Images are URLs.
+- **Last write wins.** If the app is open in two tabs, the later save overwrites the earlier one.
+- Account IDs for freelancers created in the browser are generated locally and are not globally unique.
+
+## Moving to a real backend later
+
+All business rules are in `MarketplaceContext.js` and `AuthContext.js`. Every action returns `{ ok, error }`,
+so each function can be replaced with an API call without changing the UI:
+
+1. Replace the `data/` files with a database and seed script.
+2. Replace `AuthContext` with real authentication (hashed passwords, sessions or tokens).
+3. Replace the LocalStorage reads and writes in the contexts with API requests (and move role checks to the server).
+4. Add real file uploads and payments if needed.
