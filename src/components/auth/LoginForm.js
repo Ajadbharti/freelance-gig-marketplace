@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
@@ -27,7 +27,7 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const { user, hydrated, login } = useAuth();
   const { showToast } = useToast();
-  const redirecting = useRef(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [formError, setFormError] = useState("");
 
   const next = getSafeNext(searchParams.get("next"));
@@ -41,10 +41,10 @@ export default function LoginForm() {
 
   // Pehle se logged in ho to login page nahi dikhana
   useEffect(() => {
-    if (hydrated && user && !redirecting.current) {
+    if (hydrated && user && !redirecting) {
       router.replace(next ?? dashboardFor(user));
     }
-  }, [hydrated, user, next, router]);
+  }, [hydrated, user, redirecting, next, router]);
 
   function fillDemo(email) {
     setValue("email", email);
@@ -58,7 +58,7 @@ export default function LoginForm() {
       setFormError(result.error);
       return;
     }
-    redirecting.current = true;
+    setRedirecting(true);
     showToast(`Welcome back, ${result.user.name.split(" ")[0]}!`);
     router.push(next ?? dashboardFor(result.user));
   }

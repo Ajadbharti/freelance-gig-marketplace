@@ -1,34 +1,19 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import { demoUsers, DEMO_PASSWORD } from "@/data/users";
-import { loadFromStorage, removeFromStorage, saveToStorage } from "@/lib/storage";
+import { createPersistedStore, useIsClient, usePersistedStore } from "@/lib/persistedStore";
 import { generateId } from "@/lib/utils";
 
 const AuthContext = createContext(null);
 
+const userStore = createPersistedStore("auth:user", null);
+const registeredStore = createPersistedStore("auth:registered", []);
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [registeredUsers, setRegisteredUsers] = useState([]);
-  const [hydrated, setHydrated] = useState(false);
-
-  // Page load par LocalStorage se data lo (hydration error se bachne ke liye effect mein)
-  useEffect(() => {
-    setUser(loadFromStorage("auth:user", null));
-    setRegisteredUsers(loadFromStorage("auth:registered", []));
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (user) saveToStorage("auth:user", user);
-    else removeFromStorage("auth:user");
-  }, [user, hydrated]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    saveToStorage("auth:registered", registeredUsers);
-  }, [registeredUsers, hydrated]);
+  const [user, setUser] = usePersistedStore(userStore);
+  const [registeredUsers, setRegisteredUsers] = usePersistedStore(registeredStore);
+  const hydrated = useIsClient();
 
   const login = useCallback(
     (email, password) => {
@@ -55,7 +40,7 @@ export function AuthProvider({ children }) {
       setUser(safeUser);
       return { ok: true, user: safeUser };
     },
-    [registeredUsers]
+    [registeredUsers, setUser]
   );
 
   const register = useCallback(
@@ -77,10 +62,10 @@ export function AuthProvider({ children }) {
       setUser(newUser);
       return { ok: true, user: newUser };
     },
-    [registeredUsers]
+    [registeredUsers, setRegisteredUsers, setUser]
   );
 
-  const logout = useCallback(() => setUser(null), []);
+  const logout = useCallback(() => setUser(null), [setUser]);
 
   const value = useMemo(
     () => ({ user, hydrated, login, register, logout }),

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Briefcase, ShoppingBag } from "lucide-react";
@@ -24,7 +24,7 @@ export default function RegisterForm() {
   const { user, hydrated, register: registerUser } = useAuth();
   const { createFreelancerProfile } = useMarketplace();
   const { showToast } = useToast();
-  const redirecting = useRef(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const initialRole = searchParams.get("role") === "freelancer" ? "freelancer" : "client";
 
@@ -39,10 +39,10 @@ export default function RegisterForm() {
   });
 
   useEffect(() => {
-    if (hydrated && user && !redirecting.current) {
+    if (hydrated && user && !redirecting) {
       router.replace(user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
     }
-  }, [hydrated, user, router]);
+  }, [hydrated, user, redirecting, router]);
 
   function onSubmit(values) {
     const result = registerUser({
@@ -55,7 +55,7 @@ export default function RegisterForm() {
       setError("email", { type: "server", message: result.error });
       return;
     }
-    redirecting.current = true;
+    setRedirecting(true);
     if (values.role === "freelancer") {
       createFreelancerProfile(result.user);
       showToast("Account created! Complete your profile and publish your first gig.");

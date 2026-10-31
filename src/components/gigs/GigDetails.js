@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { use, useMemo, useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Clock, RefreshCw, SearchX } from "lucide-react";
 import { categories } from "@/data/categories";
@@ -48,13 +48,13 @@ export default function GigDetails({ params }) {
   const { average, count } = gig ? getGigRating(gig.id) : { average: 0, count: 0 };
   const category = gig ? categories.find((c) => c.slug === gig.category) : null;
 
-  const related = useMemo(() => {
-    if (!gig) return [];
+  let related = [];
+  if (gig) {
     const others = gigs.filter((g) => g.id !== gig.id);
     const sameCategory = others.filter((g) => g.category === gig.category);
     const rest = others.filter((g) => g.category !== gig.category);
-    return [...sameCategory, ...rest].slice(0, 3);
-  }, [gigs, gig]);
+    related = [...sameCategory, ...rest].slice(0, 3);
+  }
 
   if (!hydrated) return <GigDetailsSkeleton />;
 

@@ -1,17 +1,23 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { gigs as seedGigs } from "@/data/gigs";
 import { freelancers as seedFreelancers } from "@/data/freelancers";
 import { orders as seedOrders } from "@/data/orders";
 import { reviews as seedReviews } from "@/data/reviews";
-import { loadFromStorage, removeFromStorage, saveToStorage } from "@/lib/storage";
+import { createPersistedStore, useIsClient, usePersistedStore } from "@/lib/persistedStore";
+import { removeFromStorage } from "@/lib/storage";
 import { averageRating, generateId } from "@/lib/utils";
 
 const MarketplaceContext = createContext(null);
 
 const ALL_KEYS = ["gigs", "freelancers", "orders", "reviews", "auth:user", "auth:registered"];
+
+const gigsStore = createPersistedStore("gigs", seedGigs);
+const freelancersStore = createPersistedStore("freelancers", seedFreelancers);
+const ordersStore = createPersistedStore("orders", seedOrders);
+const reviewsStore = createPersistedStore("reviews", seedReviews);
 
 const ok = (extra = {}) => ({ ok: true, ...extra });
 const fail = (error) => ({ ok: false, error });
@@ -20,33 +26,11 @@ const newestFirst = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
 export function MarketplaceProvider({ children }) {
   const { user } = useAuth();
 
-  const [gigs, setGigs] = useState(seedGigs);
-  const [freelancers, setFreelancers] = useState(seedFreelancers);
-  const [orders, setOrders] = useState(seedOrders);
-  const [reviews, setReviews] = useState(seedReviews);
-  const [hydrated, setHydrated] = useState(false);
-
-  // Pehle seed data se render hota hai, phir LocalStorage ka data load hota hai
-  useEffect(() => {
-    setGigs(loadFromStorage("gigs", seedGigs));
-    setFreelancers(loadFromStorage("freelancers", seedFreelancers));
-    setOrders(loadFromStorage("orders", seedOrders));
-    setReviews(loadFromStorage("reviews", seedReviews));
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (hydrated) saveToStorage("gigs", gigs);
-  }, [gigs, hydrated]);
-  useEffect(() => {
-    if (hydrated) saveToStorage("freelancers", freelancers);
-  }, [freelancers, hydrated]);
-  useEffect(() => {
-    if (hydrated) saveToStorage("orders", orders);
-  }, [orders, hydrated]);
-  useEffect(() => {
-    if (hydrated) saveToStorage("reviews", reviews);
-  }, [reviews, hydrated]);
+  const [gigs, setGigs] = usePersistedStore(gigsStore);
+  const [freelancers, setFreelancers] = usePersistedStore(freelancersStore);
+  const [orders, setOrders] = usePersistedStore(ordersStore);
+  const [reviews, setReviews] = usePersistedStore(reviewsStore);
+  const hydrated = useIsClient();
 
   /* ---------- Getters ---------- */
 
@@ -107,16 +91,19 @@ export function MarketplaceProvider({ children }) {
     [user]
   );
 
-  const applyOrderChange = useCallback((orderId, status, label, extra = {}) => {
-    const date = new Date().toISOString();
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === orderId
-          ? { ...o, ...extra, status, timeline: [...o.timeline, { status, label, date }] }
-          : o
-      )
-    );
-  }, []);
+  const applyOrderChange = useCallback(
+    (orderId, status, label, extra = {}) => {
+      const date = new Date().toISOString();
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? { ...o, ...extra, status, timeline: [...o.timeline, { status, label, date }] }
+            : o
+        )
+      );
+    },
+    [setOrders]
+  );
 
   /* ---------- Gigs ---------- */
 
@@ -133,7 +120,7 @@ export function MarketplaceProvider({ children }) {
       setGigs((prev) => [gig, ...prev]);
       return ok({ gig });
     },
-    [requireRole, user]
+    [requireRole, user, setGigs]
   );
 
   const updateGig = useCallback(
@@ -146,7 +133,7 @@ export function MarketplaceProvider({ children }) {
       );
       return ok();
     },
-    [gigs, user]
+    [gigs, user, setGigs]
   );
 
   const deleteGig = useCallback(
@@ -157,7 +144,7 @@ export function MarketplaceProvider({ children }) {
       setGigs((prev) => prev.filter((g) => g.id !== id));
       return ok();
     },
-    [gigs, user]
+    [gigs, user, setGigs]
   );
 
   /* ---------- Orders ---------- */
@@ -195,7 +182,7 @@ export function MarketplaceProvider({ children }) {
       setOrders((prev) => [order, ...prev]);
       return ok({ order });
     },
-    [gigs, requireRole, user]
+    [gigs, requireRole, user, setOrders]
   );
 
   const deliverOrder = useCallback(
@@ -247,7 +234,7 @@ export function MarketplaceProvider({ children }) {
         return fail("Only the client of this order can complete it.");
       }
       if (order.status !== "delivered") return fail("Only delivered orders can be completed.");
-            applyOrderChange(orderId, "completed", "Order completed");
+      applyOrderChange(orderId, "completed", "Order completed");
       setFreelancers((prev) =>
         prev.map((f) =>
           f.id === order.freelancerId ? { ...f, completedOrders: f.completedOrders + 1 } : f
@@ -255,7 +242,7 @@ export function MarketplaceProvider({ children }) {
       );
       return ok();
     },
-    [orders, user, applyOrderChange]
+    [orders, user, applyOrderChange, setFreelancers]
   );
 
   const cancelOrder = useCallback(
@@ -300,30 +287,32 @@ export function MarketplaceProvider({ children }) {
       setReviews((prev) => [review, ...prev]);
       return ok({ review });
     },
-    [orders, reviews, user]
+    [orders, reviews, user, setReviews]
   );
 
   /* ---------- Freelancer profiles ---------- */
 
-  // Register ke baad naye freelancer ka profile banane ke liye (Phase 5 mein use hoga)
-  const createFreelancerProfile = useCallback((newUser) => {
-    const profile = {
-      id: newUser.id,
-      name: newUser.name,
-      headline: "New freelancer on GigNest",
-      bio: "",
-      avatar: newUser.avatar,
-      location: "",
-      skills: [],
-      languages: ["English"],
-      experience: 0,
-      startingPrice: 0,
-      completedOrders: 0,
-      joinedAt: new Date().toISOString(),
-      portfolio: [],
-    };
-    setFreelancers((prev) => (prev.some((f) => f.id === newUser.id) ? prev : [...prev, profile]));
-  }, []);
+  const createFreelancerProfile = useCallback(
+    (newUser) => {
+      const profile = {
+        id: newUser.id,
+        name: newUser.name,
+        headline: "New freelancer on GigNest",
+        bio: "",
+        avatar: newUser.avatar,
+        location: "",
+        skills: [],
+        languages: ["English"],
+        experience: 0,
+        startingPrice: 0,
+        completedOrders: 0,
+        joinedAt: new Date().toISOString(),
+        portfolio: [],
+      };
+      setFreelancers((prev) => (prev.some((f) => f.id === newUser.id) ? prev : [...prev, profile]));
+    },
+    [setFreelancers]
+  );
 
   const updateFreelancerProfile = useCallback(
     (id, changes) => {
@@ -331,7 +320,7 @@ export function MarketplaceProvider({ children }) {
       setFreelancers((prev) => prev.map((f) => (f.id === id ? { ...f, ...changes, id: f.id } : f)));
       return ok();
     },
-    [user]
+    [user, setFreelancers]
   );
 
   /* ---------- Reset ---------- */
