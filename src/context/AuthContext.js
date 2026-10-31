@@ -1,71 +1,116 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo } from "react";
-import { demoUsers, DEMO_PASSWORD } from "@/data/users";
-import { createPersistedStore, useIsClient, usePersistedStore } from "@/lib/persistedStore";
-import { generateId } from "@/lib/utils";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { initialsAvatar } from "@/lib/avatar";
 
 const AuthContext = createContext(null);
 
-const userStore = createPersistedStore("auth:user", null);
-const registeredStore = createPersistedStore("auth:registered", []);
+function toUser(profile, authUser) {
+  return {
+    id: profile.id,
+    name: profile.full_name,
+    email: authUser?.email ?? "",
+    role: profile.role,
+    avatar: profile.avatar_url || initialsAvatar(profile.full_name),
+  };
+}
+
+function friendlyError(error) {
+  const message = (error?.message || "").toLowerCase();
+  if (message.includes("invalid login credentials")) return "Incorrect email or password.";
+  if (message.includes("email not confirmed")) return "Please confirm your email first. Check your inbox for the link.";
+  if (message.includes("already registered")) return "An account with this email already exists.";
+  if (message.includes("rate limit") || message.includes("too many")) {
+    return "Too many attempts. Please wait a while and try again.";
+  }
+  if (message.includes("not authorized")) {
+    return "This project cannot send emails to this address yet. Turn off email confirmation or set up custom SMTP.";
+  }
+  return error?.message || "Something went wrong. Please try again.";
+}
+
+async function fetchProfile(supabase, userId) {
+  const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+  return data ?? null;
+}
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = usePersistedStore(userStore);
-  const [registeredUsers, setRegisteredUsers] = usePersistedStore(registeredStore);
-  const hydrated = useIsClient();
+  // undefined = abhi pata nahi, null = logged out, object = logged in
+  const [session, setSession] = useState(undefined);
+  const [profile, setProfile] = useState(null);
+  const [loadedFor, setLoadedFor] = useState(null);
 
-  const login = useCallback(
-    (email, password) => {
-      const normalized = (email || "").trim().toLowerCase();
-      const invalid = { ok: false, error: "Incorrect email or password." };
+  useEffect(() => {
+    const supabase = createClient();
+    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession ?? null);
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
 
-      const demo = demoUsers.find((u) => u.email === normalized);
-      if (demo) {
-        if (password !== DEMO_PASSWORD) return invalid;
-        setUser(demo);
-        return { ok: true, user: demo };
-      }
+  const userId = session?.user?.id ?? null;
 
-      const found = registeredUsers.find((u) => u.email === normalized);
-      if (!found || found.password !== password) return invalid;
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    fetchProfile(createClient(), userId)
+      .then((row) => {
+        if (cancelled) return;
+        setProfile(row);
+        setLoadedFor(userId);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setProfile(null);
+        setLoadedFor(userId);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
-      const safeUser = {
-        id: found.id,
-        name: found.name,
-        email: found.email,
-        role: found.role,
-        avatar: found.avatar,
-      };
-      setUser(safeUser);
-      return { ok: true, user: safeUser };
-    },
-    [registeredUsers, setUser]
-  );
+  const hydrated = session !== undefined && (!userId || loadedFor === userId);
+  const user = session?.user && profile && profile.id === session.user.id ? toUser(profile, session.user) : null;
 
-  const register = useCallback(
-    ({ name, email, password, role }) => {
-      const normalized = (email || "").trim().toLowerCase();
-      const exists =
-        demoUsers.some((u) => u.email === normalized) ||
-        registeredUsers.some((u) => u.email === normalized);
-      if (exists) return { ok: false, error: "An account with this email already exists." };
+  const login = useCallback(async (email, password) => {
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: (email || "").trim().toLowerCase(),
+      password,
+    });
+    if (error) return { ok: false, error: friendlyError(error) };
 
-      const newUser = {
-        id: generateId(role === "freelancer" ? "f" : "c"),
-        name: name.trim(),
-        email: normalized,
-        role,
-        avatar: `https://i.pravatar.cc/200?u=${encodeURIComponent(normalized)}`,
-      };
-      setRegisteredUsers((prev) => [...prev, { ...newUser, password }]);
-      setUser(newUser);
-      return { ok: true, user: newUser };
-    },
-    [registeredUsers, setRegisteredUsers, setUser]
-  );
+    const row = await fetchProfile(supabase, data.user.id);
+    if (!row) return { ok: false, error: "Your profile could not be loaded. Please try again." };
+    return { ok: true, user: toUser(row, data.user) };
+  }, []);
 
-  const logout = useCallback(() => setUser(null), [setUser]);
+  const register = useCallback(async ({ name, email, password, role }) => {
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email: (email || "").trim().toLowerCase(),
+      password,
+      options: { data: { full_name: name.trim(), role } },
+    });
+    if (error) return { ok: false, error: friendlyError(error) };
+
+    // Email pehle se registered ho to Supabase bina identities wala user lautata hai
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      return { ok: false, error: "An account with this email already exists." };
+    }
+
+    // Email confirmation on ho to abhi session nahi milta
+    if (!data.session) return { ok: true, needsConfirmation: true };
+
+    const row = await fetchProfile(supabase, data.user.id);
+    if (!row) return { ok: false, error: "Your account was created but the profile could not be loaded." };
+    return { ok: true, needsConfirmation: false, user: toUser(row, data.user) };
+  }, []);
+
+  const logout = useCallback(async () => {
+    await createClient().auth.signOut();
+  }, []);
 
   const value = useMemo(
     () => ({ user, hydrated, login, register, logout }),

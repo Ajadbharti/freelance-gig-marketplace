@@ -46,9 +46,9 @@ export default function Navbar() {
     setUserOpen(false);
   }
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
     closeAll();
+    await logout();
     showToast("You have been logged out.", "info");
     router.push("/");
   }
@@ -135,7 +135,7 @@ export default function Navbar() {
                 >
                   <div className="border-b border-slate-100 px-3 py-2">
                     <p className="truncate text-sm font-semibold text-slate-900">{user.name}</p>
-                    <p className="text-xs capitalize text-slate-500">{user.role} (demo)</p>
+                    <p className="text-xs capitalize text-slate-500">{user.role}</p>
                   </div>
                   <Link
                     href={dashboardHref}

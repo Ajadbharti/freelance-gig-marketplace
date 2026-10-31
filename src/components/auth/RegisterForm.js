@@ -4,11 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Briefcase, ShoppingBag } from "lucide-react";
+import { Briefcase, MailCheck, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import AuthCard, { DemoNotice } from "@/components/auth/AuthCard";
+import AuthCard from "@/components/auth/AuthCard";
 import FormField, { inputClass } from "@/components/ui/FormField";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,9 +21,10 @@ export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, hydrated, register: registerUser } = useAuth();
-  const { createFreelancerProfile } = useMarketplace();
   const { showToast } = useToast();
   const [redirecting, setRedirecting] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
 
   const initialRole = searchParams.get("role") === "freelancer" ? "freelancer" : "client";
 
@@ -32,8 +32,7 @@ export default function RegisterForm() {
     register,
     handleSubmit,
     getValues,
-    setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: { name: "", email: "", password: "", confirmPassword: "", role: initialRole },
   });
@@ -44,26 +43,53 @@ export default function RegisterForm() {
     }
   }, [hydrated, user, redirecting, router]);
 
-  function onSubmit(values) {
-    const result = registerUser({
+  async function onSubmit(values) {
+    setFormError("");
+    const result = await registerUser({
       name: values.name,
       email: values.email,
       password: values.password,
       role: values.role,
     });
+
     if (!result.ok) {
-      setError("email", { type: "server", message: result.error });
+      setFormError(result.error);
       return;
     }
+
+    if (result.needsConfirmation) {
+      setConfirmEmail(values.email.trim());
+      return;
+    }
+
     setRedirecting(true);
     if (values.role === "freelancer") {
-      createFreelancerProfile(result.user);
       showToast("Account created! Complete your profile and publish your first gig.");
       router.push("/dashboard/freelancer");
     } else {
       showToast("Account created! You can now browse gigs and place orders.");
       router.push("/dashboard/client");
     }
+  }
+
+  if (confirmEmail) {
+    return (
+      <AuthCard title="Check your email" subtitle="One last step to activate your account.">
+        <div className="flex flex-col items-center text-center">
+          <MailCheck className="h-14 w-14 text-indigo-600" />
+          <p className="mt-4 text-sm text-slate-700">
+            We sent a confirmation link to <strong>{confirmEmail}</strong>. Open it to activate your account, then
+            log in.
+          </p>
+          <Link
+            href="/login"
+            className="mt-6 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          >
+            Go to login
+          </Link>
+        </div>
+      </AuthCard>
+    );
   }
 
   return (
@@ -79,15 +105,13 @@ export default function RegisterForm() {
         </>
       }
     >
-      <DemoNotice>
-        <p className="font-semibold">Demo authentication only</p>
-        <p className="mt-1">
-          Your account is saved only in this browser (LocalStorage). Do not use a real password or real personal
-          data.
-        </p>
-      </DemoNotice>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+        {formError && (
+          <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {formError}
+          </p>
+        )}
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-6 space-y-4">
         <fieldset>
           <legend className="mb-1.5 block text-sm font-medium text-slate-800">I am joining as</legend>
           <div className="grid grid-cols-2 gap-3">
@@ -172,9 +196,10 @@ export default function RegisterForm() {
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSubmitting}
+          className="w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          Create account
+          {isSubmitting ? "Creating account..." : "Create account"}
         </button>
       </form>
     </AuthCard>

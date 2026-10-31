@@ -6,8 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import { DEMO_PASSWORD } from "@/data/users";
-import AuthCard, { DemoNotice } from "@/components/auth/AuthCard";
+import AuthCard from "@/components/auth/AuthCard";
 import FormField, { inputClass } from "@/components/ui/FormField";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,8 +34,7 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { email: "", password: "" } });
 
   // Pehle se logged in ho to login page nahi dikhana
@@ -46,14 +44,9 @@ export default function LoginForm() {
     }
   }, [hydrated, user, redirecting, next, router]);
 
-  function fillDemo(email) {
-    setValue("email", email);
-    setValue("password", DEMO_PASSWORD);
+  async function onSubmit(values) {
     setFormError("");
-  }
-
-  function onSubmit(values) {
-    const result = login(values.email, values.password);
+    const result = await login(values.email, values.password);
     if (!result.ok) {
       setFormError(result.error);
       return;
@@ -76,35 +69,7 @@ export default function LoginForm() {
         </>
       }
     >
-      <DemoNotice>
-        <p className="font-semibold">Demo authentication only</p>
-        <p className="mt-1">
-          This is not production-secure login. Accounts live in your browser (LocalStorage) and passwords are not
-          protected. Never enter a real password.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => fillDemo("rohan@demo.com")}
-            className="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
-          >
-            Fill client demo
-          </button>
-          <button
-            type="button"
-            onClick={() => fillDemo("aarav@demo.com")}
-            className="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
-          >
-            Fill freelancer demo
-          </button>
-        </div>
-        <p className="mt-3 text-xs">
-          Password for all demo accounts: <strong>{DEMO_PASSWORD}</strong>. Clients: rohan@demo.com, lisa@demo.com.
-          Freelancers: aarav, sofia, daniel, priya, emma, kenji (each @demo.com).
-        </p>
-      </DemoNotice>
-
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-6 space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
         {formError && (
           <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
             {formError}
@@ -142,9 +107,10 @@ export default function LoginForm() {
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSubmitting}
+          className="w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          Log in
+          {isSubmitting ? "Logging in..." : "Log in"}
         </button>
       </form>
     </AuthCard>
