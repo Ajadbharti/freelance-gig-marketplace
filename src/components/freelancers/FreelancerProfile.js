@@ -47,7 +47,7 @@ function EditProfileForm({ freelancer, onClose }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       headline: freelancer.headline,
@@ -57,12 +57,12 @@ function EditProfileForm({ freelancer, onClose }) {
       languages: freelancer.languages.join(", "),
       experience: String(freelancer.experience),
       startingPrice: String(freelancer.startingPrice),
-      avatar: freelancer.avatar,
+      avatar: freelancer.avatar?.startsWith("http") ? freelancer.avatar : "",
     },
   });
 
-  function onSubmit(values) {
-    const result = updateFreelancerProfile(freelancer.id, {
+  async function onSubmit(values) {
+    const result = await updateFreelancerProfile(freelancer.id, {
       headline: values.headline.trim(),
       bio: values.bio.trim(),
       location: values.location.trim(),
@@ -70,7 +70,7 @@ function EditProfileForm({ freelancer, onClose }) {
       languages: toList(values.languages),
       experience: Number(values.experience),
       startingPrice: Number(values.startingPrice),
-      avatar: values.avatar.trim() || freelancer.avatar,
+      avatar: values.avatar.trim(),
     });
     if (!result.ok) {
       showToast(result.error, "error");
@@ -192,7 +192,12 @@ function EditProfileForm({ freelancer, onClose }) {
         </FormField>
       </div>
 
-      <FormField id="avatar" label="Profile image URL" error={errors.avatar?.message}>
+      <FormField
+        id="avatar"
+        label="Profile image URL (optional)"
+        hint="Leave empty to keep your current picture."
+        error={errors.avatar?.message}
+      >
         <input
           id="avatar"
           type="url"
@@ -215,9 +220,10 @@ function EditProfileForm({ freelancer, onClose }) {
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSubmitting}
+          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          Save changes
+          {isSubmitting ? "Saving..." : "Save changes"}
         </button>
       </div>
     </form>
@@ -275,7 +281,9 @@ export default function FreelancerProfile({ params }) {
         />
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl font-bold text-slate-900">{freelancer.name}</h1>
-          <p className="mt-1 text-slate-600">{freelancer.headline}</p>
+          <p className="mt-1 text-slate-600">
+            {freelancer.headline || (isOwner ? "Add a headline using Edit profile." : "")}
+          </p>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-600">
             <RatingStars rating={average} count={count > 0 ? count : undefined} showNumber />
             {freelancer.location && (

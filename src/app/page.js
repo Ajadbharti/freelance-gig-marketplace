@@ -22,7 +22,7 @@ const STEPS = [
   {
     icon: ClipboardCheck,
     title: "Place your order",
-    text: "Share your requirements and place a demo order. Track every status update in your dashboard.",
+    text: "Share your requirements and place an order. Track every status update in your dashboard.",
   },
   {
     icon: BadgeCheck,
@@ -85,7 +85,7 @@ export default function Home() {
       <section className="bg-gradient-to-b from-indigo-50 via-white to-white">
         <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:py-24">
           <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
-            <Sparkles className="h-3.5 w-3.5" /> Demo marketplace with mock data
+            <Sparkles className="h-3.5 w-3.5" /> Hire talent. Sell your skills.
           </p>
           <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
             Find the Right Freelancer for Your Next Big Idea.
@@ -135,22 +135,34 @@ export default function Home() {
             href="/gigs"
             linkLabel="Explore more"
           />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {hydrated
-              ? featuredGigs.map((gig) => <GigCard key={gig.id} gig={gig} />)
-              : Array.from({ length: 4 }).map((_, i) => <GigCardSkeleton key={i} />)}
-          </div>
+          {hydrated && featuredGigs.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center text-slate-600">
+              No gigs have been published yet. Freelancers can create the first one from their dashboard.
+            </p>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {hydrated
+                ? featuredGigs.map((gig) => <GigCard key={gig.id} gig={gig} />)
+                : Array.from({ length: 4 }).map((_, i) => <GigCardSkeleton key={i} />)}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Top-rated freelancers */}
       <section className="mx-auto max-w-7xl px-4 py-14">
         <SectionHeading title="Top-rated freelancers" subtitle="Experienced professionals ready to start." />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {hydrated
-            ? topFreelancers.map((f) => <FreelancerCard key={f.id} freelancer={f} />)
-            : Array.from({ length: 4 }).map((_, i) => <GigCardSkeleton key={i} />)}
-        </div>
+        {hydrated && topFreelancers.length === 0 ? (
+          <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-600">
+            No freelancers have joined yet.
+          </p>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {hydrated
+              ? topFreelancers.map((f) => <FreelancerCard key={f.id} freelancer={f} />)
+              : Array.from({ length: 4 }).map((_, i) => <GigCardSkeleton key={i} />)}
+          </div>
+        )}
       </section>
 
       {/* How it works */}
@@ -182,7 +194,7 @@ export default function Home() {
         <div className="rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-12 text-center text-white sm:px-12">
           <h2 className="text-2xl font-bold sm:text-3xl">Ready to sell your skills?</h2>
           <p className="mx-auto mt-3 max-w-xl text-indigo-100">
-            Create a freelancer account, publish your first gig and start receiving demo orders.
+            Create a freelancer account, publish your first gig and start receiving orders.
           </p>
           <Link
             href="/register?role=freelancer"

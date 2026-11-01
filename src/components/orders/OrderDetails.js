@@ -6,7 +6,6 @@ import { ArrowLeft, Clock, ExternalLink, RefreshCw, SearchX, ShieldAlert } from 
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import { findUserById } from "@/lib/users";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import SafeImage from "@/components/ui/SafeImage";
@@ -71,8 +70,17 @@ function PersonCard({ label, name, avatar, href }) {
 export default function OrderDetails({ params }) {
   const { id } = use(params);
   const { user, hydrated: authReady } = useAuth();
-  const { hydrated, gigs, getOrder, getOrderGig, getFreelancer, getOrderReview, completeOrder, cancelOrder } =
-    useMarketplace();
+  const {
+    hydrated,
+    gigs,
+    getOrder,
+    getOrderGig,
+    getFreelancer,
+    getProfile,
+    getOrderReview,
+    completeOrder,
+    cancelOrder,
+  } = useMarketplace();
   const { showToast } = useToast();
   const [modal, setModal] = useState(null); // deliver | revision | complete | cancel | review
 
@@ -80,26 +88,27 @@ export default function OrderDetails({ params }) {
 
   const order = getOrder(id);
 
-  if (!order) {
-    return (
-      <Notice
-        icon={SearchX}
-        title="Order not found"
-        text="This order does not exist."
-        href={user?.role === "freelancer" ? "/dashboard/freelancer" : user ? "/dashboard/client" : "/gigs"}
-        linkLabel={user ? "Back to dashboard" : "Browse gigs"}
-      />
-    );
-  }
-
   if (!user) {
     return (
       <Notice
         icon={ShieldAlert}
         title="Please log in"
         text="You need to log in to view this order."
-        href={`/login?next=${encodeURIComponent(`/orders/${order.id}`)}`}
+        href={`/login?next=${encodeURIComponent(`/orders/${id}`)}`}
         linkLabel="Go to login"
+      />
+    );
+  }
+
+  // Order sirf uske client aur freelancer ko milta hai, baaki sab ko "not found" dikhta hai
+  if (!order) {
+    return (
+      <Notice
+        icon={SearchX}
+        title="Order not found"
+        text="This order does not exist, or it does not belong to your account."
+        href={user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client"}
+        linkLabel="Back to dashboard"
       />
     );
   }
@@ -121,7 +130,7 @@ export default function OrderDetails({ params }) {
 
   const gig = getOrderGig(order);
   const gigExists = gigs.some((g) => g.id === order.gigId);
-  const client = findUserById(order.clientId);
+  const client = getProfile(order.clientId);
   const freelancer = getFreelancer(order.freelancerId);
   const review = getOrderReview(order.id);
 
@@ -163,14 +172,14 @@ export default function OrderDetails({ params }) {
 
   const safeLink = /^https?:\/\//i.test(order.deliveryLink || "");
 
-  function handleComplete() {
-    const result = completeOrder(order.id);
+  async function handleComplete() {
+    const result = await completeOrder(order.id);
     showToast(result.ok ? "Order completed! You can now leave a review." : result.error, result.ok ? "success" : "error");
     setModal(null);
   }
 
-  function handleCancel() {
-    const result = cancelOrder(order.id);
+  async function handleCancel() {
+    const result = await cancelOrder(order.id);
     showToast(result.ok ? "Order cancelled." : result.error, result.ok ? "success" : "error");
     setModal(null);
   }
@@ -299,7 +308,11 @@ export default function OrderDetails({ params }) {
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <PersonCard label="Client" name={client?.name ?? "Unknown client"} avatar={client?.avatar} />
+            <PersonCard
+              label="Client"
+              name={client?.name ?? "Unknown client"}
+              avatar={client?.avatar}
+            />
             <PersonCard
               label="Freelancer"
               name={freelancer?.name ?? "Unknown freelancer"}

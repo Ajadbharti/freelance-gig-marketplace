@@ -59,14 +59,14 @@ export default function FreelancerDashboard() {
 
   const visibleOrders = tab === "all" ? myOrders : myOrders.filter((o) => o.status === tab);
 
-  function confirmDelete() {
-    const result = deleteGig(deleteTarget.id);
+  async function confirmDelete() {
+    const result = await deleteGig(deleteTarget.id);
     showToast(result.ok ? "Gig deleted." : result.error, result.ok ? "success" : "error");
     setDeleteTarget(null);
   }
 
-  function confirmCancel() {
-    const result = cancelOrder(cancelTarget.id);
+  async function confirmCancel() {
+    const result = await cancelOrder(cancelTarget.id);
     showToast(result.ok ? "Order cancelled." : result.error, result.ok ? "success" : "error");
     setCancelTarget(null);
   }
@@ -126,7 +126,7 @@ export default function FreelancerDashboard() {
         <StatCard icon={CheckCircle2} label="Completed orders" value={counts.completed} tone="emerald" />
         <StatCard
           icon={Wallet}
-          label="Demo earnings"
+          label="Earnings"
           value={formatPrice(earnings)}
           hint={pending > 0 ? `${formatPrice(pending)} pending approval` : "From completed orders"}
           tone="slate"

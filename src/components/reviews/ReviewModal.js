@@ -16,17 +16,17 @@ function ReviewForm({ order, onClose }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { comment: "" } });
 
   const gig = getOrderGig(order);
 
-  function onSubmit({ comment }) {
+  async function onSubmit({ comment }) {
     if (rating < 1) {
       setRatingError("Please select a rating from 1 to 5.");
       return;
     }
-    const result = addReview({ orderId: order.id, rating, comment });
+    const result = await addReview({ orderId: order.id, rating, comment });
     if (!result.ok) {
       showToast(result.error, "error");
       return;
@@ -82,9 +82,10 @@ function ReviewForm({ order, onClose }) {
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSubmitting}
+          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          Submit review
+          {isSubmitting ? "Submitting..." : "Submit review"}
         </button>
       </div>
     </form>

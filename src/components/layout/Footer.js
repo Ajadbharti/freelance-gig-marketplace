@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { categories } from "@/data/categories";
-import ResetDemoButton from "@/components/layout/ResetDemoButton";
 
 export default function Footer() {
   return (
@@ -14,7 +13,7 @@ export default function Footer() {
             <span className="text-xl font-bold text-slate-900">GigNest</span>
           </Link>
           <p className="mt-4 max-w-xs text-sm text-slate-600">
-            A demo freelance marketplace where clients discover talent and freelancers sell digital services.
+            A marketplace where clients discover talent and freelancers sell digital services.
           </p>
         </div>
 
@@ -51,24 +50,30 @@ export default function Footer() {
             </li>
           </ul>
         </div>
-                <div>
-          <h3 className="text-sm font-semibold text-slate-900">Demo notice</h3>
-          <p className="mt-4 text-sm text-slate-600">
-            This is a frontend-only demo. ... are processed.
-          </p>
-          <ResetDemoButton />
-        </div>
 
         <div>
-          <h3 className="text-sm font-semibold text-slate-900">Demo notice</h3>
-          <p className="mt-4 text-sm text-slate-600">
-            This is a frontend-only demo. Data is mock data saved in your browser (LocalStorage), and login is
-            demo authentication, not production-secure. No real payments or messages are processed.
-          </p>
+          <h3 className="text-sm font-semibold text-slate-900">For clients</h3>
+          <ul className="mt-4 space-y-2 text-sm text-slate-600">
+            <li>
+              <Link href="/gigs" className="transition hover:text-indigo-600">
+                Explore gigs
+              </Link>
+            </li>
+            <li>
+              <Link href="/register" className="transition hover:text-indigo-600">
+                Create an account
+              </Link>
+            </li>
+            <li>
+              <Link href="/dashboard/client" className="transition hover:text-indigo-600">
+                Client dashboard
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
       <div className="border-t border-slate-200 py-5 text-center text-xs text-slate-500">
-        © 2026 GigNest demo project. Not affiliated with any real marketplace.
+        © 2026 GigNest. All rights reserved.
       </div>
     </footer>
   );

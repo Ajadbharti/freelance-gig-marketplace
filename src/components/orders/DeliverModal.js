@@ -13,20 +13,20 @@ function DeliverForm({ order, onClose }) {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { deliveryLink: "", deliveryNote: "" } });
 
-  function onSubmit(values) {
+  async function onSubmit(values) {
     if (!values.deliveryLink.trim() && !values.deliveryNote.trim()) {
       setError("deliveryNote", { type: "manual", message: "Add a delivery link or a note (or both)." });
       return;
     }
-    const result = deliverOrder(order.id, values);
+    const result = await deliverOrder(order.id, values);
     if (!result.ok) {
       showToast(result.error, "error");
       return;
     }
-    showToast("Work delivered. The client has been notified (demo).");
+    showToast("Work delivered. The client can now review it.");
     onClose();
   }
 
@@ -35,7 +35,7 @@ function DeliverForm({ order, onClose }) {
       <FormField
         id="deliveryLink"
         label="Delivery link (optional)"
-        hint="For example a demo link to files, a repo or a design."
+        hint="For example a link to files, a repository or a design."
         error={errors.deliveryLink?.message}
       >
         <input
@@ -75,9 +75,10 @@ function DeliverForm({ order, onClose }) {
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSubmitting}
+          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          Deliver work
+          {isSubmitting ? "Delivering..." : "Deliver work"}
         </button>
       </div>
     </form>

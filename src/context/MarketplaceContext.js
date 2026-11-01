@@ -1,374 +1,375 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { gigs as seedGigs } from "@/data/gigs";
-import { freelancers as seedFreelancers } from "@/data/freelancers";
-import { orders as seedOrders } from "@/data/orders";
-import { reviews as seedReviews } from "@/data/reviews";
-import { createPersistedStore, useIsClient, usePersistedStore } from "@/lib/persistedStore";
-import { removeFromStorage } from "@/lib/storage";
-import { averageRating, generateId } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import { initialsAvatar } from "@/lib/avatar";
+import { averageRating } from "@/lib/utils";
 
 const MarketplaceContext = createContext(null);
 
-const ALL_KEYS = ["gigs", "freelancers", "orders", "reviews", "auth:user", "auth:registered"];
-
-const gigsStore = createPersistedStore("gigs", seedGigs);
-const freelancersStore = createPersistedStore("freelancers", seedFreelancers);
-const ordersStore = createPersistedStore("orders", seedOrders);
-const reviewsStore = createPersistedStore("reviews", seedReviews);
-
+const EMPTY = [];
 const ok = (extra = {}) => ({ ok: true, ...extra });
 const fail = (error) => ({ ok: false, error });
-const newestFirst = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
+
+function dbError(error) {
+  if (!error) return "Something went wrong. Please try again.";
+  if (error.code === "23514") return "Some values are outside the allowed limits. Please check the form.";
+  if (error.code === "42501") return "You are not allowed to do this.";
+  return error.message || "Something went wrong. Please try again.";
+}
+
+/* ---------- Database row -> shape used by the screens ---------- */
+
+function mapGig(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    category: row.category,
+    freelancerId: row.freelancer_id,
+    price: row.price,
+    deliveryDays: row.delivery_days,
+    revisions: row.revisions,
+    image: row.image_url,
+    skills: row.skills ?? [],
+    tags: row.tags ?? [],
+    createdAt: row.created_at,
+  };
+}
+
+function mapProfile(row) {
+  return {
+    id: row.id,
+    role: row.role,
+    name: row.full_name,
+    headline: row.headline ?? "",
+    bio: row.bio ?? "",
+    avatar: row.avatar_url || initialsAvatar(row.full_name),
+    location: row.location ?? "",
+    skills: row.skills ?? [],
+    languages: row.languages ?? [],
+    experience: row.experience_years ?? 0,
+    startingPrice: row.starting_price ?? 0,
+    completedOrders: row.completed_orders ?? 0,
+    joinedAt: row.created_at,
+    portfolio: (row.portfolio_items ?? []).map((item) => ({
+      id: item.id,
+      title: item.title,
+      image: item.image_url,
+    })),
+  };
+}
+
+function mapOrder(row) {
+  const events = [...(row.order_events ?? [])].sort(
+    (a, b) => new Date(a.created_at) - new Date(b.created_at) || a.id - b.id
+  );
+  return {
+    id: row.id,
+    gigId: row.gig_id,
+    clientId: row.client_id,
+    freelancerId: row.freelancer_id,
+    price: row.price,
+    status: row.status,
+    requirements: row.requirements,
+    deliveryLink: row.delivery_link ?? "",
+    deliveryNote: row.delivery_note ?? "",
+    revisionsUsed: row.revisions_used ?? 0,
+    createdAt: row.created_at,
+    gigSnapshot: {
+      title: row.gig_title,
+      image: row.gig_image,
+      deliveryDays: row.gig_delivery_days,
+      revisions: row.gig_revisions,
+    },
+    timeline: events.map((e) => ({ status: e.status, label: e.label, date: e.created_at })),
+  };
+}
+
+function mapReview(row, nameById) {
+  return {
+    id: row.id,
+    orderId: row.order_id,
+    gigId: row.gig_id,
+    freelancerId: row.freelancer_id,
+    clientId: row.client_id,
+    clientName: nameById.get(row.client_id) ?? "Client",
+    rating: row.rating,
+    comment: row.comment,
+    createdAt: row.created_at,
+  };
+}
+
+/* ---------- Loading from Supabase ---------- */
+
+async function fetchPublicData() {
+  const supabase = createClient();
+  const [gigsRes, profilesRes, reviewsRes] = await Promise.all([
+    supabase.from("gigs").select("*").order("created_at", { ascending: false }),
+    supabase.from("profiles").select("*, portfolio_items(*)"),
+    supabase.from("reviews").select("*").order("created_at", { ascending: false }),
+  ]);
+  const firstError = gigsRes.error || profilesRes.error || reviewsRes.error;
+  if (firstError) console.error("Could not load marketplace data:", firstError);
+  return {
+    gigs: (gigsRes.data ?? []).map(mapGig),
+    profiles: (profilesRes.data ?? []).map(mapProfile),
+    reviews: reviewsRes.data ?? [],
+  };
+}
+
+async function fetchOrders() {
+  const { data, error } = await createClient()
+    .from("orders")
+    .select("*, order_events(*)")
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error("Could not load orders:", error);
+    return [];
+  }
+  return (data ?? []).map(mapOrder);
+}
+
+async function callRpc(name, args) {
+  const { data, error } = await createClient().rpc(name, args);
+  if (error) return fail(dbError(error));
+  return ok({ data });
+}
+
+const GIG_COLUMNS = {
+  title: "title",
+  description: "description",
+  category: "category",
+  price: "price",
+  deliveryDays: "delivery_days",
+  revisions: "revisions",
+  skills: "skills",
+  tags: "tags",
+};
 
 export function MarketplaceProvider({ children }) {
   const { user } = useAuth();
+  const userId = user?.id ?? null;
 
-  const [gigs, setGigs] = usePersistedStore(gigsStore);
-  const [freelancers, setFreelancers] = usePersistedStore(freelancersStore);
-  const [orders, setOrders] = usePersistedStore(ordersStore);
-  const [reviews, setReviews] = usePersistedStore(reviewsStore);
-  const hydrated = useIsClient();
+  const [publicData, setPublicData] = useState(null);
+  const [ordersState, setOrdersState] = useState({ userId: null, list: EMPTY });
+
+  // Public data: gigs, profiles, reviews (sabko dikhta hai)
+  useEffect(() => {
+    let cancelled = false;
+    fetchPublicData().then((data) => {
+      if (!cancelled) setPublicData(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Orders: sirf logged-in user ke apne orders
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    fetchOrders().then((list) => {
+      if (!cancelled) setOrdersState({ userId, list });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  const gigs = publicData ? publicData.gigs : EMPTY;
+  const profiles = publicData ? publicData.profiles : EMPTY;
+  const freelancers = profiles.filter((p) => p.role === "freelancer");
+  const nameById = new Map(profiles.map((p) => [p.id, p.name]));
+  const reviews = publicData ? publicData.reviews.map((r) => mapReview(r, nameById)) : EMPTY;
+  const orders = userId && ordersState.userId === userId ? ordersState.list : EMPTY;
+  const hydrated = publicData !== null && (!userId || ordersState.userId === userId);
+
+  async function refreshPublic() {
+    setPublicData(await fetchPublicData());
+  }
+
+  async function refreshOrders() {
+    if (!userId) return;
+    setOrdersState({ userId, list: await fetchOrders() });
+  }
 
   /* ---------- Getters ---------- */
 
-  const getGig = useCallback((id) => gigs.find((g) => g.id === id) ?? null, [gigs]);
-  const getFreelancer = useCallback((id) => freelancers.find((f) => f.id === id) ?? null, [freelancers]);
-  const getOrder = useCallback((id) => orders.find((o) => o.id === id) ?? null, [orders]);
+  const getGig = (id) => gigs.find((g) => g.id === id) ?? null;
+  const getProfile = (id) => profiles.find((p) => p.id === id) ?? null;
+  const getFreelancer = (id) => freelancers.find((f) => f.id === id) ?? null;
+  const getOrder = (id) => orders.find((o) => o.id === id) ?? null;
+  // Order ke waqt ki shartein (title, image, delivery days, revisions)
+  const getOrderGig = (order) => (order ? order.gigSnapshot : null);
+  const getFreelancerGigs = (freelancerId) => gigs.filter((g) => g.freelancerId === freelancerId);
 
-  // Gig delete ho gaya ho to order ke andar saved snapshot use hota hai
-  const getOrderGig = useCallback(
-    (order) => {
-      if (!order) return null;
-      return gigs.find((g) => g.id === order.gigId) ?? order.gigSnapshot ?? null;
-    },
-    [gigs]
-  );
+  const getGigReviews = (gigId) => reviews.filter((r) => r.gigId === gigId);
+  const getFreelancerReviews = (freelancerId) => reviews.filter((r) => r.freelancerId === freelancerId);
+  const getOrderReview = (orderId) => reviews.find((r) => r.orderId === orderId) ?? null;
 
-  const getFreelancerGigs = useCallback(
-    (freelancerId) => gigs.filter((g) => g.freelancerId === freelancerId),
-    [gigs]
-  );
-
-  const getGigReviews = useCallback(
-    (gigId) => reviews.filter((r) => r.gigId === gigId).sort(newestFirst),
-    [reviews]
-  );
-  const getFreelancerReviews = useCallback(
-    (freelancerId) => reviews.filter((r) => r.freelancerId === freelancerId).sort(newestFirst),
-    [reviews]
-  );
-  const getOrderReview = useCallback(
-    (orderId) => reviews.find((r) => r.orderId === orderId) ?? null,
-    [reviews]
-  );
-
-  const getGigRating = useCallback(
-    (gigId) => {
-      const list = reviews.filter((r) => r.gigId === gigId);
-      return { average: averageRating(list), count: list.length };
-    },
-    [reviews]
-  );
-  const getFreelancerRating = useCallback(
-    (freelancerId) => {
-      const list = reviews.filter((r) => r.freelancerId === freelancerId);
-      return { average: averageRating(list), count: list.length };
-    },
-    [reviews]
-  );
-
-  /* ---------- Helpers ---------- */
-
-  const requireRole = useCallback(
-    (role) => {
-      if (!user) return "Please log in first.";
-      if (user.role !== role) return `Only ${role}s can do this.`;
-      return null;
-    },
-    [user]
-  );
-
-  const applyOrderChange = useCallback(
-    (orderId, status, label, extra = {}) => {
-      const date = new Date().toISOString();
-      setOrders((prev) =>
-        prev.map((o) =>
-          o.id === orderId
-            ? { ...o, ...extra, status, timeline: [...o.timeline, { status, label, date }] }
-            : o
-        )
-      );
-    },
-    [setOrders]
-  );
+  const ratingOf = (list) => ({ average: averageRating(list), count: list.length });
+  const getGigRating = (gigId) => ratingOf(reviews.filter((r) => r.gigId === gigId));
+  const getFreelancerRating = (freelancerId) =>
+    ratingOf(reviews.filter((r) => r.freelancerId === freelancerId));
 
   /* ---------- Gigs ---------- */
 
-  const addGig = useCallback(
-    (data) => {
-      const roleError = requireRole("freelancer");
-      if (roleError) return fail(roleError);
-      const gig = {
-        ...data,
-        id: generateId("g"),
-        freelancerId: user.id,
-        createdAt: new Date().toISOString(),
-      };
-      setGigs((prev) => [gig, ...prev]);
-      return ok({ gig });
-    },
-    [requireRole, user, setGigs]
-  );
+  async function addGig(data) {
+    if (!user) return fail("Please log in first.");
+    if (user.role !== "freelancer") return fail("Only freelancers can create gigs.");
+    const { data: row, error } = await createClient()
+      .from("gigs")
+      .insert({
+        freelancer_id: user.id,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        price: data.price,
+        delivery_days: data.deliveryDays,
+        revisions: data.revisions,
+        image_url: data.image || null,
+        skills: data.skills,
+        tags: data.tags ?? [],
+      })
+      .select()
+      .single();
+    if (error) return fail(dbError(error));
+    await refreshPublic();
+    return ok({ gig: mapGig(row) });
+  }
 
-  const updateGig = useCallback(
-    (id, changes) => {
-      const gig = gigs.find((g) => g.id === id);
-      if (!gig) return fail("Gig not found.");
-      if (!user || gig.freelancerId !== user.id) return fail("You can only edit your own gigs.");
-      setGigs((prev) =>
-        prev.map((g) => (g.id === id ? { ...g, ...changes, id: g.id, freelancerId: g.freelancerId } : g))
-      );
-      return ok();
-    },
-    [gigs, user, setGigs]
-  );
+  async function updateGig(id, changes) {
+    if (!user) return fail("Please log in first.");
+    const payload = {};
+    Object.entries(GIG_COLUMNS).forEach(([key, column]) => {
+      if (key in changes) payload[column] = changes[key];
+    });
+    if ("image" in changes) payload.image_url = changes.image || null;
 
-  const deleteGig = useCallback(
-    (id) => {
-      const gig = gigs.find((g) => g.id === id);
-      if (!gig) return fail("Gig not found.");
-      if (!user || gig.freelancerId !== user.id) return fail("You can only delete your own gigs.");
-      setGigs((prev) => prev.filter((g) => g.id !== id));
-      return ok();
-    },
-    [gigs, user, setGigs]
-  );
+    const { data, error } = await createClient().from("gigs").update(payload).eq("id", id).select("id");
+    if (error) return fail(dbError(error));
+    if (!data || data.length === 0) return fail("You can only edit your own gigs.");
+    await refreshPublic();
+    return ok();
+  }
 
-  /* ---------- Orders ---------- */
+  async function deleteGig(id) {
+    if (!user) return fail("Please log in first.");
+    const { data, error } = await createClient().from("gigs").delete().eq("id", id).select("id");
+    if (error) return fail(dbError(error));
+    if (!data || data.length === 0) return fail("You can only delete your own gigs.");
+    await refreshPublic();
+    return ok();
+  }
 
-  const createOrder = useCallback(
-    ({ gigId, requirements }) => {
-      const roleError = requireRole("client");
-      if (roleError) return fail(roleError);
-      const gig = gigs.find((g) => g.id === gigId);
-      if (!gig) return fail("This gig no longer exists.");
-      if (!requirements || requirements.trim().length < 10) {
-        return fail("Please describe your requirements (at least 10 characters).");
-      }
-      const date = new Date().toISOString();
-      const order = {
-        id: generateId("o"),
-        gigId: gig.id,
-        clientId: user.id,
-        freelancerId: gig.freelancerId,
-        price: gig.price,
-        status: "active",
-        requirements: requirements.trim(),
-        deliveryLink: "",
-        deliveryNote: "",
-        revisionsUsed: 0,
-        createdAt: date,
-        gigSnapshot: {
-          title: gig.title,
-          image: gig.image,
-          deliveryDays: gig.deliveryDays,
-          revisions: gig.revisions,
-        },
-        timeline: [{ status: "active", label: "Order placed", date }],
-      };
-      setOrders((prev) => [order, ...prev]);
-      return ok({ order });
-    },
-    [gigs, requireRole, user, setOrders]
-  );
+  /* ---------- Orders (rules database ke functions mein hain) ---------- */
 
-  const deliverOrder = useCallback(
-    (orderId, { deliveryLink = "", deliveryNote = "" } = {}) => {
-      const order = orders.find((o) => o.id === orderId);
-      if (!order) return fail("Order not found.");
-      if (!user || user.role !== "freelancer" || user.id !== order.freelancerId) {
-        return fail("Only the freelancer of this order can deliver it.");
-      }
-      if (order.status !== "active") return fail("Only active orders can be delivered.");
-      if (!deliveryLink.trim() && !deliveryNote.trim()) {
-        return fail("Add a delivery link or a note.");
-      }
-      applyOrderChange(orderId, "delivered", "Work delivered", {
-        deliveryLink: deliveryLink.trim(),
-        deliveryNote: deliveryNote.trim(),
-      });
-      return ok();
-    },
-    [orders, user, applyOrderChange]
-  );
+  async function createOrder({ gigId, requirements }) {
+    if (!user) return fail("Please log in first.");
+    const result = await callRpc("create_order", { p_gig_id: gigId, p_requirements: requirements });
+    if (!result.ok) return result;
+    await refreshOrders();
+    return ok({ order: { id: result.data } });
+  }
 
-  const requestRevision = useCallback(
-    (orderId, note = "") => {
-      const order = orders.find((o) => o.id === orderId);
-      if (!order) return fail("Order not found.");
-      if (!user || user.role !== "client" || user.id !== order.clientId) {
-        return fail("Only the client of this order can request a revision.");
-      }
-      if (order.status !== "delivered") return fail("Revisions can only be requested after delivery.");
-      const limit = gigs.find((g) => g.id === order.gigId)?.revisions ?? order.gigSnapshot?.revisions ?? 0;
-      if (order.revisionsUsed >= limit) return fail("No revisions left for this order.");
-      applyOrderChange(
-        orderId,
-        "active",
-        note.trim() ? `Revision requested: ${note.trim()}` : "Revision requested",
-        { revisionsUsed: order.revisionsUsed + 1 }
-      );
-      return ok();
-    },
-    [orders, gigs, user, applyOrderChange]
-  );
+  async function deliverOrder(orderId, { deliveryLink = "", deliveryNote = "" } = {}) {
+    const result = await callRpc("deliver_order", {
+      p_order_id: orderId,
+      p_link: deliveryLink,
+      p_note: deliveryNote,
+    });
+    if (!result.ok) return result;
+    await refreshOrders();
+    return ok();
+  }
 
-  const completeOrder = useCallback(
-    (orderId) => {
-      const order = orders.find((o) => o.id === orderId);
-      if (!order) return fail("Order not found.");
-      if (!user || user.role !== "client" || user.id !== order.clientId) {
-        return fail("Only the client of this order can complete it.");
-      }
-      if (order.status !== "delivered") return fail("Only delivered orders can be completed.");
-      applyOrderChange(orderId, "completed", "Order completed");
-      setFreelancers((prev) =>
-        prev.map((f) =>
-          f.id === order.freelancerId ? { ...f, completedOrders: f.completedOrders + 1 } : f
-        )
-      );
-      return ok();
-    },
-    [orders, user, applyOrderChange, setFreelancers]
-  );
+  async function requestRevision(orderId, note = "") {
+    const result = await callRpc("request_revision", { p_order_id: orderId, p_note: note });
+    if (!result.ok) return result;
+    await refreshOrders();
+    return ok();
+  }
 
-  const cancelOrder = useCallback(
-    (orderId) => {
-      const order = orders.find((o) => o.id === orderId);
-      if (!order) return fail("Order not found.");
-      if (!user || (user.id !== order.clientId && user.id !== order.freelancerId)) {
-        return fail("You are not part of this order.");
-      }
-      if (order.status !== "active") return fail("Only active orders can be cancelled.");
-      applyOrderChange(orderId, "cancelled", "Order cancelled");
-      return ok();
-    },
-    [orders, user, applyOrderChange]
-  );
+  async function completeOrder(orderId) {
+    const result = await callRpc("complete_order", { p_order_id: orderId });
+    if (!result.ok) return result;
+    await Promise.all([refreshOrders(), refreshPublic()]);
+    return ok();
+  }
+
+  async function cancelOrder(orderId) {
+    const result = await callRpc("cancel_order", { p_order_id: orderId });
+    if (!result.ok) return result;
+    await refreshOrders();
+    return ok();
+  }
 
   /* ---------- Reviews ---------- */
 
-  const addReview = useCallback(
-    ({ orderId, rating, comment }) => {
-      const order = orders.find((o) => o.id === orderId);
-      if (!order) return fail("Order not found.");
-      if (!user || user.role !== "client" || user.id !== order.clientId) {
-        return fail("Only the client of this order can leave a review.");
-      }
-      if (order.status !== "completed") return fail("You can review only completed orders.");
-      if (reviews.some((r) => r.orderId === orderId)) return fail("You already reviewed this order.");
-      if (!Number.isInteger(rating) || rating < 1 || rating > 5) return fail("Please select a rating from 1 to 5.");
-      if (!comment || !comment.trim()) return fail("Please write a short review.");
+  async function addReview({ orderId, rating, comment }) {
+    const result = await callRpc("add_review", {
+      p_order_id: orderId,
+      p_rating: rating,
+      p_comment: comment,
+    });
+    if (!result.ok) return result;
+    await refreshPublic();
+    return ok({ review: { id: result.data } });
+  }
 
-      const review = {
-        id: generateId("r"),
-        orderId,
-        gigId: order.gigId,
-        freelancerId: order.freelancerId,
-        clientId: user.id,
-        clientName: user.name,
-        rating,
-        comment: comment.trim(),
-        createdAt: new Date().toISOString(),
-      };
-      setReviews((prev) => [review, ...prev]);
-      return ok({ review });
-    },
-    [orders, reviews, user, setReviews]
-  );
+  /* ---------- Freelancer profile ---------- */
 
-  /* ---------- Freelancer profiles ---------- */
+  async function updateFreelancerProfile(id, changes) {
+    if (!user || user.id !== id) return fail("You can only edit your own profile.");
+    const payload = {};
+    if ("headline" in changes) payload.headline = changes.headline;
+    if ("bio" in changes) payload.bio = changes.bio;
+    if ("location" in changes) payload.location = changes.location;
+    if ("skills" in changes) payload.skills = changes.skills;
+    if ("languages" in changes) payload.languages = changes.languages;
+    if ("experience" in changes) payload.experience_years = changes.experience;
+    if ("startingPrice" in changes) payload.starting_price = changes.startingPrice;
+    if (typeof changes.avatar === "string" && /^https?:\/\//i.test(changes.avatar)) {
+      payload.avatar_url = changes.avatar;
+    }
 
-  const createFreelancerProfile = useCallback(
-    (newUser) => {
-      const profile = {
-        id: newUser.id,
-        name: newUser.name,
-        headline: "New freelancer on GigNest",
-        bio: "",
-        avatar: newUser.avatar,
-        location: "",
-        skills: [],
-        languages: ["English"],
-        experience: 0,
-        startingPrice: 0,
-        completedOrders: 0,
-        joinedAt: new Date().toISOString(),
-        portfolio: [],
-      };
-      setFreelancers((prev) => (prev.some((f) => f.id === newUser.id) ? prev : [...prev, profile]));
-    },
-    [setFreelancers]
-  );
+    const { data, error } = await createClient().from("profiles").update(payload).eq("id", id).select("id");
+    if (error) return fail(dbError(error));
+    if (!data || data.length === 0) return fail("You can only edit your own profile.");
+    await refreshPublic();
+    return ok();
+  }
 
-  const updateFreelancerProfile = useCallback(
-    (id, changes) => {
-      if (!user || user.id !== id) return fail("You can only edit your own profile.");
-      setFreelancers((prev) => prev.map((f) => (f.id === id ? { ...f, ...changes, id: f.id } : f)));
-      return ok();
-    },
-    [user, setFreelancers]
-  );
-
-  /* ---------- Reset ---------- */
-
-  const resetDemoData = useCallback(() => {
-    ALL_KEYS.forEach((key) => removeFromStorage(key));
-    window.location.reload();
-  }, []);
-
-  const value = useMemo(
-    () => ({
-      gigs,
-      freelancers,
-      orders,
-      reviews,
-      hydrated,
-      getGig,
-      getFreelancer,
-      getOrder,
-      getOrderGig,
-      getFreelancerGigs,
-      getGigReviews,
-      getFreelancerReviews,
-      getOrderReview,
-      getGigRating,
-      getFreelancerRating,
-      addGig,
-      updateGig,
-      deleteGig,
-      createOrder,
-      deliverOrder,
-      requestRevision,
-      completeOrder,
-      cancelOrder,
-      addReview,
-      createFreelancerProfile,
-      updateFreelancerProfile,
-      resetDemoData,
-    }),
-    [
-      gigs, freelancers, orders, reviews, hydrated,
-      getGig, getFreelancer, getOrder, getOrderGig, getFreelancerGigs,
-      getGigReviews, getFreelancerReviews, getOrderReview, getGigRating, getFreelancerRating,
-      addGig, updateGig, deleteGig, createOrder, deliverOrder, requestRevision,
-      completeOrder, cancelOrder, addReview, createFreelancerProfile,
-      updateFreelancerProfile, resetDemoData,
-    ]
-  );
+  const value = {
+    gigs,
+    freelancers,
+    orders,
+    reviews,
+    hydrated,
+    getGig,
+    getProfile,
+    getFreelancer,
+    getOrder,
+    getOrderGig,
+    getFreelancerGigs,
+    getGigReviews,
+    getFreelancerReviews,
+    getOrderReview,
+    getGigRating,
+    getFreelancerRating,
+    addGig,
+    updateGig,
+    deleteGig,
+    createOrder,
+    deliverOrder,
+    requestRevision,
+    completeOrder,
+    cancelOrder,
+    addReview,
+    updateFreelancerProfile,
+  };
 
   return <MarketplaceContext.Provider value={value}>{children}</MarketplaceContext.Provider>;
 }

@@ -14,11 +14,11 @@ function OrderForm({ gig, onClose }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { requirements: "" } });
 
-  function onSubmit(values) {
-    const result = createOrder({ gigId: gig.id, requirements: values.requirements });
+  async function onSubmit(values) {
+    const result = await createOrder({ gigId: gig.id, requirements: values.requirements });
     if (!result.ok) {
       showToast(result.error, "error");
       return;
@@ -62,7 +62,7 @@ function OrderForm({ gig, onClose }) {
       </div>
 
       <p className="text-xs text-slate-500">
-        Demo order only. No payment is taken and nothing is sent to a real freelancer.
+        No payment is taken on GigNest yet. Your order is sent to the freelancer to start working.
       </p>
 
       <div className="flex justify-end gap-3">
@@ -75,9 +75,10 @@ function OrderForm({ gig, onClose }) {
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSubmitting}
+          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          Place order · {formatPrice(gig.price)}
+          {isSubmitting ? "Placing order..." : `Place order · ${formatPrice(gig.price)}`}
         </button>
       </div>
     </form>

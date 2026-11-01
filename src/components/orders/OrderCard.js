@@ -3,20 +3,17 @@
 import Link from "next/link";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import { useMarketplace } from "@/context/MarketplaceContext";
-import { findUserById } from "@/lib/users";
 import SafeImage from "@/components/ui/SafeImage";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { formatDate, formatPrice } from "@/lib/utils";
 
 export default function OrderCard({ order, viewer, children }) {
-  const { getOrderGig, getFreelancer } = useMarketplace();
+  const { getOrderGig, getProfile } = useMarketplace();
   const gig = getOrderGig(order);
 
   const isClientView = viewer === "client";
   const otherLabel = isClientView ? "Freelancer" : "Client";
-  const otherName = isClientView
-    ? getFreelancer(order.freelancerId)?.name ?? "Unknown freelancer"
-    : findUserById(order.clientId)?.name ?? "Unknown client";
+  const otherName = getProfile(isClientView ? order.freelancerId : order.clientId)?.name ?? "Unknown user";
 
   const latest = order.timeline[order.timeline.length - 1];
 

@@ -27,7 +27,7 @@ export default function GigForm({ gig, onDone }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       title: gig?.title ?? "",
@@ -47,7 +47,7 @@ export default function GigForm({ gig, onDone }) {
     "aria-describedby": errors[name] ? `${name}-error` : undefined,
   });
 
-  function onSubmit(values) {
+  async function onSubmit(values) {
     const slug = values.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -66,7 +66,7 @@ export default function GigForm({ gig, onDone }) {
     };
 
     if (editing) {
-      const result = updateGig(gig.id, data);
+      const result = await updateGig(gig.id, data);
       if (!result.ok) {
         showToast(result.error, "error");
         return;
@@ -76,7 +76,7 @@ export default function GigForm({ gig, onDone }) {
       return;
     }
 
-    const result = addGig(data);
+    const result = await addGig(data);
     if (!result.ok) {
       showToast(result.error, "error");
       return;
@@ -226,9 +226,10 @@ export default function GigForm({ gig, onDone }) {
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSubmitting}
+          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          {editing ? "Save changes" : "Publish gig"}
+          {isSubmitting ? "Saving..." : editing ? "Save changes" : "Publish gig"}
         </button>
       </div>
     </form>

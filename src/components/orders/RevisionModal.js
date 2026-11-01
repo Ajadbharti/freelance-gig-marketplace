@@ -12,11 +12,11 @@ function RevisionForm({ order, left, onClose }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { note: "" } });
 
-  function onSubmit({ note }) {
-    const result = requestRevision(order.id, note);
+  async function onSubmit({ note }) {
+    const result = await requestRevision(order.id, note);
     if (!result.ok) {
       showToast(result.error, "error");
       return;
@@ -58,9 +58,10 @@ function RevisionForm({ order, left, onClose }) {
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSubmitting}
+          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          Request revision
+          {isSubmitting ? "Sending..." : "Request revision"}
         </button>
       </div>
     </form>
