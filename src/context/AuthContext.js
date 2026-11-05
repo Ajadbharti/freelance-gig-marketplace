@@ -12,6 +12,7 @@ function toUser(profile, authUser) {
     name: profile.full_name,
     email: authUser?.email ?? "",
     role: profile.role,
+    needsRole: profile.role_chosen === false,
     avatar: profile.avatar_url || initialsAvatar(profile.full_name),
   };
 }
@@ -26,6 +27,9 @@ function friendlyError(error) {
   }
   if (message.includes("not authorized")) {
     return "This project cannot send emails to this address yet. Turn off email confirmation or set up custom SMTP.";
+  }
+  if (message.includes("provider") && message.includes("enabled")) {
+    return "This sign-in method is not enabled yet.";
   }
   return error?.message || "Something went wrong. Please try again.";
 }
@@ -86,6 +90,16 @@ export function AuthProvider({ children }) {
     return { ok: true, user: toUser(row, data.user) };
   }, []);
 
+  // Google ya GitHub se login. Browser provider ke page par chala jata hai.
+  const loginWithProvider = useCallback(async (provider) => {
+    const { error } = await createClient().auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (error) return { ok: false, error: friendlyError(error) };
+    return { ok: true };
+  }, []);
+
   const register = useCallback(async ({ name, email, password, role }) => {
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({
@@ -108,13 +122,28 @@ export function AuthProvider({ children }) {
     return { ok: true, needsConfirmation: false, user: toUser(row, data.user) };
   }, []);
 
+  // Google/GitHub se aaye naye user ka role (client ya freelancer) set karna
+  const setRole = useCallback(
+    async (role) => {
+      const supabase = createClient();
+      const { error } = await supabase.rpc("set_my_role", { p_role: role });
+      if (error) return { ok: false, error: friendlyError(error) };
+
+      const row = userId ? await fetchProfile(supabase, userId) : null;
+      if (!row) return { ok: false, error: "Could not load your profile. Please refresh." };
+      setProfile(row);
+      return { ok: true, user: toUser(row, session?.user) };
+    },
+    [userId, session]
+  );
+
   const logout = useCallback(async () => {
     await createClient().auth.signOut();
   }, []);
 
   const value = useMemo(
-    () => ({ user, hydrated, login, register, logout }),
-    [user, hydrated, login, register, logout]
+    () => ({ user, hydrated, login, loginWithProvider, register, setRole, logout }),
+    [user, hydrated, login, loginWithProvider, register, setRole, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

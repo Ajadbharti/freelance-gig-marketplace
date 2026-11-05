@@ -9,6 +9,7 @@ import { averageRating } from "@/lib/utils";
 const MarketplaceContext = createContext(null);
 
 const EMPTY = [];
+const REQUEST_TIMEOUT_MS = 12000;
 const ok = (extra = {}) => ({ ok: true, ...extra });
 const fail = (error) => ({ ok: false, error });
 
@@ -17,6 +18,43 @@ function dbError(error) {
   if (error.code === "23514") return "Some values are outside the allowed limits. Please check the form.";
   if (error.code === "42501") return "You are not allowed to do this.";
   return error.message || "Something went wrong. Please try again.";
+}
+
+/* ---------- Errors saaf dikhane aur request ko atakne se bachane ke liye ---------- */
+
+function logProblem(label, problem) {
+  console.error(label, {
+    message: problem?.message,
+    code: problem?.code,
+    details: problem?.details,
+    hint: problem?.hint,
+  });
+}
+
+function withTimeout(promise, label) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error(`${label} took longer than ${REQUEST_TIMEOUT_MS / 1000} seconds`)),
+      REQUEST_TIMEOUT_MS
+    );
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+// Ek query chalao. Error ya timeout aaye to log karo aur khaali list do.
+async function loadRows(label, query) {
+  try {
+    const { data, error } = await withTimeout(query, label);
+    if (error) {
+      logProblem(`Could not load ${label}:`, error);
+      return [];
+    }
+    return data ?? [];
+  } catch (problem) {
+    logProblem(`Could not load ${label}:`, problem);
+    return [];
+  }
 }
 
 /* ---------- Database row -> shape used by the screens ---------- */
@@ -103,32 +141,41 @@ function mapReview(row, nameById) {
 
 /* ---------- Loading from Supabase ---------- */
 
+async function loadProfiles(supabase) {
+  try {
+    const { data, error } = await withTimeout(
+      supabase.from("profiles").select("*, portfolio_items(*)"),
+      "profiles"
+    );
+    if (!error) return data ?? [];
+    logProblem("Could not load profiles with portfolio, trying without it:", error);
+  } catch (problem) {
+    logProblem("Could not load profiles:", problem);
+    return [];
+  }
+  return loadRows("profiles", supabase.from("profiles").select("*"));
+}
+
 async function fetchPublicData() {
   const supabase = createClient();
-  const [gigsRes, profilesRes, reviewsRes] = await Promise.all([
-    supabase.from("gigs").select("*").order("created_at", { ascending: false }),
-    supabase.from("profiles").select("*, portfolio_items(*)"),
-    supabase.from("reviews").select("*").order("created_at", { ascending: false }),
+  const [gigRows, profileRows, reviewRows] = await Promise.all([
+    loadRows("gigs", supabase.from("gigs").select("*").order("created_at", { ascending: false })),
+    loadProfiles(supabase),
+    loadRows("reviews", supabase.from("reviews").select("*").order("created_at", { ascending: false })),
   ]);
-  const firstError = gigsRes.error || profilesRes.error || reviewsRes.error;
-  if (firstError) console.error("Could not load marketplace data:", firstError);
   return {
-    gigs: (gigsRes.data ?? []).map(mapGig),
-    profiles: (profilesRes.data ?? []).map(mapProfile),
-    reviews: reviewsRes.data ?? [],
+    gigs: gigRows.map(mapGig),
+    profiles: profileRows.map(mapProfile),
+    reviews: reviewRows,
   };
 }
 
 async function fetchOrders() {
-  const { data, error } = await createClient()
-    .from("orders")
-    .select("*, order_events(*)")
-    .order("created_at", { ascending: false });
-  if (error) {
-    console.error("Could not load orders:", error);
-    return [];
-  }
-  return (data ?? []).map(mapOrder);
+  const rows = await loadRows(
+    "orders",
+    createClient().from("orders").select("*, order_events(*)").order("created_at", { ascending: false })
+  );
+  return rows.map(mapOrder);
 }
 
 async function callRpc(name, args) {
@@ -158,9 +205,14 @@ export function MarketplaceProvider({ children }) {
   // Public data: gigs, profiles, reviews (sabko dikhta hai)
   useEffect(() => {
     let cancelled = false;
-    fetchPublicData().then((data) => {
-      if (!cancelled) setPublicData(data);
-    });
+    fetchPublicData()
+      .then((data) => {
+        if (!cancelled) setPublicData(data);
+      })
+      .catch((problem) => {
+        logProblem("Marketplace data failed:", problem);
+        if (!cancelled) setPublicData({ gigs: [], profiles: [], reviews: [] });
+      });
     return () => {
       cancelled = true;
     };
@@ -170,9 +222,14 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    fetchOrders().then((list) => {
-      if (!cancelled) setOrdersState({ userId, list });
-    });
+    fetchOrders()
+      .then((list) => {
+        if (!cancelled) setOrdersState({ userId, list });
+      })
+      .catch((problem) => {
+        logProblem("Orders failed:", problem);
+        if (!cancelled) setOrdersState({ userId, list: [] });
+      });
     return () => {
       cancelled = true;
     };

@@ -13,6 +13,7 @@ export default function SafeImage({ src, alt = "", className, ...props }) {
       src={useFallback ? FALLBACK_IMAGE : src}
       alt={alt}
       loading="lazy"
+      referrerPolicy="no-referrer"
       className={className}
       onError={() => setFailedSrc(src)}
       {...props}

@@ -89,6 +89,7 @@ export default function ClientDashboard() {
         </Link>
       }
     >
+    
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={ShoppingBag} label="Active orders" value={counts.active} tone="indigo" />
         <StatCard icon={Package} label="Delivered" value={counts.delivered} hint="Waiting for your approval" tone="amber" />
