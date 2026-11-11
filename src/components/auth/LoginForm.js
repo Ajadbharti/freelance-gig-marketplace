@@ -7,9 +7,19 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/ToastProvider";
 import AuthCard from "@/components/auth/AuthCard";
+import SocialButtons from "@/components/auth/SocialButtons";
 import FormField, { inputClass } from "@/components/ui/FormField";
+import { dashboardPath, ROLE_LABELS } from "@/lib/roles";
+import { cn } from "@/lib/utils";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ROLE_TABS = ["client", "freelancer", "admin"];
+
+const SUBTITLES = {
+  client: "Log in to order services and track your orders.",
+  freelancer: "Log in to manage your gigs and incoming orders.",
+  admin: "Administrator access for managing users, gigs, orders and reviews.",
+};
 
 // Sirf apni site ke andar ke paths allow karo (open redirect se bachne ke liye)
 function getSafeNext(value) {
@@ -17,15 +27,17 @@ function getSafeNext(value) {
   return null;
 }
 
-function dashboardFor(user) {
-  return user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
-}
-
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, hydrated, login } = useAuth();
+  const { user, hydrated, login, logout } = useAuth();
   const { showToast } = useToast();
+
+  const [tab, setTab] = useState(() => {
+    const requested = searchParams.get("as");
+    return ROLE_TABS.includes(requested) ? requested : "client";
+  });
+  const [busy, setBusy] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const [formError, setFormError] = useState("");
 
@@ -34,42 +46,102 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({ defaultValues: { email: "", password: "" } });
 
   // Pehle se logged in ho to login page nahi dikhana
   useEffect(() => {
-    if (hydrated && user && !redirecting) {
-      router.replace(next ?? dashboardFor(user));
+    if (hydrated && user && !redirecting && !busy) {
+      router.replace(next ?? dashboardPath(user));
     }
-  }, [hydrated, user, redirecting, next, router]);
+  }, [hydrated, user, redirecting, busy, next, router]);
 
   async function onSubmit(values) {
     setFormError("");
+    setBusy(true);
+
     const result = await login(values.email, values.password);
     if (!result.ok) {
       setFormError(result.error);
+      setBusy(false);
       return;
     }
+
+    // Galat tab se login: pehle bahar nikalo, phir batao
+    if (result.user.role !== tab) {
+      await logout();
+      setFormError(
+        `This is a ${ROLE_LABELS[result.user.role]} account. Please choose the "${ROLE_LABELS[result.user.role]}" tab to log in.`
+      );
+      setBusy(false);
+      return;
+    }
+
     setRedirecting(true);
     showToast(`Welcome back, ${result.user.name.split(" ")[0]}!`);
-    router.push(next ?? dashboardFor(result.user));
+    router.push(next ?? dashboardPath(result.user));
   }
 
   return (
     <AuthCard
       title="Log in"
-      subtitle="Welcome back. Log in to manage your orders and gigs."
+      subtitle={SUBTITLES[tab]}
       footer={
-        <>
-          New to GigNest?{" "}
-          <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-700">
-            Create an account
-          </Link>
-        </>
+        tab === "admin" ? null : (
+          <>
+            New to GigNest?{" "}
+            <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-700">
+              Create an account
+            </Link>
+          </>
+        )
       }
     >
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+      <div
+        className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1"
+        role="radiogroup"
+        aria-label="Log in as"
+      >
+        {ROLE_TABS.map((role) => (
+          <button
+            key={role}
+            type="button"
+            role="radio"
+            aria-checked={tab === role}
+            onClick={() => {
+              setTab(role);
+              setFormError("");
+            }}
+            className={cn(
+              "rounded-lg px-3 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
+              tab === role ? "bg-white text-indigo-700 shadow-sm" : "text-slate-600 hover:text-slate-900"
+            )}
+          >
+            {ROLE_LABELS[role]}
+          </button>
+        ))}
+      </div>
+
+      {tab !== "admin" && (
+        <>
+          <div className="mt-6">
+            <SocialButtons />
+          </div>
+          <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wide text-slate-400">
+            <span className="h-px flex-1 bg-slate-200" />
+            or use email
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
+        </>
+      )}
+
+      {tab === "admin" && (
+        <p className="mt-6 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          Admin accounts cannot be created here. They are set up by the site owner.
+        </p>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-6 space-y-4">
         {formError && (
           <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
             {formError}
@@ -107,10 +179,10 @@ export default function LoginForm() {
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={busy}
           className="w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
         >
-          {isSubmitting ? "Logging in..." : "Log in"}
+          {busy ? "Logging in..." : `Log in as ${ROLE_LABELS[tab]}`}
         </button>
       </form>
     </AuthCard>

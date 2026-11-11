@@ -31,6 +31,7 @@ const FEATURES = [
 ];
 
 function dashboardFor(user) {
+  if (user.role === "admin") return "/admin";
   return user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
 }
 
@@ -144,10 +145,15 @@ export default function Landing() {
 
             <EmailLogin />
 
-            <p className="mt-6 text-center text-sm text-slate-600">
+                       <p className="mt-6 text-center text-sm text-slate-600">
               New to GigNest?{" "}
               <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-700">
                 Create an account
+              </Link>
+            </p>
+            <p className="mt-3 text-center text-xs text-slate-500">
+              <Link href="/login?as=admin" className="hover:text-indigo-600">
+                Admin login
               </Link>
             </p>
           </div>

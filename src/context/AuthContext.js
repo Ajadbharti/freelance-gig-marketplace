@@ -13,6 +13,7 @@ function toUser(profile, authUser) {
     email: authUser?.email ?? "",
     role: profile.role,
     needsRole: profile.role_chosen === false,
+    suspended: profile.suspended === true,
     avatar: profile.avatar_url || initialsAvatar(profile.full_name),
   };
 }
@@ -87,6 +88,11 @@ export function AuthProvider({ children }) {
 
     const row = await fetchProfile(supabase, data.user.id);
     if (!row) return { ok: false, error: "Your profile could not be loaded. Please try again." };
+
+    if (row.suspended) {
+      await supabase.auth.signOut();
+      return { ok: false, error: "Your account has been suspended. Please contact support." };
+    }
     return { ok: true, user: toUser(row, data.user) };
   }, []);
 

@@ -53,7 +53,8 @@ export default function Navbar() {
     router.push("/");
   }
 
-  const dashboardHref = user?.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
+  const dashboardHref =
+    user?.role === "admin" ? "/admin" : user?.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">

@@ -62,7 +62,8 @@ export default function DashboardShell({ role, path, title, subtitle, actions, c
   }
 
   if (user.role !== role) {
-    const ownDashboard = user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
+      const ownDashboard =
+      user.role === "admin" ? "/admin" : user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
     return (
       <Notice
         title="This area is not for your account type"
