@@ -146,6 +146,14 @@ export default function Navbar() {
                   >
                     <LayoutDashboard className="h-4 w-4" /> Dashboard
                   </Link>
+                                    <Link
+                    href="/account"
+                    role="menuitem"
+                    onClick={closeAll}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                  >
+                    <User className="h-4 w-4" /> Account settings
+                  </Link>
                   {user.role === "freelancer" && (
                     <Link
                       href={`/freelancers/${user.id}`}

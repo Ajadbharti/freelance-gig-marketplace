@@ -143,13 +143,20 @@ export function AuthProvider({ children }) {
     [userId, session]
   );
 
+  // Naam ya photo badalne ke baad profile dobara load karna
+  const refreshProfile = useCallback(async () => {
+    if (!userId) return;
+    const row = await fetchProfile(createClient(), userId);
+    if (row) setProfile(row);
+  }, [userId]);
+
   const logout = useCallback(async () => {
     await createClient().auth.signOut();
   }, []);
 
   const value = useMemo(
-    () => ({ user, hydrated, login, loginWithProvider, register, setRole, logout }),
-    [user, hydrated, login, loginWithProvider, register, setRole, logout]
+    () => ({ user, hydrated, login, loginWithProvider, register, setRole, refreshProfile, logout }),
+    [user, hydrated, login, loginWithProvider, register, setRole, refreshProfile, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

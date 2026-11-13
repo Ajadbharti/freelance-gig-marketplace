@@ -16,6 +16,7 @@ import FormField, { inputClass } from "@/components/ui/FormField";
 import GigCard from "@/components/gigs/GigCard";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { formatDate } from "@/lib/utils";
+import PortfolioManager from "@/components/freelancers/PortfolioManager";
 
 const toList = (text) =>
   text
@@ -324,9 +325,10 @@ export default function FreelancerProfile({ params }) {
           </section>
 
           <section id="portfolio" aria-labelledby="portfolio-heading" className="scroll-mt-24">
-            <h2 id="portfolio-heading" className="text-xl font-semibold text-slate-900">
+                        <h2 id="portfolio-heading" className="text-xl font-semibold text-slate-900">
               Portfolio
             </h2>
+            {isOwner && <PortfolioManager freelancerId={freelancer.id} />}
             {freelancer.portfolio.length === 0 ? (
               <p className="mt-3 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-600">
                 No portfolio projects yet.

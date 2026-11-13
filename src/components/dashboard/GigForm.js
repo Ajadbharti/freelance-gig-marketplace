@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { categories } from "@/data/categories";
+import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
 import FormField, { inputClass } from "@/components/ui/FormField";
+import ImageUploader from "@/components/ui/ImageUploader";
 
 const toList = (text) =>
   text
@@ -20,9 +23,13 @@ const isInt = (value, min, max) => {
 
 export default function GigForm({ gig, onDone }) {
   const router = useRouter();
+  const { user } = useAuth();
   const { addGig, updateGig } = useMarketplace();
   const { showToast } = useToast();
   const editing = Boolean(gig);
+
+  const [imageUrl, setImageUrl] = useState(gig?.image ?? "");
+  const [imageError, setImageError] = useState("");
 
   const {
     register,
@@ -36,7 +43,6 @@ export default function GigForm({ gig, onDone }) {
       price: gig ? String(gig.price) : "",
       deliveryDays: gig ? String(gig.deliveryDays) : "",
       revisions: gig ? String(gig.revisions) : "2",
-      image: gig?.image ?? "",
       skills: gig ? gig.skills.join(", ") : "",
       tags: gig ? gig.tags.join(", ") : "",
     },
@@ -48,10 +54,10 @@ export default function GigForm({ gig, onDone }) {
   });
 
   async function onSubmit(values) {
-    const slug = values.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .slice(0, 30);
+    if (!imageUrl) {
+      setImageError("Please upload a cover image for your gig.");
+      return;
+    }
 
     const data = {
       title: values.title.trim(),
@@ -60,7 +66,7 @@ export default function GigForm({ gig, onDone }) {
       price: Number(values.price),
       deliveryDays: Number(values.deliveryDays),
       revisions: Number(values.revisions),
-      image: values.image.trim() || `https://picsum.photos/seed/${slug || "new-gig"}/800/500`,
+      image: imageUrl,
       skills: toList(values.skills),
       tags: toList(values.tags),
     };
@@ -174,23 +180,20 @@ export default function GigForm({ gig, onDone }) {
         </FormField>
       </div>
 
-      <FormField
-        id="image"
-        label="Cover image URL (optional)"
-        hint="Leave empty to get a sample image."
-        error={errors.image?.message}
-      >
-        <input
-          id="image"
-          type="url"
-          placeholder="https://..."
-          className={inputClass}
-          {...field("image")}
-          {...register("image", {
-            pattern: { value: /^$|^https?:\/\/\S+$/i, message: "Enter a valid http(s) image URL." },
-          })}
-        />
-      </FormField>
+      <ImageUploader
+        label="Cover image"
+        value={imageUrl}
+        userId={user?.id}
+        folder="gig"
+        maxSide={1600}
+        shape="wide"
+        hint="JPG, PNG or WebP, up to 5 MB. Wide images look best."
+        error={imageError}
+        onChange={(url) => {
+          setImageUrl(url);
+          setImageError("");
+        }}
+      />
 
       <FormField id="skills" label="Skills" hint="Separate with commas." error={errors.skills?.message}>
         <input
