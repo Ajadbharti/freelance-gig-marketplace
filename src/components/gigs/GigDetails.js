@@ -130,7 +130,7 @@ export default function GigDetails({ params }) {
             <h2 className="text-xl font-semibold text-slate-900">About this gig</h2>
             <p className="mt-3 leading-relaxed text-slate-700">{gig.description}</p>
             <div className="mt-5 flex flex-wrap gap-2">
-              {[...gig.skills, ...gig.tags].map((item) => (
+                           {[...new Set([...gig.skills, ...gig.tags].map((item) => item.trim()).filter(Boolean))].map((item) => (
                 <span key={item} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
                   {item}
                 </span>

@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 import { categories } from "@/data/categories";
 import SearchBar from "@/components/layout/SearchBar";
 import SafeImage from "@/components/ui/SafeImage";
+import NotificationBell from "@/components/layout/NotificationBell";
 
 export default function Navbar() {
   const router = useRouter();
@@ -111,6 +112,7 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-2">
+                   {hydrated && user && user.role !== "admin" && <NotificationBell />}
           {!hydrated ? (
             <div className="h-9 w-24 animate-pulse rounded-lg bg-slate-200" aria-hidden="true" />
           ) : user ? (

@@ -18,11 +18,14 @@ import ReviewCard from "@/components/reviews/ReviewCard";
 import { formatDate } from "@/lib/utils";
 import PortfolioManager from "@/components/freelancers/PortfolioManager";
 
-const toList = (text) =>
-  text
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+const toList = (text) => [
+  ...new Set(
+    text
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+  ),
+];
 
 export function ProfileSkeleton() {
   return (

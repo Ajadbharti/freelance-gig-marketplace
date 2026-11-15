@@ -10,11 +10,14 @@ import { useToast } from "@/components/ui/ToastProvider";
 import FormField, { inputClass } from "@/components/ui/FormField";
 import ImageUploader from "@/components/ui/ImageUploader";
 
-const toList = (text) =>
-  text
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+const toList = (text) => [
+  ...new Set(
+    text
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+  ),
+];
 
 const isInt = (value, min, max) => {
   const n = Number(value);

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Plus, Search, User } from "lucide-react";
+import { Heart, LayoutDashboard, Plus, Search, Settings, Star, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function DashboardSidebar({ role, userId }) {
@@ -14,10 +14,14 @@ export default function DashboardSidebar({ role, userId }) {
           { href: "/dashboard/freelancer", label: "Overview", icon: LayoutDashboard },
           { href: "/dashboard/freelancer/gigs/new", label: "Create gig", icon: Plus },
           { href: `/freelancers/${userId}`, label: "My profile", icon: User },
+          { href: "/account", label: "Account settings", icon: Settings },
         ]
       : [
           { href: "/dashboard/client", label: "Overview", icon: LayoutDashboard },
+          { href: "/dashboard/client#saved", label: "Saved gigs", icon: Heart },
+          { href: "/dashboard/client#reviews", label: "My reviews", icon: Star },
           { href: "/gigs", label: "Browse gigs", icon: Search },
+          { href: "/account", label: "Account settings", icon: Settings },
         ];
 
   return (

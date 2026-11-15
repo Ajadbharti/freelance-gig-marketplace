@@ -16,6 +16,7 @@ import DeliverModal from "@/components/orders/DeliverModal";
 import RevisionModal from "@/components/orders/RevisionModal";
 import OrderTimeline from "@/components/orders/OrderTimeline";
 import { formatDate, formatPrice } from "@/lib/utils";
+import OrderChat from "@/components/orders/OrderChat";
 
 export function OrderDetailsSkeleton() {
   return (
@@ -260,6 +261,15 @@ export default function OrderDetails({ params }) {
                 Nothing has been delivered yet.
               </p>
             )}
+          </section>
+
+                    <section aria-labelledby="chat-heading">
+            <h2 id="chat-heading" className="text-xl font-semibold text-slate-900">
+              Messages
+            </h2>
+            <div className="mt-3">
+              <OrderChat orderId={order.id} closed={order.status === "cancelled"} />
+            </div>
           </section>
 
           <section aria-labelledby="timeline-heading">

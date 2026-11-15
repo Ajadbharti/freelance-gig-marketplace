@@ -424,8 +424,9 @@ export function MarketplaceProvider({ children }) {
     requestRevision,
     completeOrder,
     cancelOrder,
-    addReview,
+       addReview,
     updateFreelancerProfile,
+    refreshPublic,
   };
 
   return <MarketplaceContext.Provider value={value}>{children}</MarketplaceContext.Provider>;

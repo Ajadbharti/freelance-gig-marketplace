@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import FormField, { inputClass } from "@/components/ui/FormField";
 import ImageUploader from "@/components/ui/ImageUploader";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import SecuritySettings from "@/components/auth/SecuritySettings";
 import { ROLE_LABELS } from "@/lib/roles";
 
 function SettingsForm({ user }) {
@@ -50,7 +51,7 @@ function SettingsForm({ user }) {
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
       <h1 className="text-2xl font-bold text-slate-900">Account settings</h1>
-      <p className="mt-1 text-slate-600">Update your name and profile photo.</p>
+      <p className="mt-1 text-slate-600">Update your profile, password and account.</p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -103,6 +104,8 @@ function SettingsForm({ user }) {
           {isSubmitting ? "Saving..." : "Save changes"}
         </button>
       </form>
+
+      <SecuritySettings />
     </div>
   );
 }
