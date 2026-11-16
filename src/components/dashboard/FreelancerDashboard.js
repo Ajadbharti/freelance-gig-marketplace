@@ -1,17 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Briefcase,
   CheckCircle2,
   Circle,
   Clock,
+  Copy,
   Download,
+  MessageSquare,
+  Pause,
   Pencil,
+  Percent,
+  Play,
   Plus,
   ShoppingBag,
   Star,
+  Timer,
   Trash2,
   Wallet,
 } from "lucide-react";
@@ -19,6 +25,7 @@ import { categories } from "@/data/categories";
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
+import { createClient } from "@/lib/supabase/client";
 import { downloadCsv } from "@/lib/csv";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import StatCard from "@/components/dashboard/StatCard";
@@ -26,6 +33,7 @@ import GigForm from "@/components/dashboard/GigForm";
 import OrderCard from "@/components/orders/OrderCard";
 import DeliverModal from "@/components/orders/DeliverModal";
 import ReviewCard from "@/components/reviews/ReviewCard";
+import ReplyModal from "@/components/reviews/ReplyModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import Modal from "@/components/ui/Modal";
 import RatingStars from "@/components/ui/RatingStars";
@@ -67,7 +75,7 @@ function dueDate(order) {
 export default function FreelancerDashboard() {
   const { user } = useAuth();
   const {
-    gigs,
+    allGigs,
     orders,
     getFreelancer,
     getProfile,
@@ -75,8 +83,10 @@ export default function FreelancerDashboard() {
     getGigRating,
     getFreelancerRating,
     getFreelancerReviews,
+    updateGig,
     deleteGig,
     cancelOrder,
+    refreshPublic,
   } = useMarketplace();
   const { showToast } = useToast();
 
@@ -88,9 +98,17 @@ export default function FreelancerDashboard() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deliverTarget, setDeliverTarget] = useState(null);
   const [cancelTarget, setCancelTarget] = useState(null);
+  const [replyReview, setReplyReview] = useState(null);
+  const [now, setNow] = useState(null);
+
+  // Abhi ka samay (overdue dikhane ke liye). Server par nahi, sirf browser mein.
+  useEffect(() => {
+    const id = setTimeout(() => setNow(Date.now()), 0);
+    return () => clearTimeout(id);
+  }, []);
 
   const me = user ? getFreelancer(user.id) : null;
-  const myGigs = user ? gigs.filter((g) => g.freelancerId === user.id) : [];
+  const myGigs = user ? allGigs.filter((g) => g.freelancerId === user.id) : [];
   const myOrders = user ? orders.filter((o) => o.freelancerId === user.id) : [];
 
   const counts = {
@@ -108,6 +126,17 @@ export default function FreelancerDashboard() {
 
   const rating = user ? getFreelancerRating(user.id) : { average: 0, count: 0 };
   const myReviews = user ? getFreelancerReviews(user.id) : [];
+
+  /* ---------- Performance ---------- */
+  const decided = counts.completed + counts.cancelled;
+  const completionRate = decided > 0 ? Math.round((counts.completed / decided) * 100) : null;
+
+  const deliveredOrders = myOrders.filter((o) => o.timeline.some((e) => e.status === "delivered"));
+  const onTimeCount = deliveredOrders.filter((o) => {
+    const delivered = o.timeline.find((e) => e.status === "delivered");
+    return new Date(delivered.date) <= new Date(dueDate(o));
+  }).length;
+  const onTimeRate = deliveredOrders.length > 0 ? Math.round((onTimeCount / deliveredOrders.length) * 100) : null;
 
   /* ---------- Earnings by month (completed orders) ---------- */
   const monthTotals = new Map();
@@ -166,6 +195,42 @@ export default function FreelancerDashboard() {
     );
   }
 
+  async function copyProfileLink() {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/freelancers/${user.id}`);
+      showToast("Profile link copied.");
+    } catch {
+      showToast("Could not copy the link.", "error");
+    }
+  }
+
+  async function toggleAvailability() {
+    if (!user || !me) return;
+    const next = !me.available;
+    const { data, error } = await createClient()
+      .from("profiles")
+      .update({ available: next })
+      .eq("id", user.id)
+      .select("id");
+    if (error || !data || data.length === 0) {
+      showToast(error?.message || "Could not update your availability.", "error");
+      return;
+    }
+    await refreshPublic();
+    showToast(
+      next ? "You are now accepting new orders." : "New orders are paused until you turn this back on."
+    );
+  }
+
+  async function togglePause(gig) {
+    const result = await updateGig(gig.id, { isActive: !gig.isActive });
+    if (!result.ok) {
+      showToast(result.error, "error");
+      return;
+    }
+    showToast(gig.isActive ? "Gig paused. Clients cannot see it now." : "Your gig is live again.");
+  }
+
   async function confirmDelete() {
     const result = await deleteGig(deleteTarget.id);
     showToast(result.ok ? "Gig deleted." : result.error, result.ok ? "success" : "error");
@@ -182,15 +247,22 @@ export default function FreelancerDashboard() {
     if (order.status === "active") {
       const latest = order.timeline[order.timeline.length - 1]?.label ?? "";
       const isRevision = latest.startsWith("Revision requested");
+      const due = dueDate(order);
+      const overdue = now !== null && new Date(due).getTime() < now;
       return (
         <>
-          {isRevision ? (
+          {isRevision && (
             <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
               Revision requested
             </span>
+          )}
+          {overdue ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-200">
+              <Clock className="h-3.5 w-3.5" /> Overdue since {formatDate(due)}
+            </span>
           ) : (
             <span className="inline-flex items-center gap-1 text-slate-600">
-              <Clock className="h-4 w-4" /> Due {formatDate(dueDate(order))}
+              <Clock className="h-4 w-4" /> Due {formatDate(due)}
             </span>
           )}
           <button
@@ -230,14 +302,66 @@ export default function FreelancerDashboard() {
       title="Freelancer dashboard"
       subtitle="Manage your gigs, orders and earnings."
       actions={
-        <Link
-          href="/dashboard/freelancer/gigs/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
-        >
-          <Plus className="h-4 w-4" /> Create gig
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={copyProfileLink}
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            <Copy className="h-4 w-4" /> Copy profile link
+          </button>
+          <Link
+            href="/messages"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            <MessageSquare className="h-4 w-4" /> Messages
+          </Link>
+          <Link
+            href="/dashboard/freelancer/gigs/new"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          >
+            <Plus className="h-4 w-4" /> Create gig
+          </Link>
+        </div>
       }
     >
+      {/* Availability */}
+      {me && (
+        <section
+          className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+          aria-label="Availability"
+        >
+          <div>
+            <p className="font-semibold text-slate-900">
+              {me.available ? "You are accepting new orders" : "You are not accepting new orders"}
+            </p>
+            <p className="mt-0.5 text-sm text-slate-600">
+              {me.available
+                ? "Clients can order your gigs. Turn this off when you are too busy."
+                : "Clients see a notice on your profile and cannot place new orders."}
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={me.available}
+            aria-label="Accepting new orders"
+            onClick={toggleAvailability}
+            className={cn(
+              "relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
+              me.available ? "bg-emerald-500" : "bg-slate-300"
+            )}
+          >
+            <span
+              className={cn(
+                "inline-block h-5 w-5 rounded-full bg-white shadow transition",
+                me.available ? "translate-x-6" : "translate-x-1"
+              )}
+            />
+          </button>
+        </section>
+      )}
+
       {/* Profile completeness */}
       {percent < 100 && (
         <section
@@ -312,6 +436,23 @@ export default function FreelancerDashboard() {
         />
       </div>
 
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <StatCard
+          icon={Percent}
+          label="Completion rate"
+          value={completionRate === null ? "-" : `${completionRate}%`}
+          hint={completionRate === null ? "Shown after your first finished order" : "Completed out of completed and cancelled"}
+          tone="emerald"
+        />
+        <StatCard
+          icon={Timer}
+          label="On-time delivery"
+          value={onTimeRate === null ? "-" : `${onTimeRate}%`}
+          hint={onTimeRate === null ? "Shown after your first delivery" : "Delivered within the gig's delivery time"}
+          tone="indigo"
+        />
+      </div>
+
       {/* Earnings by month */}
       <section className="mt-10" aria-labelledby="earnings-heading">
         <h2 id="earnings-heading" className="text-xl font-semibold text-slate-900">
@@ -365,18 +506,32 @@ export default function FreelancerDashboard() {
               return (
                 <li
                   key={gig.id}
-                  className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center"
+                  className={cn(
+                    "flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm sm:flex-row sm:items-center",
+                    gig.isActive ? "border-slate-200" : "border-amber-200 bg-amber-50/40"
+                  )}
                 >
                   <div className="h-24 w-full shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:w-36">
-                    <SafeImage src={gig.image} alt="" className="h-full w-full object-cover" />
+                    <SafeImage src={gig.image} alt="" className={cn("h-full w-full object-cover", !gig.isActive && "opacity-60")} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <Link
-                      href={`/gigs/${gig.id}`}
-                      className="line-clamp-2 font-semibold text-slate-900 transition hover:text-indigo-600"
-                    >
-                      {gig.title}
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {gig.isActive ? (
+                        <Link
+                          href={`/gigs/${gig.id}`}
+                          className="line-clamp-2 font-semibold text-slate-900 transition hover:text-indigo-600"
+                        >
+                          {gig.title}
+                        </Link>
+                      ) : (
+                        <>
+                          <span className="line-clamp-2 font-semibold text-slate-700">{gig.title}</span>
+                          <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                            Paused
+                          </span>
+                        </>
+                      )}
+                    </div>
                     <p className="mt-1 text-sm text-slate-500">
                       {categoryName} · {formatPrice(gig.price)} · {gig.deliveryDays} days
                     </p>
@@ -391,7 +546,22 @@ export default function FreelancerDashboard() {
                       size={14}
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => togglePause(gig)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                    >
+                      {gig.isActive ? (
+                        <>
+                          <Pause className="h-4 w-4" /> Pause
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" /> Resume
+                        </>
+                      )}
+                    </button>
                     <button
                       type="button"
                       onClick={() => setEditGig(gig)}
@@ -536,9 +706,18 @@ export default function FreelancerDashboard() {
             You have no reviews yet. Clients can review you after an order is completed.
           </p>
         ) : (
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-5">
             {myReviews.slice(0, 3).map((review) => (
-              <ReviewCard key={review.id} review={review} />
+              <div key={review.id}>
+                <ReviewCard review={review} />
+                <button
+                  type="button"
+                  onClick={() => setReplyReview(review)}
+                  className="mt-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  {review.reply ? "Edit reply" : "Reply"}
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -547,6 +726,8 @@ export default function FreelancerDashboard() {
       <Modal open={Boolean(editGig)} onClose={() => setEditGig(null)} title="Edit gig">
         {editGig && <GigForm key={editGig.id} gig={editGig} onDone={() => setEditGig(null)} />}
       </Modal>
+
+      <ReplyModal review={replyReview} open={Boolean(replyReview)} onClose={() => setReplyReview(null)} />
 
       <ConfirmModal
         open={Boolean(deleteTarget)}

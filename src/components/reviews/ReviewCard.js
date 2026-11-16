@@ -20,6 +20,15 @@ export default function ReviewCard({ review }) {
         <RatingStars rating={review.rating} />
       </div>
       <p className="mt-3 text-sm leading-relaxed text-slate-700">{review.comment}</p>
+
+      {review.reply && (
+        <div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm">
+          <p className="text-xs font-semibold text-slate-500">
+            Reply from the freelancer{review.replyAt ? ` · ${formatDate(review.replyAt)}` : ""}
+          </p>
+          <p className="mt-1 leading-relaxed text-slate-700">{review.reply}</p>
+        </div>
+      )}
     </article>
   );
 }

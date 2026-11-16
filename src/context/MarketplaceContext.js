@@ -71,7 +71,8 @@ function mapGig(row) {
     revisions: row.revisions,
     image: row.image_url,
     skills: row.skills ?? [],
-    tags: row.tags ?? [],
+        tags: row.tags ?? [],
+    isActive: row.is_active !== false,
     createdAt: row.created_at,
   };
 }
@@ -90,6 +91,7 @@ function mapProfile(row) {
     experience: row.experience_years ?? 0,
     startingPrice: row.starting_price ?? 0,
     completedOrders: row.completed_orders ?? 0,
+    available: row.available !== false,
     joinedAt: row.created_at,
     portfolio: (row.portfolio_items ?? []).map((item) => ({
       id: item.id,
@@ -134,7 +136,9 @@ function mapReview(row, nameById) {
     clientId: row.client_id,
     clientName: nameById.get(row.client_id) ?? "Client",
     rating: row.rating,
-    comment: row.comment,
+        comment: row.comment,
+    reply: row.reply ?? "",
+    replyAt: row.reply_at ?? null,
     createdAt: row.created_at,
   };
 }
@@ -192,7 +196,8 @@ const GIG_COLUMNS = {
   deliveryDays: "delivery_days",
   revisions: "revisions",
   skills: "skills",
-  tags: "tags",
+    tags: "tags",
+  isActive: "is_active",
 };
 
 export function MarketplaceProvider({ children }) {
@@ -235,7 +240,9 @@ export function MarketplaceProvider({ children }) {
     };
   }, [userId]);
 
-  const gigs = publicData ? publicData.gigs : EMPTY;
+    const allGigs = publicData ? publicData.gigs : EMPTY;
+  // Paused gigs sirf freelancer ke dashboard mein dikhte hain
+  const gigs = allGigs.filter((g) => g.isActive);
   const profiles = publicData ? publicData.profiles : EMPTY;
   const freelancers = profiles.filter((p) => p.role === "freelancer");
   const nameById = new Map(profiles.map((p) => [p.id, p.name]));
@@ -400,6 +407,7 @@ export function MarketplaceProvider({ children }) {
   }
 
   const value = {
+    allGigs,
     gigs,
     freelancers,
     orders,
