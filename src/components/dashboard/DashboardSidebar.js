@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, LayoutDashboard, MessageSquare, Plus, Search, Settings, Star, User } from "lucide-react";
+import {
+  FileText,
+  Heart,
+  LayoutDashboard,
+  MessageSquare,
+  Plus,
+  Search,
+  Settings,
+  ShieldCheck,
+  Star,
+  User,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function DashboardSidebar({ role, userId }) {
@@ -11,25 +22,27 @@ export default function DashboardSidebar({ role, userId }) {
   const links =
     role === "freelancer"
       ? [
-          { href: "/dashboard/freelancer", label: "Overview", icon: LayoutDashboard },
-          { href: "/messages", label: "Messages", icon: MessageSquare },
-          { href: "/dashboard/freelancer/gigs/new", label: "Create gig", icon: Plus },
-          { href: `/freelancers/${userId}`, label: "My profile", icon: User },
-          { href: "/account", label: "Account settings", icon: Settings },
+          { href: "/dashboard/freelancer", label: "Workspace Overview", icon: LayoutDashboard },
+          { href: "/orders", label: "Active Contracts", icon: ShieldCheck },
+          { href: "/messages", label: "Encrypted Messages", icon: MessageSquare },
+          { href: "/dashboard/freelancer/gigs/new", label: "Publish New Spec", icon: Plus },
+          { href: `/freelancers/${userId || "f1"}`, label: "Audited Profile", icon: User },
+          { href: "/account", label: "Security & Keys", icon: Settings },
         ]
       : [
-          { href: "/dashboard/client", label: "Overview", icon: LayoutDashboard },
-          { href: "/messages", label: "Messages", icon: MessageSquare },
-          { href: "/dashboard/client#saved", label: "Saved gigs", icon: Heart },
-          { href: "/dashboard/client#reviews", label: "My reviews", icon: Star },
-          { href: "/gigs", label: "Browse gigs", icon: Search },
-          { href: "/account", label: "Account settings", icon: Settings },
+          { href: "/dashboard/client", label: "Buyer Console", icon: LayoutDashboard },
+          { href: "/orders", label: "Contract Ledger", icon: ShieldCheck },
+          { href: "/messages", label: "Messages & Audit", icon: MessageSquare },
+          { href: "/dashboard/client#saved", label: "Vault Specs", icon: Heart },
+          { href: "/dashboard/client#reviews", label: "Audited Reviews", icon: Star },
+          { href: "/gigs", label: "Browse Contracts", icon: Search },
+          { href: "/account", label: "Account Settings", icon: Settings },
         ];
 
   return (
     <nav
       aria-label="Dashboard"
-      className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm lg:sticky lg:top-24 lg:flex-col lg:self-start lg:overflow-visible"
+      className="flex gap-1.5 overflow-x-auto border border-slate-200 bg-white p-2 font-mono text-xs uppercase tracking-wider shadow-sm lg:sticky lg:top-24 lg:flex-col lg:self-start lg:overflow-visible"
     >
       {links.map((link) => {
         const Icon = link.icon;
@@ -40,12 +53,14 @@ export default function DashboardSidebar({ role, userId }) {
             href={link.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition",
-              active ? "bg-indigo-600 text-white" : "text-slate-700 hover:bg-slate-100"
+              "flex shrink-0 items-center gap-2 px-3.5 py-2.5 transition",
+              active
+                ? "bg-[#0a5c36] font-bold text-white"
+                : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
             )}
           >
-            <Icon className="h-4 w-4" />
-            {link.label}
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="truncate">{link.label}</span>
           </Link>
         );
       })}

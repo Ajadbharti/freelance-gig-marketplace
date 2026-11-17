@@ -1,99 +1,283 @@
 "use client";
 
-import { categories } from "@/data/categories";
+import { useState } from "react";
 
-export const PRICE_RANGES = [
-  { value: "any", label: "Any price", min: 0, max: Infinity },
-  { value: "0-100", label: "Under $100", min: 0, max: 100 },
-  { value: "100-200", label: "$100 – $199", min: 100, max: 200 },
-  { value: "200-400", label: "$200 – $399", min: 200, max: 400 },
-  { value: "400-up", label: "$400 and above", min: 400, max: Infinity },
+export const SERVICE_TYPES = [
+  { label: "Figma UI Design", count: 742 },
+  { label: "Webflow Dev", count: 314 },
+  { label: "Mobile App UI", count: 265 },
+  { label: "Brand Identity", count: 107 },
 ];
 
-export const RATING_OPTIONS = [
-  { value: "0", label: "Any rating" },
-  { value: "4", label: "4.0 & up" },
-  { value: "4.5", label: "4.5 & up" },
+export const DELIVERY_OPTIONS = [
+  { value: "any", label: "Anytime" },
+  { value: "24h", label: "Up to 24 hours (Rush)" },
+  { value: "3d", label: "Up to 3 days" },
+  { value: "7d", label: "Up to 7 days" },
 ];
 
-export const SORT_OPTIONS = [
-  { value: "newest", label: "Newest" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
-  { value: "rating", label: "Highest rated" },
+export const BUDGET_CHIPS = [
+  { label: "UNDER $50", min: 0, max: 50 },
+  { label: "$50 - $150", min: 50, max: 150 },
+  { label: "$150 - $500", min: 150, max: 500 },
+  { label: "$500+", min: 500, max: 10000 },
 ];
 
-function RadioGroup({ legend, name, options, value, onChange }) {
+export const SELLER_TIERS = [
+  { label: "Pro Verified", badge: "PRO", count: null },
+  { label: "Top Rated", badge: null, count: 389 },
+  { label: "Level 2", badge: null, count: 512 },
+  { label: "Rising Talent", badge: null, count: 194 },
+];
+
+export default function FilterSidebar({
+  selectedServiceTypes = [],
+  setSelectedServiceTypes,
+  deliveryTime = "any",
+  setDeliveryTime,
+  minBudget = "",
+  setMinBudget,
+  maxBudget = "",
+  setMaxBudget,
+  selectedTiers = [],
+  setSelectedTiers,
+  minRating = "0",
+  setMinRating,
+  onApply,
+  onReset,
+}) {
+  function toggleServiceType(st) {
+    if (setSelectedServiceTypes) {
+      setSelectedServiceTypes((prev) =>
+        prev.includes(st) ? prev.filter((item) => item !== st) : [...prev, st]
+      );
+    }
+  }
+
+  function toggleTier(tier) {
+    if (setSelectedTiers) {
+      setSelectedTiers((prev) =>
+        prev.includes(tier) ? prev.filter((item) => item !== tier) : [...prev, tier]
+      );
+    }
+  }
+
+  const activeCount =
+    (selectedServiceTypes?.length || 0) +
+    (selectedTiers?.length || 0) +
+    (deliveryTime !== "any" ? 1 : 0) +
+    (minBudget || maxBudget ? 1 : 0) +
+    (minRating !== "0" ? 1 : 0);
+
   return (
-    <fieldset>
-      <legend className="mb-3 text-sm font-semibold text-slate-900">{legend}</legend>
-      <div className="space-y-2">
-        {options.map((option) => (
-          <label
-            key={option.value}
-            className="flex cursor-pointer items-center gap-2 text-sm text-slate-700"
-          >
-            <input
-              type="radio"
-              name={name}
-              value={option.value}
-              checked={value === option.value}
-              onChange={() => onChange(option.value)}
-              className="h-4 w-4 accent-indigo-600"
-            />
-            {option.label}
-          </label>
-        ))}
+    <aside aria-label="Filters" className="border border-slate-200 bg-white p-5 shadow-sm">
+      {/* Filters Header */}
+      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+          <span>🗂 FILTERS</span>
+        </div>
+        <span className="border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-700">
+          ACTIVE: {activeCount}
+        </span>
       </div>
-    </fieldset>
-  );
-}
 
-export default function FilterSidebar({ category, price, rating, onChange, onClear, hasActiveFilters }) {
-  const categoryOptions = [
-    { value: "", label: "All categories" },
-    ...categories.map((c) => ({ value: c.slug, label: c.name })),
-  ];
+      <div className="space-y-6 pt-4">
+        {/* [01] SERVICE TYPE */}
+        <div>
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <span>SERVICE TYPE</span>
+            <span className="text-slate-400">[01]</span>
+          </div>
+          <div className="mt-3 space-y-2">
+            {SERVICE_TYPES.map((st) => {
+              const checked = selectedServiceTypes?.includes(st.label);
+              return (
+                <label
+                  key={st.label}
+                  className="flex cursor-pointer items-center justify-between text-xs text-slate-700 hover:text-slate-900"
+                >
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleServiceType(st.label)}
+                      className="h-3.5 w-3.5 rounded-none accent-[#0a5c36]"
+                    />
+                    <span className={checked ? "font-semibold text-slate-900" : ""}>
+                      {st.label}
+                    </span>
+                  </div>
+                  <span className="font-mono text-[11px] text-slate-400">{st.count}</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
 
-  return (
-    <aside
-      aria-label="Filters"
-      className="space-y-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
-      <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-slate-900">Filters</h2>
-        {hasActiveFilters && (
+        {/* [02] DELIVERY TIME */}
+        <div className="border-t border-slate-100 pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <span>DELIVERY TIME</span>
+            <span className="text-slate-400">[02]</span>
+          </div>
+          <div className="mt-3 space-y-2">
+            {DELIVERY_OPTIONS.map((opt) => (
+              <label
+                key={opt.value}
+                className="flex cursor-pointer items-center gap-2 text-xs text-slate-700 hover:text-slate-900"
+              >
+                <input
+                  type="radio"
+                  name="deliveryTime"
+                  value={opt.value}
+                  checked={deliveryTime === opt.value}
+                  onChange={(e) => setDeliveryTime && setDeliveryTime(e.target.value)}
+                  className="h-3.5 w-3.5 accent-[#0a5c36]"
+                />
+                <span className={deliveryTime === opt.value ? "font-semibold text-slate-900" : ""}>
+                  {opt.label}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* [03] BUDGET (USD) */}
+        <div className="border-t border-slate-100 pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <span>BUDGET (USD)</span>
+            <span className="text-slate-400">[03]</span>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex flex-1 items-center border border-slate-200 px-2 py-1">
+              <span className="font-mono text-[10px] text-slate-400 mr-1">$</span>
+              <input
+                type="number"
+                placeholder="MIN"
+                value={minBudget}
+                onChange={(e) => setMinBudget && setMinBudget(e.target.value)}
+                className="w-full font-mono text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none"
+              />
+            </div>
+            <span className="font-mono text-xs text-slate-400">-</span>
+            <div className="flex flex-1 items-center border border-slate-200 px-2 py-1">
+              <span className="font-mono text-[10px] text-slate-400 mr-1">$</span>
+              <input
+                type="number"
+                placeholder="MAX"
+                value={maxBudget}
+                onChange={(e) => setMaxBudget && setMaxBudget(e.target.value)}
+                className="w-full font-mono text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Quick chips matching image */}
+          <div className="mt-2.5 grid grid-cols-2 gap-1.5">
+            {BUDGET_CHIPS.map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => {
+                  setMinBudget && setMinBudget(chip.min);
+                  setMaxBudget && setMaxBudget(chip.max === 10000 ? "" : chip.max);
+                }}
+                className="border border-slate-200 bg-[#FAFBFB] py-1 font-mono text-[10px] text-slate-700 hover:border-slate-300 hover:bg-white"
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* [04] SELLER TIER */}
+        <div className="border-t border-slate-100 pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <span>SELLER TIER</span>
+            <span className="text-slate-400">[04]</span>
+          </div>
+          <div className="mt-3 space-y-2">
+            {SELLER_TIERS.map((tier) => {
+              const checked = selectedTiers?.includes(tier.label);
+              return (
+                <label
+                  key={tier.label}
+                  className="flex cursor-pointer items-center justify-between text-xs text-slate-700 hover:text-slate-900"
+                >
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleTier(tier.label)}
+                      className="h-3.5 w-3.5 rounded-none accent-[#0a5c36]"
+                    />
+                    <span className={checked ? "font-semibold text-slate-900" : ""}>
+                      {tier.label}
+                    </span>
+                  </div>
+                  {tier.badge ? (
+                    <span className="border border-emerald-300 bg-emerald-50 px-1 font-mono text-[9px] font-bold text-[#0a5c36]">
+                      {tier.badge}
+                    </span>
+                  ) : (
+                    <span className="font-mono text-[11px] text-slate-400">{tier.count}</span>
+                  )}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* [05] REVIEW SCORE */}
+        <div className="border-t border-slate-100 pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <span>REVIEW SCORE</span>
+            <span className="text-slate-400">[05]</span>
+          </div>
+          <div className="mt-3 space-y-2">
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-700 hover:text-slate-900">
+              <input
+                type="radio"
+                name="minRating"
+                value="4.5"
+                checked={minRating === "4.5"}
+                onChange={(e) => setMinRating && setMinRating(e.target.value)}
+                className="h-3.5 w-3.5 accent-[#0a5c36]"
+              />
+              <span>★ 4.5 & above</span>
+            </label>
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-700 hover:text-slate-900">
+              <input
+                type="radio"
+                name="minRating"
+                value="4.0"
+                checked={minRating === "4.0"}
+                onChange={(e) => setMinRating && setMinRating(e.target.value)}
+                className="h-3.5 w-3.5 accent-[#0a5c36]"
+              />
+              <span>★ 4.0 & above</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Filter Action Buttons */}
+        <div className="space-y-2 border-t border-slate-200 pt-5">
           <button
             type="button"
-            onClick={onClear}
-            className="text-sm font-medium text-indigo-600 transition hover:text-indigo-700"
+            onClick={onApply}
+            className="w-full bg-[#0a5c36] py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
           >
-            Clear all
+            APPLY FILTER STATE
           </button>
-        )}
+          <button
+            type="button"
+            onClick={onReset}
+            className="w-full border border-slate-300 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50"
+          >
+            RESET PARAMETERS
+          </button>
+        </div>
       </div>
-
-      <RadioGroup
-        legend="Category"
-        name="category"
-        options={categoryOptions}
-        value={category}
-        onChange={(v) => onChange("category", v)}
-      />
-      <RadioGroup
-        legend="Price"
-        name="price"
-        options={PRICE_RANGES}
-        value={price}
-        onChange={(v) => onChange("price", v)}
-      />
-      <RadioGroup
-        legend="Minimum rating"
-        name="rating"
-        options={RATING_OPTIONS}
-        value={rating}
-        onChange={(v) => onChange("rating", v)}
-      />
     </aside>
   );
 }

@@ -2,36 +2,32 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronDown, LayoutDashboard, LogOut, Menu, User, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Bell, ChevronDown, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, User, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import { categories } from "@/data/categories";
-import SearchBar from "@/components/layout/SearchBar";
+import { NAV_CATEGORIES } from "@/data/categories";
 import SafeImage from "@/components/ui/SafeImage";
-import NotificationBell from "@/components/layout/NotificationBell";
 
 export default function Navbar() {
+  const pathname = usePathname();
   const router = useRouter();
-  const { user, hydrated, logout } = useAuth();
+  const { user, hydrated, logout, switchRole } = useAuth();
   const { showToast } = useToast();
 
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [catOpen, setCatOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
-  const catRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const userRef = useRef(null);
+
+  const isAuthPage = pathname === "/login" || pathname === "/register";
 
   useEffect(() => {
     function handleClick(e) {
-      if (catRef.current && !catRef.current.contains(e.target)) setCatOpen(false);
       if (userRef.current && !userRef.current.contains(e.target)) setUserOpen(false);
     }
     function handleKey(e) {
-      if (e.key === "Escape") {
-        setCatOpen(false);
-        setUserOpen(false);
-      }
+      if (e.key === "Escape") setUserOpen(false);
     }
     document.addEventListener("mousedown", handleClick);
     document.addEventListener("keydown", handleKey);
@@ -41,205 +37,292 @@ export default function Navbar() {
     };
   }, []);
 
-  function closeAll() {
-    setMobileOpen(false);
-    setCatOpen(false);
-    setUserOpen(false);
+  function handleSearchSubmit(e) {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/gigs?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
   }
 
   async function handleLogout() {
-    closeAll();
+    setUserOpen(false);
     await logout();
-    showToast("You have been logged out.", "info");
-    router.push("/");
+    showToast("Signed out from GigCraft node.", "info");
+    router.push("/login");
+  }
+
+  function handleToggleSelling() {
+    const nextRole = user?.role === "freelancer" ? "client" : "freelancer";
+    switchRole(nextRole);
+    showToast(`Switched workspace mode to ${nextRole.toUpperCase()}`, "info");
+    router.push(nextRole === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
   }
 
   const dashboardHref =
     user?.role === "admin" ? "/admin" : user?.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
 
-  return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-        <Link href="/" onClick={closeAll} className="flex shrink-0 items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-lg font-bold text-white">
-            G
-          </span>
-          <span className="text-xl font-bold text-slate-900">GigNest</span>
-        </Link>
-
-        <div className="hidden max-w-md flex-1 md:block">
-          <SearchBar />
-        </div>
-
-        <nav className="ml-auto hidden items-center gap-1 lg:flex" aria-label="Main">
+  // Streamlined Minimal Header for Auth Pages (Image 1 & Image 6)
+  if (isAuthPage) {
+    return (
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-4 w-4 items-center justify-center bg-[#0a5c36] text-[10px] text-white">■</span>
+            <span className="font-serif text-xl font-bold tracking-tight text-slate-950">GIGCRAFT</span>
+          </Link>
           <Link
             href="/gigs"
-            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-600 transition hover:text-[#0a5c36]"
           >
-            Explore
+            BACK TO MARKETPLACE →
+          </Link>
+        </div>
+      </header>
+    );
+  }
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
+      {/* Top Main Navigation Bar */}
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
+        {/* Brand Logo */}
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <span className="flex h-4 w-4 items-center justify-center bg-[#0a5c36] text-[10px] text-white">■</span>
+          <span className="font-serif text-2xl font-bold tracking-tight text-slate-950">GIGCRAFT</span>
+        </Link>
+
+        {/* Search Bar matching image */}
+        <div className="hidden max-w-md flex-1 md:block">
+          <form onSubmit={handleSearchSubmit} className="flex h-9 items-center rounded border border-slate-300 bg-white shadow-none focus-within:border-slate-800">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search services, talent, or gigs..."
+              className="h-full min-w-0 flex-1 px-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="h-full bg-[#0a5c36] px-4 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+            >
+              SEARCH
+            </button>
+          </form>
+        </div>
+
+        {/* Center/Right Nav Links */}
+        <nav className="ml-auto hidden items-center gap-6 lg:flex" aria-label="Main">
+          <Link
+            href="/gigs"
+            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#0a5c36] ${
+              pathname === "/gigs" ? "text-[#0a5c36] underline underline-offset-8" : "text-slate-700"
+            }`}
+          >
+            Explore Gigs
           </Link>
 
-          <div className="relative" ref={catRef}>
+          <Link
+            href="/orders"
+            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#0a5c36] ${
+              pathname.startsWith("/orders") ? "text-[#0a5c36] underline underline-offset-8" : "text-slate-700"
+            }`}
+          >
+            My Orders
+          </Link>
+
+          <Link
+            href="/messages"
+            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#0a5c36] ${
+              pathname === "/messages" ? "text-[#0a5c36] underline underline-offset-8" : "text-slate-700"
+            }`}
+          >
+            Messages
+          </Link>
+
+          {hydrated && user && (
             <button
               type="button"
-              onClick={() => setCatOpen((v) => !v)}
-              aria-expanded={catOpen}
-              aria-haspopup="menu"
-              className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              onClick={handleToggleSelling}
+              className="text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#0a5c36]"
             >
-              Categories
-              <ChevronDown className={`h-4 w-4 transition ${catOpen ? "rotate-180" : ""}`} />
+              {user.role === "freelancer" ? "Switch to Buying" : "Switch to Selling"}
             </button>
-            {catOpen && (
-              <div
-                role="menu"
-                className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
-              >
-                {categories.map((c) => (
-                  <Link
-                    key={c.slug}
-                    href={`/gigs?category=${c.slug}`}
-                    role="menuitem"
-                    onClick={closeAll}
-                    className="block rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-indigo-50 hover:text-indigo-700"
-                  >
-                    {c.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 lg:ml-2">
-                   {hydrated && user && user.role !== "admin" && <NotificationBell />}
+        {/* User & Auth Right controls */}
+        <div className="flex items-center gap-3">
+          {/* Notification bell */}
+          <Link
+            href="/messages"
+            aria-label="Notifications"
+            className="relative flex h-8 w-8 items-center justify-center rounded border border-slate-200 text-slate-600 transition hover:bg-slate-50"
+          >
+            <Bell className="h-4 w-4" />
+            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#0a5c36]" />
+          </Link>
+
           {!hydrated ? (
-            <div className="h-9 w-24 animate-pulse rounded-lg bg-slate-200" aria-hidden="true" />
+            <div className="h-8 w-20 animate-pulse rounded bg-slate-200" />
           ) : user ? (
             <div className="relative" ref={userRef}>
               <button
                 type="button"
                 onClick={() => setUserOpen((v) => !v)}
-                aria-expanded={userOpen}
-                aria-haspopup="menu"
-                aria-label="Open user menu"
-                className="flex items-center gap-2 rounded-full border border-slate-200 p-1 pr-3 transition hover:bg-slate-50"
+                className="flex items-center gap-2 rounded border border-slate-200 p-1 pr-2 transition hover:bg-slate-50"
               >
-                <SafeImage src={user.avatar} alt="" className="h-8 w-8 rounded-full object-cover" />
-                <span className="hidden max-w-[110px] truncate text-sm font-medium text-slate-800 sm:block">
+                <SafeImage
+                  src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80"}
+                  alt=""
+                  className="h-6 w-6 rounded-full object-cover"
+                />
+                <span className="hidden max-w-[100px] truncate text-xs font-semibold text-slate-900 sm:block">
                   {user.name}
                 </span>
-                <ChevronDown className="h-4 w-4 text-slate-500" />
+                <ChevronDown className="h-3 w-3 text-slate-500" />
               </button>
+
               {userOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
+                  className="absolute right-0 mt-2 w-56 rounded border border-slate-200 bg-white p-2 shadow-lg"
                 >
                   <div className="border-b border-slate-100 px-3 py-2">
-                    <p className="truncate text-sm font-semibold text-slate-900">{user.name}</p>
-                    <p className="text-xs capitalize text-slate-500">{user.role}</p>
+                    <p className="truncate text-xs font-bold uppercase tracking-wider text-slate-900">{user.name}</p>
+                    <p className="font-mono text-[10px] uppercase text-[#0a5c36]">
+                      {user.role === "freelancer" ? "BUILDER WORKSPACE" : "BUYER ESCROW MODE"}
+                    </p>
                   </div>
                   <Link
                     href={dashboardHref}
-                    role="menuitem"
-                    onClick={closeAll}
-                    className="mt-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                    onClick={() => setUserOpen(false)}
+                    className="mt-1 flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    <LayoutDashboard className="h-4 w-4" /> Dashboard
+                    <LayoutDashboard className="h-3.5 w-3.5" /> Workspace Dashboard
                   </Link>
-                                    <Link
+                  <Link
+                    href="/orders"
+                    onClick={() => setUserOpen(false)}
+                    className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" /> Active Contracts Ledger
+                  </Link>
+                  <Link
+                    href="/freelancers/f1"
+                    onClick={() => setUserOpen(false)}
+                    className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    <User className="h-3.5 w-3.5" /> View Sample Profile (Elena)
+                  </Link>
+                  <Link
                     href="/account"
-                    role="menuitem"
-                    onClick={closeAll}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                    onClick={() => setUserOpen(false)}
+                    className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    <User className="h-4 w-4" /> Account settings
+                    <User className="h-3.5 w-3.5" /> Account Settings
                   </Link>
-                  {user.role === "freelancer" && (
-                    <Link
-                      href={`/freelancers/${user.id}`}
-                      role="menuitem"
-                      onClick={closeAll}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
-                    >
-                      <User className="h-4 w-4" /> My profile
-                    </Link>
-                  )}
                   <button
                     type="button"
-                    role="menuitem"
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 transition hover:bg-red-50"
+                    className="flex w-full items-center gap-2 rounded px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
                   >
-                    <LogOut className="h-4 w-4" /> Log out
+                    <LogOut className="h-3.5 w-3.5" /> Sign Out
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <>
+            <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 sm:block"
+                className="px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#0a5c36]"
               >
-                Login
+                Log In
               </Link>
               <Link
                 href="/register"
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                className="bg-[#0a5c36] px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
               >
                 Sign Up
               </Link>
-            </>
+            </div>
           )}
 
+          {/* Mobile hamburger button */}
           <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
-            aria-expanded={mobileOpen}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            className="rounded-lg p-2 text-slate-700 transition hover:bg-slate-100 lg:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded border border-slate-200 text-slate-700 lg:hidden"
           >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
       </div>
 
-      {mobileOpen && (
-        <div className="max-h-[calc(100vh-4rem)] overflow-y-auto border-t border-slate-200 bg-white px-4 py-4 lg:hidden">
-          <div className="md:hidden">
-            <SearchBar onSearch={closeAll} />
+      {/* Subcategory Technical Strip matching image */}
+      <div className="border-t border-slate-200 bg-[#FAFAFA]">
+        <div className="mx-auto flex h-9 max-w-7xl items-center overflow-x-auto px-4 text-[11px] font-mono tracking-wider text-slate-600 sm:px-6">
+          <div className="flex items-center gap-6 whitespace-nowrap">
+            {NAV_CATEGORIES.map((cat, idx) => (
+              <span key={cat.slug} className="flex items-center gap-6">
+                <Link
+                  href={`/gigs?category=${cat.slug}`}
+                  className="transition hover:text-[#0a5c36] hover:underline"
+                >
+                  {cat.name}
+                </Link>
+                {idx < NAV_CATEGORIES.length - 1 && <span className="text-slate-300">/</span>}
+              </span>
+            ))}
           </div>
-          <nav className="mt-4 space-y-1 md:mt-0" aria-label="Mobile">
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      {mobileOpen && (
+        <div className="border-t border-slate-200 bg-white px-4 py-4 lg:hidden">
+          <form onSubmit={handleSearchSubmit} className="mb-4 flex h-9">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search services..."
+              className="h-full flex-1 rounded-l border border-slate-300 px-3 text-xs"
+            />
+            <button type="submit" className="bg-[#0a5c36] px-3 font-mono text-xs text-white">
+              SEARCH
+            </button>
+          </form>
+          <div className="space-y-2 font-mono text-xs uppercase tracking-wider">
             <Link
               href="/gigs"
-              onClick={closeAll}
-              className="block rounded-lg px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+              onClick={() => setMobileOpen(false)}
+              className="block py-1 text-slate-800 hover:text-[#0a5c36]"
             >
-              Explore all gigs
+              Explore Gigs
             </Link>
-            <p className="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Categories</p>
-            {categories.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/gigs?category=${c.slug}`}
-                onClick={closeAll}
-                className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
-              >
-                {c.name}
-              </Link>
-            ))}
-            {hydrated && !user && (
-              <Link
-                href="/login"
-                onClick={closeAll}
-                className="block rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 sm:hidden"
-              >
-                Login
-              </Link>
-            )}
-          </nav>
+            <Link
+              href="/orders"
+              onClick={() => setMobileOpen(false)}
+              className="block py-1 text-slate-800 hover:text-[#0a5c36]"
+            >
+              My Orders
+            </Link>
+            <Link
+              href="/messages"
+              onClick={() => setMobileOpen(false)}
+              className="block py-1 text-slate-800 hover:text-[#0a5c36]"
+            >
+              Messages
+            </Link>
+            <Link
+              href="/dashboard/client"
+              onClick={() => setMobileOpen(false)}
+              className="block py-1 text-slate-800 hover:text-[#0a5c36]"
+            >
+              Dashboard
+            </Link>
+          </div>
         </div>
       )}
     </header>

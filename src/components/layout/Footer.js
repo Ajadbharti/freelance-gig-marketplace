@@ -1,79 +1,158 @@
 import Link from "next/link";
-import { categories } from "@/data/categories";
 
 export default function Footer() {
   return (
     <footer className="border-t border-slate-200 bg-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
-          <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-lg font-bold text-white">
-              G
-            </span>
-            <span className="text-xl font-bold text-slate-900">GigNest</span>
-          </Link>
-          <p className="mt-4 max-w-xs text-sm text-slate-600">
-            A marketplace where clients discover talent and freelancers sell digital services.
-          </p>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-semibold text-slate-900">Categories</h3>
-          <ul className="mt-4 space-y-2 text-sm text-slate-600">
-            {categories.slice(0, 5).map((c) => (
-              <li key={c.slug}>
-                <Link href={`/gigs?category=${c.slug}`} className="transition hover:text-indigo-600">
-                  {c.name}
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
+          {/* Column 1 */}
+          <div>
+            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">CATEGORIES</h3>
+            <ul className="mt-4 space-y-2.5 font-mono text-xs text-slate-600">
+              <li>
+                <Link href="/gigs?category=design-creative" className="transition hover:text-[#0a5c36]">
+                  Graphics & Design
                 </Link>
               </li>
-            ))}
-          </ul>
+              <li>
+                <Link href="/gigs?category=development-tech" className="transition hover:text-[#0a5c36]">
+                  Digital Engineering
+                </Link>
+              </li>
+              <li>
+                <Link href="/gigs?category=writing-translation" className="transition hover:text-[#0a5c36]">
+                  Writing & Copy
+                </Link>
+              </li>
+              <li>
+                <Link href="/gigs?category=ai-services" className="transition hover:text-[#0a5c36]">
+                  AI Tooling & Models
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 2 */}
+          <div>
+            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">ABOUT</h3>
+            <ul className="mt-4 space-y-2.5 font-mono text-xs text-slate-600">
+              <li>
+                <Link href="/#about" className="transition hover:text-[#0a5c36]">
+                  Platform Overview
+                </Link>
+              </li>
+              <li>
+                <Link href="/#careers" className="transition hover:text-[#0a5c36]">
+                  Engineering Careers
+                </Link>
+              </li>
+              <li>
+                <Link href="/#press" className="transition hover:text-[#0a5c36]">
+                  Press & Media
+                </Link>
+              </li>
+              <li>
+                <Link href="/#partners" className="transition hover:text-[#0a5c36]">
+                  Partnership Network
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3 */}
+          <div>
+            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">SUPPORT</h3>
+            <ul className="mt-4 space-y-2.5 font-mono text-xs text-slate-600">
+              <li>
+                <Link href="/#help" className="transition hover:text-[#0a5c36]">
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link href="/#dispute" className="transition hover:text-[#0a5c36]">
+                  Escrow Dispute Desk
+                </Link>
+              </li>
+              <li>
+                <Link href="/#standards" className="transition hover:text-[#0a5c36]">
+                  Contract Standards
+                </Link>
+              </li>
+              <li>
+                <Link href="/#contact" className="transition hover:text-[#0a5c36]">
+                  Contact Support
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4 */}
+          <div>
+            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">TRUST & SAFETY</h3>
+            <ul className="mt-4 space-y-2.5 font-mono text-xs text-slate-600">
+              <li>
+                <Link href="/#badging" className="transition hover:text-[#0a5c36]">
+                  Verified Badging
+                </Link>
+              </li>
+              <li>
+                <Link href="/#protection" className="transition hover:text-[#0a5c36]">
+                  Milestone Protection
+                </Link>
+              </li>
+              <li>
+                <Link href="/#auditing" className="transition hover:text-[#0a5c36]">
+                  Code Auditing
+                </Link>
+              </li>
+              <li>
+                <Link href="/#guidelines" className="transition hover:text-[#0a5c36]">
+                  Community Guidelines
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 5 */}
+          <div>
+            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">TERMS & LAW</h3>
+            <ul className="mt-4 space-y-2.5 font-mono text-xs text-slate-600">
+              <li>
+                <Link href="/#terms" className="transition hover:text-[#0a5c36]">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/#privacy" className="transition hover:text-[#0a5c36]">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/#agreement" className="transition hover:text-[#0a5c36]">
+                  Escrow Agreement
+                </Link>
+              </li>
+              <li>
+                <Link href="/#cookies" className="transition hover:text-[#0a5c36]">
+                  Cookie Preferences
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <div>
-          <h3 className="text-sm font-semibold text-slate-900">For freelancers</h3>
-          <ul className="mt-4 space-y-2 text-sm text-slate-600">
-            <li>
-              <Link href="/register?role=freelancer" className="transition hover:text-indigo-600">
-                Become a freelancer
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/freelancer" className="transition hover:text-indigo-600">
-                Freelancer dashboard
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/freelancer/gigs/new" className="transition hover:text-indigo-600">
-                Create a gig
-              </Link>
-            </li>
-          </ul>
+        {/* Bottom Bar */}
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 sm:flex-row">
+          <div className="flex items-center gap-2">
+            <span className="font-serif font-bold text-slate-950">GIGCRAFT</span>
+            <span className="font-mono text-xs text-slate-500">
+              © 2025 GigCraft Marketplace Inc. All rights reserved.
+            </span>
+          </div>
+          <div className="font-mono text-xs uppercase tracking-wider text-slate-500">
+            ENGINEERED FOR HIGH-OUTPUT TECHNICAL CONTRACTS
+          </div>
         </div>
-
-        <div>
-          <h3 className="text-sm font-semibold text-slate-900">For clients</h3>
-          <ul className="mt-4 space-y-2 text-sm text-slate-600">
-            <li>
-              <Link href="/gigs" className="transition hover:text-indigo-600">
-                Explore gigs
-              </Link>
-            </li>
-            <li>
-              <Link href="/register" className="transition hover:text-indigo-600">
-                Create an account
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/client" className="transition hover:text-indigo-600">
-                Client dashboard
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-slate-200 py-5 text-center text-xs text-slate-500">
-        © 2026 GigNest. All rights reserved.
       </div>
     </footer>
   );

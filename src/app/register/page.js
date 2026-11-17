@@ -3,7 +3,7 @@ import RegisterForm from "@/components/auth/RegisterForm";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 
 export const metadata = {
-  title: "Sign up | GigNest",
+  title: "Create your GigCraft account | Technical Marketplace",
 };
 
 function FormFallback() {

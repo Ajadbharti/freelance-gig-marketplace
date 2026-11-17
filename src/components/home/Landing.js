@@ -3,179 +3,265 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { ArrowRight, Briefcase, Search, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Lock,
+  Search,
+  ShieldCheck,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useToast } from "@/components/ui/ToastProvider";
-import SocialButtons from "@/components/auth/SocialButtons";
-import FormField, { inputClass } from "@/components/ui/FormField";
+import { useMarketplace } from "@/context/MarketplaceContext";
+import GigCard from "@/components/gigs/GigCard";
+import { NAV_CATEGORIES } from "@/data/categories";
+import SafeImage from "@/components/ui/SafeImage";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const FEATURES = [
-  {
-    icon: Search,
-    title: "Find the right talent",
-    text: "Search by skill, category, price and rating to shortlist the best gigs in minutes.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Order with confidence",
-    text: "Track every order, ask for revisions and approve work only when you are happy.",
-  },
-  {
-    icon: Briefcase,
-    title: "Sell your skills",
-    text: "Publish gigs, receive orders and build a profile with real client reviews.",
-  },
-];
-
-function dashboardFor(user) {
-  if (user.role === "admin") return "/admin";
-  return user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
-}
-
-function EmailLogin() {
+export default function Landing() {
   const router = useRouter();
-  const { login } = useAuth();
-  const { showToast } = useToast();
-  const [formError, setFormError] = useState("");
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm({ defaultValues: { email: "", password: "" } });
+  const { user } = useAuth();
+  const { gigs, freelancers } = useMarketplace();
+  const [query, setQuery] = useState("");
 
-  async function onSubmit(values) {
-    setFormError("");
-    const result = await login(values.email, values.password);
-    if (!result.ok) {
-      setFormError(result.error);
-      return;
+  function handleSearch(e) {
+    e.preventDefault();
+    if (query.trim()) {
+      router.push(`/gigs?q=${encodeURIComponent(query.trim())}`);
+    } else {
+      router.push("/gigs");
     }
-    showToast(`Welcome back, ${result.user.name.split(" ")[0]}!`);
-    router.push(result.user.needsRole ? "/welcome" : dashboardFor(result.user));
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      {formError && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-          {formError}
-        </p>
-      )}
+    <div className="min-h-screen bg-[#FBFBFB]">
+      {/* Top Protocol Header Bar */}
+      <section className="border-b border-slate-200 bg-white py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="inline-flex items-center gap-2 border border-slate-200 bg-slate-50 px-3 py-1 font-mono text-xs font-semibold text-slate-800">
+            <span className="h-2 w-2 rounded-full bg-[#0a5c36]" />
+            <span>PROTOCOL v2.4 ACTIVE // NEXT SPRINT RECONCILIATION LIVE</span>
+          </div>
 
-      <FormField id="landing-email" label="Email" error={errors.email?.message}>
-        <input
-          id="landing-email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          aria-invalid={errors.email ? "true" : "false"}
-          aria-describedby={errors.email ? "landing-email-error" : undefined}
-          className={inputClass}
-          {...register("email", {
-            required: "Email is required.",
-            pattern: { value: EMAIL_PATTERN, message: "Enter a valid email address." },
-          })}
-        />
-      </FormField>
+          <h1 className="mt-5 font-serif text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl max-w-4xl">
+            Contract High-Output Engineers & Designers Under Escrow.
+          </h1>
 
-      <FormField id="landing-password" label="Password" error={errors.password?.message}>
-        <input
-          id="landing-password"
-          type="password"
-          autoComplete="current-password"
-          placeholder="Your password"
-          aria-invalid={errors.password ? "true" : "false"}
-          aria-describedby={errors.password ? "landing-password-error" : undefined}
-          className={inputClass}
-          {...register("password", { required: "Password is required." })}
-        />
-      </FormField>
+          <p className="mt-4 max-w-2xl font-mono text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Deterministic milestone vault releases, cryptographic deliverables inspection, and zero upfront platform commissions. Verified top 1.4% technical talent contracting across Next.js, Figma, Rust & AI architectures.
+          </p>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
-      >
-        {isSubmitting ? "Logging in..." : "Log in"}
-      </button>
-    </form>
-  );
-}
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="mt-8 flex max-w-2xl border border-slate-300 bg-white shadow-sm focus-within:border-slate-800">
+            <div className="flex flex-1 items-center px-4">
+              <Search className="h-4 w-4 text-slate-400 mr-2 shrink-0" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search technical specs, Figma UI, Next.js, or engineers..."
+                className="w-full font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-[#0a5c36] px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+            >
+              SEARCH CATALOG
+            </button>
+          </form>
 
-export default function Landing() {
-  return (
-    <>
-      <section className="bg-gradient-to-b from-indigo-50 via-white to-white">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 lg:grid-cols-[1.1fr_0.9fr] lg:py-20">
-          <div>
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
-              <Sparkles className="h-3.5 w-3.5" /> Hire talent. Sell your skills.
-            </p>
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-              Find the Right Freelancer for Your Next Big Idea.
-            </h1>
-            <p className="mt-5 max-w-xl text-lg text-slate-600">
-              GigNest connects clients with freelancers for web development, design, writing, video and marketing.
-              Sign in to order a service, or create your own gigs and start earning.
-            </p>
+          {/* Quick Category Chips */}
+          <div className="mt-4 flex flex-wrap items-center gap-2 font-mono text-xs text-slate-600">
+            <span className="text-slate-400">Popular Sprints:</span>
+            <Link href="/gigs?q=Figma" className="border border-slate-200 bg-white px-2 py-0.5 hover:border-slate-400">
+              #Figma UI/UX
+            </Link>
+            <Link href="/gigs?q=Next.js" className="border border-slate-200 bg-white px-2 py-0.5 hover:border-slate-400">
+              #Next.js Fullstack
+            </Link>
+            <Link href="/gigs?q=Design+System" className="border border-slate-200 bg-white px-2 py-0.5 hover:border-slate-400">
+              #Design Systems
+            </Link>
+            <Link href="/gigs?q=3D" className="border border-slate-200 bg-white px-2 py-0.5 hover:border-slate-400">
+              #3D Blender
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Network Telemetry Banner */}
+      <section className="border-b border-slate-200 bg-[#FAFBFB] py-6 font-mono">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 text-center">
+            <div className="p-2 border-r border-slate-200 last:border-none">
+              <p className="text-[10px] uppercase text-slate-500">ESCROW LIQUIDITY</p>
+              <p className="font-serif text-2xl font-bold text-slate-950">$24,200,000</p>
+              <p className="text-[10px] text-emerald-700">Q1 VERIFIED</p>
+            </div>
+            <div className="p-2 border-r border-slate-200 last:border-none">
+              <p className="text-[10px] uppercase text-slate-500">AVG CONTRACT FILL TIME</p>
+              <p className="font-serif text-2xl font-bold text-slate-950">3.8 Hours</p>
+              <p className="text-[10px] text-emerald-700">▲ 14% FASTER</p>
+            </div>
+            <div className="p-2 border-r border-slate-200 last:border-none">
+              <p className="text-[10px] uppercase text-slate-500">DISPUTE RATE</p>
+              <p className="font-serif text-2xl font-bold text-[#0a5c36]">0.08%</p>
+              <p className="text-[10px] text-slate-500">DETERMINISTIC SLA</p>
+            </div>
+            <div className="p-2">
+              <p className="text-[10px] uppercase text-slate-500">APPLICANT ACCEPTANCE</p>
+              <p className="font-serif text-2xl font-bold text-slate-950">Top 1.4%</p>
+              <p className="text-[10px] text-slate-500">CODE AUDIT PASS</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Production Specs Section */}
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-slate-200 pb-4">
+            <div>
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0a5c36]">
+                VERIFIED CONTRACT CATALOG
+              </span>
+              <h2 className="mt-1 font-serif text-3xl font-bold text-slate-950">
+                Featured Engineering & UI/UX Specs
+              </h2>
+            </div>
             <Link
               href="/gigs"
-              className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 transition hover:text-indigo-700"
+              className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800 hover:text-[#0a5c36]"
             >
-              Browse gigs without signing in <ArrowRight className="h-4 w-4" />
+              EXPLORE ALL 1,428 SPECS →
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="text-xl font-bold text-slate-900">Welcome to GigNest</h2>
-            <p className="mt-1 text-sm text-slate-600">Log in or create an account to get started.</p>
-
-            <div className="mt-6">
-              <SocialButtons />
-            </div>
-
-            <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wide text-slate-400">
-              <span className="h-px flex-1 bg-slate-200" />
-              or log in with email
-              <span className="h-px flex-1 bg-slate-200" />
-            </div>
-
-            <EmailLogin />
-
-                       <p className="mt-6 text-center text-sm text-slate-600">
-              New to GigNest?{" "}
-              <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-700">
-                Create an account
-              </Link>
-            </p>
-            <p className="mt-3 text-center text-xs text-slate-500">
-              <Link href="/login?as=admin" className="hover:text-indigo-600">
-                Admin login
-              </Link>
-            </p>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {gigs.slice(0, 6).map((gig) => (
+              <GigCard key={gig.id} gig={gig} />
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16">
-        <div className="grid gap-6 md:grid-cols-3">
-          {FEATURES.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <div key={feature.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <h3 className="mt-4 text-lg font-semibold text-slate-900">{feature.title}</h3>
-                <p className="mt-2 text-sm text-slate-600">{feature.text}</p>
+      {/* Top Rated Specialists Section */}
+      <section className="border-t border-slate-200 bg-white py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div>
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0a5c36]">
+                AUDITED CONTRACTORS
+              </span>
+              <h2 className="mt-1 font-serif text-3xl font-bold text-slate-950">
+                Vetted Technical Specialists
+              </h2>
+            </div>
+            <Link
+              href="/freelancers/f1"
+              className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800 hover:text-[#0a5c36]"
+            >
+              INSPECT SAMPLE ARCHITECT (ELENA) →
+            </Link>
+          </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {freelancers.slice(0, 3).map((f) => (
+              <div key={f.id} className="border border-slate-200 bg-white p-5 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <SafeImage
+                        src={f.avatar}
+                        alt={f.name}
+                        className="h-12 w-12 rounded-full object-cover border border-slate-200"
+                      />
+                      <div>
+                        <Link
+                          href={`/freelancers/${f.id}`}
+                          className="font-sans text-sm font-bold text-slate-950 hover:underline"
+                        >
+                          {f.name} <span className="text-[#0a5c36]">✓</span>
+                        </Link>
+                        <p className="font-mono text-[10px] text-slate-500">{f.location}</p>
+                      </div>
+                    </div>
+                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#0a5c36]">
+                      {f.tier || "TOP RATED"}
+                    </span>
+                  </div>
+
+                  <p className="mt-3 font-mono text-xs font-semibold text-slate-800">
+                    {f.headline}
+                  </p>
+                  <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-slate-600">
+                    {f.bio}
+                  </p>
+
+                  <div className="mt-4 flex flex-wrap gap-1">
+                    {(f.skills?.slice(0, 4) || []).map((s) => (
+                      <span key={s} className="border border-slate-200 bg-[#FAFBFB] px-2 py-0.5 font-mono text-[9px] text-slate-700">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 font-mono text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-400">RATE</span>
+                    <p className="font-bold text-slate-900">${f.hourlyRate || 95}/hr</p>
+                  </div>
+                  <Link
+                    href={`/freelancers/${f.id}`}
+                    className="border border-slate-300 bg-white px-3 py-1 font-bold uppercase text-slate-800 hover:bg-slate-50"
+                  >
+                    VIEW SPECS
+                  </Link>
+                </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </section>
-    </>
+
+      {/* Escrow Guarantee Architecture Banner */}
+      <section className="border-t border-slate-200 bg-[#FAFBFB] py-14">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="border border-slate-200 bg-white p-6 shadow-sm">
+              <ShieldCheck className="h-8 w-8 text-[#0a5c36]" />
+              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+                100% ESCROW VAULT SETTLEMENT
+              </h3>
+              <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+                Client funds remain safely in cold multi-signature escrow vaults until pull requests, Figma deliverables, or architectural milestones pass verification.
+              </p>
+            </div>
+
+            <div className="border border-slate-200 bg-white p-6 shadow-sm">
+              <Lock className="h-8 w-8 text-[#0a5c36]" />
+              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+                SOC-2 TYPE II PROTOCOL SECURITY
+              </h3>
+              <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+                Full enterprise compliance with automated tax reporting, zero-leak credential isolation, and verified 256-bit hardware session tokens.
+              </p>
+            </div>
+
+            <div className="border border-slate-200 bg-white p-6 shadow-sm">
+              <Zap className="h-8 w-8 text-[#0a5c36]" />
+              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+                AUTOMATED GIT REPO DISBURSEMENT
+              </h3>
+              <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+                Auto-sync pull requests with GitHub actions and automated code quality suites for zero-friction milestone releases.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

@@ -10,11 +10,11 @@ import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 function ShellSkeleton() {
   return (
     <div
-      className="mx-auto max-w-7xl px-4 py-8 lg:grid lg:grid-cols-[220px_1fr] lg:gap-8"
+      className="mx-auto max-w-7xl px-4 py-8 lg:grid lg:grid-cols-[240px_1fr] lg:gap-8 font-mono text-xs"
       role="status"
       aria-label="Loading dashboard"
     >
-      <LoadingSkeleton className="h-32 w-full" />
+      <LoadingSkeleton className="h-48 w-full" />
       <div className="mt-6 space-y-4 lg:mt-0">
         <LoadingSkeleton className="h-9 w-1/3" />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -30,13 +30,13 @@ function ShellSkeleton() {
 
 function Notice({ title, text, href, linkLabel }) {
   return (
-    <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-24 text-center">
+    <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-24 text-center font-mono">
       <ShieldAlert className="h-14 w-14 text-slate-300" />
-      <h1 className="mt-4 text-2xl font-bold text-slate-900">{title}</h1>
-      <p className="mt-2 text-slate-600">{text}</p>
+      <h1 className="mt-4 font-serif text-3xl font-bold text-slate-900">{title}</h1>
+      <p className="mt-2 text-xs text-slate-600">{text}</p>
       <Link
         href={href}
-        className="mt-6 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+        className="mt-6 bg-[#0a5c36] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
       >
         {linkLabel}
       </Link>
@@ -53,39 +53,36 @@ export default function DashboardShell({ role, path, title, subtitle, actions, c
   if (!user) {
     return (
       <Notice
-        title="Please log in"
-        text="You need to log in to view this dashboard."
+        title="Authentication Required"
+        text="You must be verified on the node network to access this workspace."
         href={`/login?next=${encodeURIComponent(path)}`}
-        linkLabel="Go to login"
-      />
-    );
-  }
-
-  if (user.role !== role) {
-      const ownDashboard =
-      user.role === "admin" ? "/admin" : user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
-    return (
-      <Notice
-        title="This area is not for your account type"
-        text={`This page is only for ${role} accounts. You are logged in as a ${user.role}.`}
-        href={ownDashboard}
-        linkLabel="Go to my dashboard"
+        linkLabel="Sign In to Node"
       />
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 lg:grid lg:grid-cols-[220px_1fr] lg:gap-8">
-      <DashboardSidebar role={role} userId={user.id} />
-      <div className="mt-6 min-w-0 lg:mt-0">
-        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">{title}</h1>
-            {subtitle && <p className="mt-1 text-slate-600">{subtitle}</p>}
+    <div className="min-h-screen bg-[#FBFBFB] py-8 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl lg:grid lg:grid-cols-[240px_1fr] lg:gap-8">
+        <DashboardSidebar role={user.role} userId={user.id} />
+        <div className="mt-6 min-w-0 lg:mt-0">
+          <div className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
+            <div>
+              <div className="flex items-center gap-2 font-mono text-xs text-[#0a5c36]">
+                <span className="text-[10px]">■</span>
+                <span className="font-bold uppercase tracking-wider">
+                  WORKSPACE MODE: {user.role === "freelancer" ? "BUILDER NODE" : "BUYER ESCROW CONSOLE"}
+                </span>
+              </div>
+              <h1 className="mt-1 font-serif text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+                {title}
+              </h1>
+              {subtitle && <p className="mt-1 font-mono text-xs text-slate-600">{subtitle}</p>}
+            </div>
+            {actions}
           </div>
-          {actions}
+          {children}
         </div>
-        {children}
       </div>
     </div>
   );
