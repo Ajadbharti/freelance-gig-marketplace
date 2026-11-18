@@ -12,13 +12,18 @@ import SafeImage from "@/components/ui/SafeImage";
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, hydrated, logout, switchRole } = useAuth();
+  const { user, logout, switchRole } = useAuth();
   const { showToast } = useToast();
 
+  const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const userRef = useRef(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
 
@@ -52,6 +57,10 @@ export default function Navbar() {
   }
 
   function handleToggleSelling() {
+    if (!user) {
+      router.push("/register?role=freelancer");
+      return;
+    }
     const nextRole = user?.role === "freelancer" ? "client" : "freelancer";
     switchRole(nextRole);
     showToast(`Switched workspace mode to ${nextRole.toUpperCase()}`, "info");
@@ -139,15 +148,13 @@ export default function Navbar() {
             Messages
           </Link>
 
-          {hydrated && user && (
-            <button
-              type="button"
-              onClick={handleToggleSelling}
-              className="text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#0a5c36]"
-            >
-              {user.role === "freelancer" ? "Switch to Buying" : "Switch to Selling"}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleToggleSelling}
+            className="text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#0a5c36]"
+          >
+            {mounted && user?.role === "freelancer" ? "Switch to Buying" : "Switch to Selling"}
+          </button>
         </nav>
 
         {/* User & Auth Right controls */}
@@ -162,8 +169,21 @@ export default function Navbar() {
             <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#0a5c36]" />
           </Link>
 
-          {!hydrated ? (
-            <div className="h-8 w-20 animate-pulse rounded bg-slate-200" />
+          {!mounted ? (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/login"
+                className="px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#0a5c36]"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/register"
+                className="bg-[#0a5c36] px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+              >
+                Sign Up
+              </Link>
+            </div>
           ) : user ? (
             <div className="relative" ref={userRef}>
               <button
