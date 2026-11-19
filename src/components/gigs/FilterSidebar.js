@@ -17,10 +17,10 @@ export const DELIVERY_OPTIONS = [
 ];
 
 export const BUDGET_CHIPS = [
-  { label: "UNDER $50", min: 0, max: 50 },
-  { label: "$50 - $150", min: 50, max: 150 },
-  { label: "$150 - $500", min: 150, max: 500 },
-  { label: "$500+", min: 500, max: 10000 },
+  { label: "UNDER ₹5,000", min: 0, max: 5000 },
+  { label: "₹5K - ₹15K", min: 5000, max: 15000 },
+  { label: "₹15K - ₹50K", min: 15000, max: 50000 },
+  { label: "₹50K+", min: 50000, max: 500000 },
 ];
 
 export const SELLER_TIERS = [
@@ -142,15 +142,15 @@ export default function FilterSidebar({
           </div>
         </div>
 
-        {/* [03] BUDGET (USD) */}
+        {/* [03] BUDGET (INR / ₹) */}
         <div className="border-t border-slate-100 pt-5">
           <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-            <span>BUDGET (USD)</span>
+            <span>BUDGET (INR / ₹)</span>
             <span className="text-slate-400">[03]</span>
           </div>
           <div className="mt-3 flex items-center gap-2">
             <div className="flex flex-1 items-center border border-slate-200 px-2 py-1">
-              <span className="font-mono text-[10px] text-slate-400 mr-1">$</span>
+              <span className="font-mono text-[10px] text-slate-400 mr-1">₹</span>
               <input
                 type="number"
                 placeholder="MIN"
@@ -161,7 +161,7 @@ export default function FilterSidebar({
             </div>
             <span className="font-mono text-xs text-slate-400">-</span>
             <div className="flex flex-1 items-center border border-slate-200 px-2 py-1">
-              <span className="font-mono text-[10px] text-slate-400 mr-1">$</span>
+              <span className="font-mono text-[10px] text-slate-400 mr-1">₹</span>
               <input
                 type="number"
                 placeholder="MAX"

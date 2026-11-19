@@ -144,13 +144,13 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 sm:flex-row">
           <div className="flex items-center gap-2">
-            <span className="font-serif font-bold text-slate-950">GIGCRAFT</span>
+            <span className="font-serif font-bold text-slate-950">GIGCRAFT BHARAT</span>
             <span className="font-mono text-xs text-slate-500">
-              © 2025 GigCraft Marketplace Inc. All rights reserved.
+              © 2025 GigCraft Technologies India Pvt. Ltd. All rights reserved.
             </span>
           </div>
           <div className="font-mono text-xs uppercase tracking-wider text-slate-500">
-            ENGINEERED FOR HIGH-OUTPUT TECHNICAL CONTRACTS
+            ENGINEERED FOR HIGH-OUTPUT TECHNICAL CONTRACTS // BENGALURU • MUMBAI • HYDERABAD • NCR
           </div>
         </div>
       </div>

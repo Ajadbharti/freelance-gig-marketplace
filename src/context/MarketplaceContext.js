@@ -33,7 +33,7 @@ export function MarketplaceProvider({ children }) {
   const [gigs, setGigs] = useState(() => {
     if (typeof window !== "undefined") {
       try {
-        const saved = localStorage.getItem("gigcraft:gigs");
+        const saved = localStorage.getItem("gigcraft_in:gigs");
         if (saved) return JSON.parse(saved);
       } catch {}
     }
@@ -43,7 +43,7 @@ export function MarketplaceProvider({ children }) {
   const [freelancers, setFreelancers] = useState(() => {
     if (typeof window !== "undefined") {
       try {
-        const saved = localStorage.getItem("gigcraft:freelancers");
+        const saved = localStorage.getItem("gigcraft_in:freelancers");
         if (saved) return JSON.parse(saved);
       } catch {}
     }
@@ -53,7 +53,7 @@ export function MarketplaceProvider({ children }) {
   const [orders, setOrders] = useState(() => {
     if (typeof window !== "undefined") {
       try {
-        const saved = localStorage.getItem("gigcraft:orders");
+        const saved = localStorage.getItem("gigcraft_in:orders");
         if (saved) return JSON.parse(saved);
       } catch {}
     }
@@ -63,7 +63,7 @@ export function MarketplaceProvider({ children }) {
   const [reviews, setReviews] = useState(() => {
     if (typeof window !== "undefined") {
       try {
-        const saved = localStorage.getItem("gigcraft:reviews");
+        const saved = localStorage.getItem("gigcraft_in:reviews");
         if (saved) return JSON.parse(saved);
       } catch {}
     }
@@ -76,7 +76,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("gigcraft:gigs", JSON.stringify(gigs));
+        localStorage.setItem("gigcraft_in:gigs", JSON.stringify(gigs));
       } catch {}
     }
   }, [gigs]);
@@ -84,7 +84,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("gigcraft:freelancers", JSON.stringify(freelancers));
+        localStorage.setItem("gigcraft_in:freelancers", JSON.stringify(freelancers));
       } catch {}
     }
   }, [freelancers]);
@@ -92,7 +92,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("gigcraft:orders", JSON.stringify(orders));
+        localStorage.setItem("gigcraft_in:orders", JSON.stringify(orders));
       } catch {}
     }
   }, [orders]);
@@ -100,7 +100,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("gigcraft:reviews", JSON.stringify(reviews));
+        localStorage.setItem("gigcraft_in:reviews", JSON.stringify(reviews));
       } catch {}
     }
   }, [reviews]);
@@ -209,7 +209,7 @@ export function MarketplaceProvider({ children }) {
       clientName: user.name || "Apex Cloud Labs",
       clientBadge: "Verified Payment Method",
       freelancerId: targetGig?.freelancerId || "f1",
-      freelancerName: targetGig ? getFreelancer(targetGig.freelancerId)?.name : "Elena Rostova",
+      freelancerName: targetGig ? getFreelancer(targetGig.freelancerId)?.name : "Ananya Sharma",
       freelancerBadge: "Top Rated Plus (100%)",
       freelancerAvatar: targetGig ? getFreelancer(targetGig.freelancerId)?.avatar : "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
       title: targetGig?.title || "SaaS UI Milestone Contract",
@@ -428,7 +428,7 @@ export function MarketplaceProvider({ children }) {
       clientBadge: "VERIFIED BUYER",
       rating: Number(rating),
       verifiedOrder: true,
-      paidEscrow: targetOrder ? `$${targetOrder.price}.00` : "$280.00",
+      paidEscrow: targetOrder ? `₹${targetOrder.price?.toLocaleString("en-IN")}` : "₹24,000",
       completedDate: "Completed Just now",
       projectName: targetOrder?.title || "Engineering Contract",
       comment,

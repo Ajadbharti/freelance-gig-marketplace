@@ -98,7 +98,7 @@ export default function GigCard({ gig }) {
               className="h-6 w-6 rounded-full object-cover"
             />
             <span className="truncate text-xs font-semibold text-slate-900 group-hover/author:text-[#0a5c36]">
-              {freelancer?.name || "Elena Rostova"} <span className="text-[#0a5c36]">✓</span>
+              {freelancer?.name || "Ananya Sharma"} <span className="text-[#0a5c36]">✓</span>
             </span>
           </Link>
           <div className="flex items-center gap-1 font-mono text-xs font-bold text-slate-800">
@@ -131,7 +131,7 @@ export default function GigCard({ gig }) {
         <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3.5">
           <div>
             <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400">STARTING AT</p>
-            <p className="font-mono text-base font-bold text-slate-950">${gig.price}</p>
+            <p className="font-mono text-base font-bold text-slate-950">₹{gig.price?.toLocaleString("en-IN")}</p>
           </div>
           <Link
             href={`/gigs/${gig.id}`}

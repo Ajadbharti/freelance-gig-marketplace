@@ -43,7 +43,7 @@ export default function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      email: "developer@agency.io",
+      email: "developer@agency.in",
       password: "••••••••••••",
     },
   });
@@ -220,22 +220,22 @@ export default function LoginForm() {
                   <button
                     type="button"
                     onClick={() => {
-                      setValue("email", "developer@agency.io");
+                      setValue("email", "developer@agency.in");
                       setValue("password", "demo123");
                     }}
                     className="border border-slate-300 bg-white px-2 py-1 text-[11px] hover:border-[#0a5c36]"
                   >
-                    Client: developer@agency.io
+                    Client: developer@agency.in
                   </button>
                   <button
                     type="button"
                     onClick={() => {
-                      setValue("email", "elena@demo.com");
+                      setValue("email", "ananya@gigcraft.in");
                       setValue("password", "demo123");
                     }}
                     className="border border-slate-300 bg-white px-2 py-1 text-[11px] hover:border-[#0a5c36]"
                   >
-                    Freelancer: elena@demo.com
+                    Freelancer: ananya@gigcraft.in
                   </button>
                 </div>
               </div>
@@ -279,7 +279,7 @@ export default function LoginForm() {
                   <div>
                     <p className="font-mono text-xs uppercase text-slate-500">ACTIVE ESCROW LIQUIDITY</p>
                     <p className="mt-1 font-serif text-3xl font-bold tracking-tight text-slate-950">
-                      $1,842,500.00
+                      ₹18,42,50,000
                     </p>
                   </div>
                   <div className="flex h-10 w-10 items-center justify-center border border-slate-200 bg-slate-50 text-slate-700">
@@ -327,11 +327,11 @@ export default function LoginForm() {
               </p>
               <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 font-mono text-[11px]">
                 <div>
-                  <p className="font-bold text-slate-900">Marcus Vance</p>
-                  <p className="text-[10px] text-slate-500">VP Infrastructure @ HyperLayer Corp</p>
+                  <p className="font-bold text-slate-900">Manoj Varma</p>
+                  <p className="text-[10px] text-slate-500">VP Infrastructure @ HyperLayer India (Bengaluru)</p>
                 </div>
                 <span className="border border-slate-200 bg-slate-50 px-2 py-1 text-slate-700">
-                  $340k+ Transacted
+                  ₹3.4 Cr+ Transacted
                 </span>
               </div>
             </div>
@@ -360,10 +360,10 @@ export default function LoginForm() {
             <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-                SOC-2 TYPE II CERTIFIED
+                SOC-2 & CERT-IN COMPLIANT
               </h4>
               <p className="mt-1 text-xs text-slate-600">
-                Continuous third-party audits ensure complete financial and credential protection.
+                Continuous audits ensure complete financial and credential protection across Indian & global entities.
               </p>
             </div>
           </div>
@@ -372,10 +372,10 @@ export default function LoginForm() {
             <Lock className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-                MULTI-SIG ESCROW VAULT
+                RBI COMPLIANT ESCROW VAULT
               </h4>
               <p className="mt-1 text-xs text-slate-600">
-                Funds are held neutral until acceptance criteria and code deliverable verification meet specs.
+                Funds are held neutral in nodal escrow accounts until acceptance criteria and code deliverable verification meet specs.
               </p>
             </div>
           </div>
@@ -384,10 +384,10 @@ export default function LoginForm() {
             <KeyRound className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-                256-BIT HARDWARE ENCRYPTION
+                256-BIT ENCRYPTION & UPI/IMPS
               </h4>
               <p className="mt-1 text-xs text-slate-600">
-                Strict hardware token integration with encrypted payload transmission and session pinning.
+                Strict hardware token integration with encrypted payload transmission and instantaneous bank settlement.
               </p>
             </div>
           </div>
@@ -395,7 +395,7 @@ export default function LoginForm() {
 
         {/* Bottom Mini Footer */}
         <div className="mt-6 flex items-center justify-between border-t border-slate-200 pt-4 font-mono text-xs text-slate-500">
-          <span>GIGCRAFT © 2025 GigCraft Marketplace Inc.</span>
+          <span>GIGCRAFT BHARAT © 2025 GigCraft Marketplace India Inc.</span>
           <span className="uppercase tracking-wider">SECURE ACCESS PORTAL</span>
         </div>
       </div>

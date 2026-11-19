@@ -232,7 +232,7 @@ export default function Navbar() {
                     onClick={() => setUserOpen(false)}
                     className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    <User className="h-3.5 w-3.5" /> View Sample Profile (Elena)
+                    <User className="h-3.5 w-3.5" /> View Sample Profile (Ananya)
                   </Link>
                   <Link
                     href="/account"

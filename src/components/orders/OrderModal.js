@@ -57,7 +57,7 @@ function OrderForm({ gig, selectedPackage, onClose }) {
             </p>
           </div>
           <span className="font-serif text-xl font-bold text-slate-950">
-            ${price}.00
+            ₹{price.toLocaleString("en-IN")}
           </span>
         </div>
         <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-2.5 text-[11px] text-slate-600">
@@ -106,7 +106,7 @@ function OrderForm({ gig, selectedPackage, onClose }) {
           disabled={isSubmitting}
           className="bg-[#0a5c36] px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#084c2c] disabled:opacity-50"
         >
-          {isSubmitting ? "Locking Escrow..." : `LOCK IN ESCROW VAULT ($${price}) →`}
+          {isSubmitting ? "Locking Escrow..." : `LOCK IN ESCROW VAULT (₹${price.toLocaleString("en-IN")}) →`}
         </button>
       </div>
     </form>

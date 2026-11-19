@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("gigcraft:user");
+      const saved = localStorage.getItem("gigcraft_in:user");
       if (saved) {
         setUser(JSON.parse(saved));
       } else {
@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
     if (found) {
       setUser(found);
       try {
-        localStorage.setItem("gigcraft:user", JSON.stringify(found));
+        localStorage.setItem("gigcraft_in:user", JSON.stringify(found));
       } catch {}
       return { ok: true, user: found };
     }
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
     };
     setUser(newUser);
     try {
-      localStorage.setItem("gigcraft:user", JSON.stringify(newUser));
+      localStorage.setItem("gigcraft_in:user", JSON.stringify(newUser));
     } catch {}
     return { ok: true, user: newUser };
   }, []);
@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
     const providerUser = provider === "github" ? demoUsers[1] : demoUsers[0];
     setUser(providerUser);
     try {
-      localStorage.setItem("gigcraft:user", JSON.stringify(providerUser));
+      localStorage.setItem("gigcraft_in:user", JSON.stringify(providerUser));
     } catch {}
     return { ok: true, user: providerUser };
   }, []);
@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
     };
     setUser(newUser);
     try {
-      localStorage.setItem("gigcraft:user", JSON.stringify(newUser));
+      localStorage.setItem("gigcraft_in:user", JSON.stringify(newUser));
     } catch {}
     return { ok: true, user: newUser };
   }, []);
@@ -77,7 +77,7 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     setUser(null);
     try {
-      localStorage.removeItem("gigcraft:user");
+      localStorage.removeItem("gigcraft_in:user");
     } catch {}
   }, []);
 
@@ -86,7 +86,7 @@ export function AuthProvider({ children }) {
       if (!prev) return prev;
       const updated = { ...prev, role: newRole };
       try {
-        localStorage.setItem("gigcraft:user", JSON.stringify(updated));
+        localStorage.setItem("gigcraft_in:user", JSON.stringify(updated));
       } catch {}
       return updated;
     });

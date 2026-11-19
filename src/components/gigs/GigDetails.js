@@ -146,7 +146,7 @@ export default function GigDetails({ params }) {
                   className="h-8 w-8 rounded-full object-cover"
                 />
                 <span className="font-sans text-sm font-bold text-slate-950 hover:underline">
-                  {freelancer?.name || "Elena Rostova"} <span className="text-[#0a5c36]">✓</span>
+                  {freelancer?.name || "Ananya Sharma"} <span className="text-[#0a5c36]">✓</span>
                 </span>
               </Link>
               <span className="bg-slate-950 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-white">
@@ -293,15 +293,15 @@ export default function GigDetails({ params }) {
                       <th className="p-3 text-slate-500 font-normal">FEATURES / PRODUCTION</th>
                       <th className="p-3 font-bold text-slate-900">
                         BASIC
-                        <p className="text-sm font-serif font-bold text-slate-950">$120</p>
+                        <p className="text-sm font-serif font-bold text-slate-950">₹{packages.basic.price?.toLocaleString("en-IN")}</p>
                       </th>
                       <th className="border-x border-t border-[#0a5c36] bg-[#eaf6ee] p-3 font-bold text-[#0a5c36]">
                         STANDARD (RECOMMENDED)
-                        <p className="text-sm font-serif font-bold text-slate-950">$280</p>
+                        <p className="text-sm font-serif font-bold text-slate-950">₹{packages.standard.price?.toLocaleString("en-IN")}</p>
                       </th>
                       <th className="p-3 font-bold text-slate-900">
                         PREMIUM
-                        <p className="text-sm font-serif font-bold text-slate-950">$450</p>
+                        <p className="text-sm font-serif font-bold text-slate-950">₹{packages.premium.price?.toLocaleString("en-IN")}</p>
                       </th>
                     </tr>
                   </thead>
@@ -566,7 +566,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  BASIC $120
+                  BASIC ₹{packages.basic.price?.toLocaleString("en-IN")}
                 </button>
                 <button
                   type="button"
@@ -577,7 +577,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  STANDARD $280
+                  STANDARD ₹{packages.standard.price?.toLocaleString("en-IN")}
                 </button>
                 <button
                   type="button"
@@ -588,7 +588,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  PREMIUM $450
+                  PREMIUM ₹{packages.premium.price?.toLocaleString("en-IN")}
                 </button>
               </div>
 
@@ -598,7 +598,7 @@ export default function GigDetails({ params }) {
                   {selectedPkg.name}
                 </h3>
                 <span className="font-serif text-2xl font-bold text-slate-950">
-                  ${selectedPkg.price}
+                  ₹{selectedPkg.price?.toLocaleString("en-IN")}
                 </span>
               </div>
 
@@ -632,7 +632,7 @@ export default function GigDetails({ params }) {
                 onClick={handleOrderClick}
                 className="mt-6 flex h-12 w-full items-center justify-center gap-2 bg-[#0a5c36] font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
               >
-                CONTINUE (${selectedPkg.price}) →
+                CONTINUE (₹{selectedPkg.price?.toLocaleString("en-IN")}) →
               </button>
 
               <div className="mt-3 text-center">
@@ -671,7 +671,7 @@ export default function GigDetails({ params }) {
                     href={`/freelancers/${freelancer?.id || "f1"}`}
                     className="font-sans text-sm font-bold text-slate-900 hover:underline"
                   >
-                    {freelancer?.name || "Elena Rostova"}
+                    {freelancer?.name || "Ananya Sharma"}
                   </Link>
                   <p className="font-mono text-xs text-slate-500">Design Systems Specialist</p>
                 </div>
@@ -680,7 +680,7 @@ export default function GigDetails({ params }) {
               <div className="mt-4 border-t border-slate-100 pt-3 space-y-2 font-mono text-xs text-slate-600">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Location</span>
-                  <span className="text-slate-900">Berlin, Germany 🇩🇪</span>
+                  <span className="text-slate-900">{freelancer?.location || "Bengaluru, India 🇮🇳"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Member since</span>
@@ -688,7 +688,7 @@ export default function GigDetails({ params }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Avg. response time</span>
-                  <span className="text-slate-900">1 hour</span>
+                  <span className="text-slate-900">18 mins</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Last delivery</span>
@@ -696,7 +696,7 @@ export default function GigDetails({ params }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Languages</span>
-                  <span className="text-slate-900">English, DEU (Fluent)</span>
+                  <span className="text-slate-900">English, Hindi (Fluent)</span>
                 </div>
               </div>
 
@@ -705,7 +705,7 @@ export default function GigDetails({ params }) {
                 onClick={handleContactSeller}
                 className="mt-5 w-full border border-slate-300 py-2 font-mono text-xs font-bold uppercase tracking-wider text-slate-800 transition hover:bg-slate-50"
               >
-                CONTACT ELENA
+                CONTACT {freelancer?.name?.split(" ")[0]?.toUpperCase() || "ANANYA"}
               </button>
             </div>
 

@@ -96,7 +96,7 @@ export default function Landing() {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 text-center">
             <div className="p-2 border-r border-slate-200 last:border-none">
               <p className="text-[10px] uppercase text-slate-500">ESCROW LIQUIDITY</p>
-              <p className="font-serif text-2xl font-bold text-slate-950">$24,200,000</p>
+              <p className="font-serif text-2xl font-bold text-slate-950">₹24,20,00,000</p>
               <p className="text-[10px] text-emerald-700">Q1 VERIFIED</p>
             </div>
             <div className="p-2 border-r border-slate-200 last:border-none">

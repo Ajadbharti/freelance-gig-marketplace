@@ -122,7 +122,7 @@ export default function FreelancerProfile({ params }) {
               <div className="border-b border-slate-200 pb-3">
                 <p className="font-mono text-[10px] uppercase text-slate-500">RATE INDICATOR</p>
                 <p className="font-serif text-2xl font-bold text-slate-950">
-                  ${freelancer.hourlyRate || 95}.00 <span className="font-sans text-xs font-normal text-slate-500">/ HOUR</span>
+                  ₹{freelancer.hourlyRate?.toLocaleString("en-IN") || "3,500"} <span className="font-sans text-xs font-normal text-slate-500">/ HOUR</span>
                 </p>
               </div>
 
@@ -181,7 +181,7 @@ export default function FreelancerProfile({ params }) {
               <p className="text-[10px] uppercase text-slate-500">HOURS LOGGED</p>
             </div>
             <div className="p-2">
-              <p className="text-xs font-bold text-slate-950">{freelancer.totalEscrow || "$128k+"}</p>
+              <p className="text-xs font-bold text-slate-950">{freelancer.totalEscrow || "₹1.2 Cr+"}</p>
               <p className="text-[10px] uppercase text-slate-500">TOTAL ESCROW EARNINGS</p>
             </div>
           </div>
@@ -435,7 +435,7 @@ export default function FreelancerProfile({ params }) {
                           <span className="font-mono text-xs text-amber-500">★★★★★</span>
                         </div>
                         <p className="mt-1 font-mono text-[10px] text-slate-500">
-                          {rev.clientRole} · {rev.paidEscrow || "$1,840.00"} Escrow Paid
+                          {rev.clientRole} · {rev.paidEscrow || "₹1,84,000"} Escrow Paid
                         </p>
                         <p className="mt-2 text-xs text-slate-700 leading-relaxed">
                           {rev.comment}

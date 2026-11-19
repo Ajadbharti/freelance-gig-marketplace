@@ -5,9 +5,9 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "GigCraft | Technical Marketplace & Milestone Escrow Protocol",
+  title: "GigCraft Bharat | Technical Marketplace & Milestone Escrow Protocol",
   description:
-    "Contract top-tier software engineers, system architects, and UI/UX designers under deterministic cryptographic escrow milestones.",
+    "Contract India's top-tier software engineers, system architects, and UI/UX designers under deterministic cryptographic escrow milestones.",
 };
 
 function NavFallback() {

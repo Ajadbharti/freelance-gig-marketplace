@@ -66,9 +66,9 @@ export default function RegisterForm() {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      firstName: "Linus",
-      lastName: "Torvalds",
-      email: "engineer@enterprise.io",
+      firstName: "Aakash",
+      lastName: "Verma",
+      email: "engineer@enterprise.in",
       password: "••••••••••••",
     },
   });
@@ -488,7 +488,7 @@ export default function RegisterForm() {
                 </div>
                 <div className="border border-slate-100 bg-[#FAFBFB] p-3">
                   <p className="font-mono text-[10px] uppercase text-slate-500">ESCROW VOLUME</p>
-                  <p className="mt-1 font-serif text-xl font-bold text-slate-950">$24.2M</p>
+                  <p className="mt-1 font-serif text-xl font-bold text-slate-950">₹24.2 Cr</p>
                   <p className="font-mono text-[10px] text-slate-500">Q1 VERIFIED</p>
                 </div>
               </div>
@@ -529,12 +529,12 @@ export default function RegisterForm() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-xs font-bold text-slate-900">Alex K.</p>
+                    <p className="text-xs font-bold text-slate-900">Aakash K.</p>
                     <span className="border border-emerald-300 bg-emerald-50 px-1.5 font-mono text-[9px] font-bold text-[#0a5c36]">
                       STAFF ARCHITECT
                     </span>
                   </div>
-                  <p className="font-mono text-[10px] text-slate-500">Distributed Systems & Rust</p>
+                  <p className="font-mono text-[10px] text-slate-500">Distributed Systems & Rust // Bengaluru</p>
                 </div>
               </div>
               <p className="mt-3 text-xs italic leading-relaxed text-slate-700">
@@ -566,10 +566,10 @@ export default function RegisterForm() {
             <Lock className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-                SOC-2 TYPE II CUSTODY
+                GST & TDS (194J) COMPLIANT
               </h4>
               <p className="mt-1 text-xs text-slate-600">
-                Enterprise payroll, tax compliance (1099/W8-BEN), and bank disbursements across 140+ countries.
+                Enterprise payroll, GST invoicing, TDS (194J) compliance, and direct bank (IMPS/NEFT/UPI) disbursements across India.
               </p>
             </div>
           </div>
@@ -581,7 +581,7 @@ export default function RegisterForm() {
                 PRE-SCREENED TALENT
               </h4>
               <p className="mt-1 text-xs text-slate-600">
-                Only the top 3% of technical applicants pass algorithmic repo evaluations and live architecture screens.
+                Only the top 1.4% of technical applicants pass algorithmic repo evaluations and live architecture screens.
               </p>
             </div>
           </div>
@@ -589,7 +589,7 @@ export default function RegisterForm() {
 
         {/* Bottom Mini Footer */}
         <div className="mt-6 flex items-center justify-between border-t border-slate-200 pt-4 font-mono text-xs text-slate-500">
-          <span>GIGCRAFT © 2025 GigCraft Marketplace Inc.</span>
+          <span>GIGCRAFT BHARAT © 2025 GigCraft Marketplace India Inc.</span>
           <span className="uppercase tracking-wider">SECURE ACCESS PORTAL</span>
         </div>
       </div>

@@ -3,16 +3,16 @@ export function cn(...classes) {
 }
 
 export function formatPrice(amount) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     maximumFractionDigits: 0,
   }).format(amount ?? 0);
 }
 
 export function formatDate(iso) {
   if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-US", {
+  return new Date(iso).toLocaleDateString("en-IN", {
     year: "numeric",
     month: "short",
     day: "numeric",
