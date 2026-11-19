@@ -34,12 +34,12 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB]">
+    <div className="min-h-screen bg-[#f8f9ff]">
       {/* Top Protocol Header Bar */}
       <section className="border-b border-slate-200 bg-white py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="inline-flex items-center gap-2 border border-slate-200 bg-slate-50 px-3 py-1 font-mono text-xs font-semibold text-slate-800">
-            <span className="h-2 w-2 rounded-full bg-[#0a5c36]" />
+            <span className="h-2 w-2 rounded-full bg-[#047857]" />
             <span>PROTOCOL v2.4 ACTIVE // NEXT SPRINT RECONCILIATION LIVE</span>
           </div>
 
@@ -65,7 +65,7 @@ export default function Landing() {
             </div>
             <button
               type="submit"
-              className="bg-[#0a5c36] px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+              className="bg-[#047857] px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
             >
               SEARCH CATALOG
             </button>
@@ -106,7 +106,7 @@ export default function Landing() {
             </div>
             <div className="p-2 border-r border-slate-200 last:border-none">
               <p className="text-[10px] uppercase text-slate-500">DISPUTE RATE</p>
-              <p className="font-serif text-2xl font-bold text-[#0a5c36]">0.08%</p>
+              <p className="font-serif text-2xl font-bold text-[#047857]">0.08%</p>
               <p className="text-[10px] text-slate-500">DETERMINISTIC SLA</p>
             </div>
             <div className="p-2">
@@ -123,7 +123,7 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0a5c36]">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#047857]">
                 VERIFIED CONTRACT CATALOG
               </span>
               <h2 className="mt-1 font-serif text-3xl font-bold text-slate-950">
@@ -132,7 +132,7 @@ export default function Landing() {
             </div>
             <Link
               href="/gigs"
-              className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800 hover:text-[#0a5c36]"
+              className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800 hover:text-[#047857]"
             >
               EXPLORE ALL 1,428 SPECS →
             </Link>
@@ -151,7 +151,7 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between border-b border-slate-200 pb-4">
             <div>
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0a5c36]">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#047857]">
                 AUDITED CONTRACTORS
               </span>
               <h2 className="mt-1 font-serif text-3xl font-bold text-slate-950">
@@ -160,7 +160,7 @@ export default function Landing() {
             </div>
             <Link
               href="/freelancers/f1"
-              className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800 hover:text-[#0a5c36]"
+              className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800 hover:text-[#047857]"
             >
               INSPECT SAMPLE ARCHITECT (ELENA) →
             </Link>
@@ -182,12 +182,12 @@ export default function Landing() {
                           href={`/freelancers/${f.id}`}
                           className="font-sans text-sm font-bold text-slate-950 hover:underline"
                         >
-                          {f.name} <span className="text-[#0a5c36]">✓</span>
+                          {f.name} <span className="text-[#047857]">✓</span>
                         </Link>
                         <p className="font-mono text-[10px] text-slate-500">{f.location}</p>
                       </div>
                     </div>
-                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#0a5c36]">
+                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#047857]">
                       {f.tier || "TOP RATED"}
                     </span>
                   </div>
@@ -231,7 +231,7 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-6 md:grid-cols-3">
             <div className="border border-slate-200 bg-white p-6 shadow-sm">
-              <ShieldCheck className="h-8 w-8 text-[#0a5c36]" />
+              <ShieldCheck className="h-8 w-8 text-[#047857]" />
               <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 100% ESCROW VAULT SETTLEMENT
               </h3>
@@ -241,7 +241,7 @@ export default function Landing() {
             </div>
 
             <div className="border border-slate-200 bg-white p-6 shadow-sm">
-              <Lock className="h-8 w-8 text-[#0a5c36]" />
+              <Lock className="h-8 w-8 text-[#047857]" />
               <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 SOC-2 TYPE II PROTOCOL SECURITY
               </h3>
@@ -251,7 +251,7 @@ export default function Landing() {
             </div>
 
             <div className="border border-slate-200 bg-white p-6 shadow-sm">
-              <Zap className="h-8 w-8 text-[#0a5c36]" />
+              <Zap className="h-8 w-8 text-[#047857]" />
               <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 AUTOMATED GIT REPO DISBURSEMENT
               </h3>

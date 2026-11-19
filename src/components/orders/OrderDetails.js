@@ -98,12 +98,12 @@ export default function OrderDetails({ initialOrderId }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Protocol Header */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3 font-mono text-xs text-slate-600">
           <div className="flex items-center gap-2">
-            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#0a5c36] text-[9px] text-white">■</span>
+            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#047857] text-[9px] text-white">■</span>
             <span className="font-bold text-slate-900 uppercase">
               SYSTEM // CONTRACT OPS # ESCROW GUARANTEED
             </span>
@@ -111,7 +111,7 @@ export default function OrderDetails({ initialOrderId }) {
           <div className="flex items-center gap-3 text-[11px] text-slate-500">
             <span>SOCKET AUDIT: ENCRYPTED</span>
             <span className="text-slate-300">|</span>
-            <span className="text-[#0a5c36] font-bold">100% ESCROW PROTECTED</span>
+            <span className="text-[#047857] font-bold">100% ESCROW PROTECTED</span>
           </div>
         </div>
 
@@ -157,7 +157,7 @@ export default function OrderDetails({ initialOrderId }) {
             <p className="mt-1 font-serif text-3xl font-bold text-slate-950">4</p>
             <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400">SLA: PASS</span>
-              <span className="text-[#0a5c36] font-bold">100% HEALTHY</span>
+              <span className="text-[#047857] font-bold">100% HEALTHY</span>
             </div>
           </div>
 
@@ -178,7 +178,7 @@ export default function OrderDetails({ initialOrderId }) {
               <span className="text-[11px] uppercase">ESCROW VAULT SECURED</span>
               <span className="text-xs">🛡</span>
             </div>
-            <p className="mt-1 font-serif text-3xl font-bold text-[#0a5c36]">₹1,84,000</p>
+            <p className="mt-1 font-serif text-3xl font-bold text-[#047857]">₹1,84,000</p>
             <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400">DISPUTE PROTECTION</span>
               <span className="text-slate-800 font-bold">MULTI-SIG LOCK</span>
@@ -193,7 +193,7 @@ export default function OrderDetails({ initialOrderId }) {
             <p className="mt-1 font-serif text-3xl font-bold text-slate-950">100%</p>
             <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400">BENCHMARK</span>
-              <span className="text-[#0a5c36] font-bold">TOP 1% FREELANCER</span>
+              <span className="text-[#047857] font-bold">TOP 1% FREELANCER</span>
             </div>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function OrderDetails({ initialOrderId }) {
             type="button"
             onClick={() => setFilterTab("all")}
             className={`px-4 py-2.5 whitespace-nowrap uppercase tracking-wider transition ${
-              filterTab === "all" ? "bg-[#0a5c36] text-white" : "text-slate-700 hover:bg-slate-50"
+              filterTab === "all" ? "bg-[#047857] text-white" : "text-slate-700 hover:bg-slate-50"
             }`}
           >
             ALL ORDERS (14)
@@ -213,7 +213,7 @@ export default function OrderDetails({ initialOrderId }) {
             type="button"
             onClick={() => setFilterTab("in-progress")}
             className={`px-4 py-2.5 whitespace-nowrap uppercase tracking-wider border-l border-slate-200 transition ${
-              filterTab === "in-progress" ? "bg-[#0a5c36] text-white" : "text-slate-700 hover:bg-slate-50"
+              filterTab === "in-progress" ? "bg-[#047857] text-white" : "text-slate-700 hover:bg-slate-50"
             }`}
           >
             IN PROGRESS (4)
@@ -222,7 +222,7 @@ export default function OrderDetails({ initialOrderId }) {
             type="button"
             onClick={() => setFilterTab("under-review")}
             className={`px-4 py-2.5 whitespace-nowrap uppercase tracking-wider border-l border-slate-200 transition ${
-              filterTab === "under-review" ? "bg-[#0a5c36] text-white" : "text-slate-700 hover:bg-slate-50"
+              filterTab === "under-review" ? "bg-[#047857] text-white" : "text-slate-700 hover:bg-slate-50"
             }`}
           >
             UNDER REVIEW (2)
@@ -231,7 +231,7 @@ export default function OrderDetails({ initialOrderId }) {
             type="button"
             onClick={() => setFilterTab("completed")}
             className={`px-4 py-2.5 whitespace-nowrap uppercase tracking-wider border-l border-slate-200 transition ${
-              filterTab === "completed" ? "bg-[#0a5c36] text-white" : "text-slate-700 hover:bg-slate-50"
+              filterTab === "completed" ? "bg-[#047857] text-white" : "text-slate-700 hover:bg-slate-50"
             }`}
           >
             COMPLETED (7)
@@ -252,7 +252,7 @@ export default function OrderDetails({ initialOrderId }) {
                 const isSelected = ord.id === activeOrder?.id;
                 const statusBadge =
                   ord.status === "active"
-                    ? "bg-[#eaf6ee] text-[#0a5c36] border-[#0a5c36]"
+                    ? "bg-[#eaf6ee] text-[#047857] border-[#047857]"
                     : ord.status === "delivered"
                     ? "bg-amber-50 text-amber-800 border-amber-300"
                     : "bg-slate-100 text-slate-700 border-slate-300";
@@ -263,7 +263,7 @@ export default function OrderDetails({ initialOrderId }) {
                     onClick={() => setSelectedId(ord.id)}
                     className={`cursor-pointer border p-4 transition shadow-sm ${
                       isSelected
-                        ? "border-[#0a5c36] bg-[#f7fcf9] ring-1 ring-[#0a5c36]"
+                        ? "border-[#047857] bg-[#f7fcf9] ring-1 ring-[#047857]"
                         : "border-slate-200 bg-white hover:border-slate-300"
                     }`}
                   >
@@ -308,7 +308,7 @@ export default function OrderDetails({ initialOrderId }) {
                 <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-900">{activeOrder.code || `#${activeOrder.id}`}</span>
-                    <span className="bg-[#0a5c36] px-2 py-0.5 font-bold text-white uppercase text-[10px]">
+                    <span className="bg-[#047857] px-2 py-0.5 font-bold text-white uppercase text-[10px]">
                       {activeOrder.milestoneFlight || "MILESTONE 3 OF 5 IN FLIGHT"}
                     </span>
                   </div>
@@ -339,7 +339,7 @@ export default function OrderDetails({ initialOrderId }) {
                   <div className="sm:border-l sm:border-slate-200 sm:pl-4">
                     <span className="text-slate-400 text-[10px] uppercase">VAULT COMMITMENT</span>
                     <p className="font-bold text-slate-950">{activeOrder.vaultCommitment || `$${activeOrder.price}.00 USD`}</p>
-                    <p className="text-[10px] text-[#0a5c36] font-bold">100% ESCROW SECURED</p>
+                    <p className="text-[10px] text-[#047857] font-bold">100% ESCROW SECURED</p>
                   </div>
                 </div>
               </div>
@@ -350,7 +350,7 @@ export default function OrderDetails({ initialOrderId }) {
                   <span className="font-bold uppercase tracking-wider text-slate-900">
                     EXECUTION MILESTONES & AUDIT TRAIL
                   </span>
-                  <span className="font-bold text-[#0a5c36]">
+                  <span className="font-bold text-[#047857]">
                     {activeOrder.progress || 60}% PROGRESS
                   </span>
                 </div>
@@ -358,7 +358,7 @@ export default function OrderDetails({ initialOrderId }) {
                 {/* Progress bar */}
                 <div className="mt-3 h-1.5 w-full bg-slate-100">
                   <div
-                    className="h-full bg-[#0a5c36]"
+                    className="h-full bg-[#047857]"
                     style={{ width: `${activeOrder.progress || 60}%` }}
                   />
                 </div>
@@ -370,7 +370,7 @@ export default function OrderDetails({ initialOrderId }) {
                       key={idx}
                       className={`border p-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${
                         m.current
-                          ? "border-[#0a5c36] bg-[#f7fcf9]"
+                          ? "border-[#047857] bg-[#f7fcf9]"
                           : m.completed
                           ? "border-slate-200 bg-white"
                           : "border-slate-100 bg-[#FAFBFB] text-slate-400"
@@ -380,9 +380,9 @@ export default function OrderDetails({ initialOrderId }) {
                         <div
                           className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-[10px] ${
                             m.completed
-                              ? "bg-[#0a5c36] text-white"
+                              ? "bg-[#047857] text-white"
                               : m.current
-                              ? "border-2 border-[#0a5c36] text-[#0a5c36]"
+                              ? "border-2 border-[#047857] text-[#047857]"
                               : "border border-slate-300 text-slate-400"
                           }`}
                         >
@@ -401,7 +401,7 @@ export default function OrderDetails({ initialOrderId }) {
                         <span
                           className={`border px-2 py-0.5 text-[10px] font-bold ${
                             m.completed
-                              ? "border-emerald-300 bg-emerald-50 text-[#0a5c36]"
+                              ? "border-emerald-300 bg-emerald-50 text-[#047857]"
                               : m.current
                               ? "border-blue-300 bg-blue-50 text-blue-700"
                               : "border-slate-200 bg-slate-50 text-slate-500"
@@ -461,8 +461,8 @@ export default function OrderDetails({ initialOrderId }) {
                   <span className="font-bold uppercase tracking-wider text-slate-900">
                     CONTRACT AUDIT & DIRECT MESSAGING
                   </span>
-                  <span className="flex items-center gap-1.5 text-[#0a5c36] font-bold">
-                    <span className="h-2 w-2 rounded-full bg-[#0a5c36]" />
+                  <span className="flex items-center gap-1.5 text-[#047857] font-bold">
+                    <span className="h-2 w-2 rounded-full bg-[#047857]" />
                     SOCKET LIVE
                   </span>
                 </div>
@@ -474,7 +474,7 @@ export default function OrderDetails({ initialOrderId }) {
                       return (
                         <div
                           key={idx}
-                          className="border border-emerald-200 bg-[#f7fcf9] p-3 text-center font-mono text-xs font-bold text-[#0a5c36]"
+                          className="border border-emerald-200 bg-[#f7fcf9] p-3 text-center font-mono text-xs font-bold text-[#047857]"
                         >
                           {msg.text}
                         </div>
@@ -548,7 +548,7 @@ export default function OrderDetails({ initialOrderId }) {
                     type="button"
                     onClick={handleApproveMilestone}
                     disabled={isApproving}
-                    className="bg-[#0a5c36] px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#084c2c] shadow-sm disabled:opacity-50"
+                    className="bg-[#047857] px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#065f46] shadow-sm disabled:opacity-50"
                   >
                     ✓ APPROVE & RELEASE FUNDS (₹5,000)
                   </button>

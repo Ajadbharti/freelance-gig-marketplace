@@ -1,43 +1,160 @@
 @import "tailwindcss";
 @source "../";
 
-@layer base {
+@layer theme {
   :root {
-    --background: #fbfbfb;
-    --foreground: #09090b;
-    --primary: #0a5c36;
-    --primary-hover: #084c2c;
+    --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-serif: "Space Grotesk", sans-serif;
+    --font-headline: "Space Grotesk", sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+
+    /* Technical Marketplace Precision Palette */
+    --background: #f8f9ff;
+    --foreground: #0b1c30;
+    --surface: #f8f9ff;
+    --surface-dim: #cbdbf5;
+    --surface-bright: #f8f9ff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #eff4ff;
+    --surface-container: #e5eeff;
+    --surface-container-high: #dce9ff;
+    --surface-container-highest: #d3e4fe;
+    --on-surface: #0b1c30;
+    --on-surface-variant: #3e4943;
+    --inverse-surface: #213145;
+    --inverse-on-surface: #eaf1ff;
+    --outline: #6e7a73;
+    --outline-variant: #bdc9c1;
+
+    /* Primary Precision Emerald */
+    --primary: #047857;
+    --primary-hover: #065f46;
+    --on-primary: #ffffff;
+    --primary-container: #047857;
+    --on-primary-container: #9ffdd3;
+    --inverse-primary: #7bd8b1;
+
+    /* Secondary Solid Slate */
+    --secondary: #0f172a;
+    --on-secondary: #ffffff;
+    --secondary-container: #dae2fd;
+    --on-secondary-container: #5c647a;
+
+    /* Tertiary Cobalt */
+    --tertiary: #2563eb;
+    --on-tertiary: #ffffff;
+    --tertiary-container: #1e5fe7;
+    --on-tertiary-container: #e6e9ff;
+
+    /* Strict Borders */
     --border: #e2e8f0;
+    --border-strong: #0f172a;
     --muted: #64748b;
+  }
+}
+
+@layer base {
+  /* Zero Corner Radius Everywhere - Strict Orthogonal Brutalism */
+  *,
+  ::before,
+  ::after,
+  ::backdrop {
+    border-radius: 0px !important;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, .font-editorial {
-    font-family: "Georgia", "Playfair Display", "Times New Roman", serif;
+  /* Space Grotesk for All Headlines & Titles */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .font-serif,
+  .font-editorial,
+  .font-headline {
+    font-family: "Space Grotesk", sans-serif !important;
+    letter-spacing: -0.02em;
   }
 
+  /* Geist Mono for Code & Monospace Tags */
+  code,
+  kbd,
+  pre,
+  samp,
+  .font-mono,
   .font-mono-tag {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: "Geist Mono", ui-monospace, SFMono-Regular, monospace !important;
+  }
+
+  /* Form controls focus without soft blur glow */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none !important;
+    border-color: #0f172a !important;
+    box-shadow: 2px 2px 0px #0f172a !important;
   }
 }
 
-/* Custom scrollbars and styling utilities */
+/* Hard Brutalist Elevation - No soft blurred drop shadows */
+.shadow-sm,
+.shadow {
+  box-shadow: 2px 2px 0px #0f172a !important;
+}
+
+.shadow-md,
+.shadow-lg,
+.shadow-xl {
+  box-shadow: 3px 3px 0px #0f172a !important;
+}
+
+.shadow-none {
+  box-shadow: none !important;
+}
+
+/* Primary Button Styling with hard solid offset on hover */
+.bg-\[\#047857\],
+.bg-\[\#047857\] {
+  background-color: #047857 !important;
+  color: #ffffff !important;
+}
+
+.bg-\[\#047857\]:hover,
+.bg-\[\#047857\]:hover,
+.hover\:bg-\[\#065f46\]:hover,
+.hover\:bg-\[\#065f46\]:hover {
+  background-color: #065f46 !important;
+  box-shadow: 2px 2px 0px #0f172a !important;
+}
+
+.text-\[\#047857\],
+.text-\[\#047857\] {
+  color: #047857 !important;
+}
+
+.border-\[\#047857\],
+.border-\[\#047857\] {
+  border-color: #047857 !important;
+}
+
+/* Strict Selection Color */
 ::selection {
-  background-color: #0a5c36;
+  background-color: #047857;
   color: #ffffff;
 }
 
-/* Grid pattern background utility for technical feel */
+/* Architectural Grid Pattern */
 .bg-tech-grid {
   background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-image:
+    linear-gradient(to right, rgba(11, 28, 48, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11, 28, 48, 0.05) 1px, transparent 1px);
 }

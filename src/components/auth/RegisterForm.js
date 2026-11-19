@@ -118,11 +118,11 @@ export default function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         {/* Protocol Breadcrumb */}
         <div className="mb-6 flex items-center gap-2 font-mono text-xs text-slate-600">
-          <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#0a5c36] text-[9px] text-white">■</span>
+          <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#047857] text-[9px] text-white">■</span>
           <span className="bg-slate-100 px-2 py-0.5 font-bold uppercase tracking-wider text-slate-800">
             JOIN THE TECHNICAL MARKETPLACE
           </span>
@@ -152,7 +152,7 @@ export default function RegisterForm() {
                   onClick={() => setArchetype("client")}
                   className={`cursor-pointer border p-4 transition ${
                     archetype === "client"
-                      ? "border-[#0a5c36] bg-[#f7fcf9] ring-1 ring-[#0a5c36]"
+                      ? "border-[#047857] bg-[#f7fcf9] ring-1 ring-[#047857]"
                       : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
                 >
@@ -166,7 +166,7 @@ export default function RegisterForm() {
                     <div
                       className={`flex h-4 w-4 items-center justify-center border text-[10px] ${
                         archetype === "client"
-                          ? "border-[#0a5c36] bg-[#0a5c36] text-white"
+                          ? "border-[#047857] bg-[#047857] text-white"
                           : "border-slate-300"
                       }`}
                     >
@@ -181,7 +181,7 @@ export default function RegisterForm() {
                   </p>
                   <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 font-mono text-[11px] text-slate-600">
                     <span className="uppercase tracking-wider font-semibold text-slate-800">BUYER ESCROW MODE</span>
-                    <span className="text-[#0a5c36]">0% Upfront Post</span>
+                    <span className="text-[#047857]">0% Upfront Post</span>
                   </div>
                 </div>
 
@@ -190,7 +190,7 @@ export default function RegisterForm() {
                   onClick={() => setArchetype("freelancer")}
                   className={`cursor-pointer border p-4 transition ${
                     archetype === "freelancer"
-                      ? "border-[#0a5c36] bg-[#f7fcf9] ring-1 ring-[#0a5c36]"
+                      ? "border-[#047857] bg-[#f7fcf9] ring-1 ring-[#047857]"
                       : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
                 >
@@ -204,7 +204,7 @@ export default function RegisterForm() {
                     <div
                       className={`flex h-4 w-4 items-center justify-center border text-[10px] ${
                         archetype === "freelancer"
-                          ? "border-[#0a5c36] bg-[#0a5c36] text-white"
+                          ? "border-[#047857] bg-[#047857] text-white"
                           : "border-slate-300"
                       }`}
                     >
@@ -219,7 +219,7 @@ export default function RegisterForm() {
                   </p>
                   <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 font-mono text-[11px] text-slate-600">
                     <span className="uppercase tracking-wider font-semibold text-slate-800">BUILDER WORKSPACE</span>
-                    <span className="text-[#0a5c36]">Direct Settlement</span>
+                    <span className="text-[#047857]">Direct Settlement</span>
                   </div>
                 </div>
               </div>
@@ -322,17 +322,17 @@ export default function RegisterForm() {
                 <div className="mt-2 grid grid-cols-3 gap-1 font-mono text-[9px] uppercase tracking-wider text-slate-500">
                   <div
                     className={`h-1.5 ${
-                      strengthPercent >= 33 ? "bg-[#0a5c36]" : "bg-slate-200"
+                      strengthPercent >= 33 ? "bg-[#047857]" : "bg-slate-200"
                     }`}
                   />
                   <div
                     className={`h-1.5 ${
-                      strengthPercent >= 66 ? "bg-[#0a5c36]" : "bg-slate-200"
+                      strengthPercent >= 66 ? "bg-[#047857]" : "bg-slate-200"
                     }`}
                   />
                   <div
                     className={`h-1.5 ${
-                      strengthPercent >= 100 ? "bg-[#0a5c36]" : "bg-slate-200"
+                      strengthPercent >= 100 ? "bg-[#047857]" : "bg-slate-200"
                     }`}
                   />
                 </div>
@@ -370,7 +370,7 @@ export default function RegisterForm() {
                         onClick={() => toggleTag(tag)}
                         className={`border px-2.5 py-1 font-mono text-xs transition ${
                           active
-                            ? "border-[#0a5c36] bg-[#eaf6ee] text-[#0a5c36] font-semibold"
+                            ? "border-[#047857] bg-[#eaf6ee] text-[#047857] font-semibold"
                             : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
                         }`}
                       >
@@ -388,7 +388,7 @@ export default function RegisterForm() {
                     type="checkbox"
                     checked={agreeTerms}
                     onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded-none accent-[#0a5c36]"
+                    className="mt-0.5 h-4 w-4 rounded-none accent-[#047857]"
                   />
                   <span>
                     I agree to the{" "}
@@ -403,7 +403,7 @@ export default function RegisterForm() {
                     type="checkbox"
                     checked={agreeDigest}
                     onChange={(e) => setAgreeDigest(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded-none accent-[#0a5c36]"
+                    className="mt-0.5 h-4 w-4 rounded-none accent-[#047857]"
                   />
                   <span>
                     Send me weekly curated technical gig digests, benchmark contract rate indexes, and core engineering telemetry updates.
@@ -415,7 +415,7 @@ export default function RegisterForm() {
               <button
                 type="submit"
                 disabled={isSubmitting || !agreeTerms}
-                className="mt-4 flex h-12 w-full items-center justify-center gap-2 bg-[#0a5c36] font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c] disabled:opacity-50"
+                className="mt-4 flex h-12 w-full items-center justify-center gap-2 bg-[#047857] font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46] disabled:opacity-50"
               >
                 CREATE FREE ACCOUNT & START BOOKING →
               </button>
@@ -423,7 +423,7 @@ export default function RegisterForm() {
               <div className="pt-2 text-center">
                 <Link
                   href="/login"
-                  className="font-mono text-xs text-slate-600 transition hover:text-[#0a5c36]"
+                  className="font-mono text-xs text-slate-600 transition hover:text-[#047857]"
                 >
                   Already verified on the GigCraft node network?{" "}
                   <span className="font-bold underline text-slate-900">Log In →</span>
@@ -440,13 +440,13 @@ export default function RegisterForm() {
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                   PROTOCOL GUARANTEE
                 </span>
-                <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-[#0a5c36]">
+                <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-[#047857]">
                   ACTIVE
                 </span>
               </div>
               <ul className="mt-4 space-y-4 text-xs text-slate-600">
                 <li className="flex items-start gap-2.5">
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#0a5c36]" />
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#047857]" />
                   <div>
                     <strong className="text-slate-900">100% Escrow Milestone Vault</strong>
                     <p className="mt-0.5 text-slate-500">
@@ -455,7 +455,7 @@ export default function RegisterForm() {
                   </div>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Zap className="mt-0.5 h-4 w-4 shrink-0 text-[#0a5c36]" />
+                  <Zap className="mt-0.5 h-4 w-4 shrink-0 text-[#047857]" />
                   <div>
                     <strong className="text-slate-900">Instant GitHub Portfolio Sync</strong>
                     <p className="mt-0.5 text-slate-500">
@@ -464,7 +464,7 @@ export default function RegisterForm() {
                   </div>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[#0a5c36]" />
+                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[#047857]" />
                   <div>
                     <strong className="text-slate-900">Zero Upfront Hiring Fee</strong>
                     <p className="mt-0.5 text-slate-500">
@@ -497,18 +497,18 @@ export default function RegisterForm() {
               <div className="mt-4">
                 <div className="flex items-center justify-between font-mono text-xs">
                   <span className="text-slate-600">Milestone Dispute Rate</span>
-                  <span className="font-bold text-[#0a5c36]">0.08%</span>
+                  <span className="font-bold text-[#047857]">0.08%</span>
                 </div>
                 {/* SVG Sparkline */}
                 <div className="mt-2 h-10 w-full">
                   <svg viewBox="0 0 200 40" className="h-full w-full">
                     <polyline
                       fill="none"
-                      stroke="#0a5c36"
+                      stroke="#047857"
                       strokeWidth="2"
                       points="10,32 50,30 100,28 150,22 190,12"
                     />
-                    <circle cx="190" cy="12" r="3" fill="#0a5c36" />
+                    <circle cx="190" cy="12" r="3" fill="#047857" />
                   </svg>
                 </div>
                 <div className="flex justify-between font-mono text-[9px] uppercase text-slate-400">
@@ -516,7 +516,7 @@ export default function RegisterForm() {
                   <span>NOV</span>
                   <span>DEC</span>
                   <span>JAN</span>
-                  <span className="text-[#0a5c36] font-bold">LIVE</span>
+                  <span className="text-[#047857] font-bold">LIVE</span>
                 </div>
               </div>
             </div>
@@ -530,7 +530,7 @@ export default function RegisterForm() {
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-xs font-bold text-slate-900">Aakash K.</p>
-                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 font-mono text-[9px] font-bold text-[#0a5c36]">
+                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 font-mono text-[9px] font-bold text-[#047857]">
                       STAFF ARCHITECT
                     </span>
                   </div>
@@ -551,7 +551,7 @@ export default function RegisterForm() {
         {/* Bottom Security Highlights */}
         <div className="mt-8 grid gap-4 border border-slate-200 bg-white p-6 sm:grid-cols-3 shadow-sm">
           <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
+            <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 DETERMINISTIC ESCROW
@@ -563,7 +563,7 @@ export default function RegisterForm() {
           </div>
 
           <div className="flex items-start gap-3 border-slate-200 sm:border-l sm:pl-4">
-            <Lock className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
+            <Lock className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 GST & TDS (194J) COMPLIANT
@@ -575,7 +575,7 @@ export default function RegisterForm() {
           </div>
 
           <div className="flex items-start gap-3 border-slate-200 sm:border-l sm:pl-4">
-            <UserCheck className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
+            <UserCheck className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 PRE-SCREENED TALENT

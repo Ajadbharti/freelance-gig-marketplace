@@ -11,17 +11,17 @@ export default function Inbox() {
   const { orders } = useMarketplace();
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
         {/* Protocol Header */}
         <div className="flex items-center justify-between border-b border-slate-200 pb-3 font-mono text-xs text-slate-600">
           <div className="flex items-center gap-2">
-            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#0a5c36] text-[9px] text-white">■</span>
+            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#047857] text-[9px] text-white">■</span>
             <span className="font-bold text-slate-900 uppercase">
               COMMUNICATIONS HUB // CONTRACT THREADS
             </span>
           </div>
-          <span className="text-[#0a5c36] font-bold">SOCKET LIVE</span>
+          <span className="text-[#047857] font-bold">SOCKET LIVE</span>
         </div>
 
         <div className="mt-6">
@@ -45,7 +45,7 @@ export default function Inbox() {
               <Link
                 key={ord.id}
                 href={`/orders/${ord.id}`}
-                className="block border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#0a5c36] hover:shadow-md"
+                className="block border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#047857] hover:shadow-md"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -58,7 +58,7 @@ export default function Inbox() {
                       <div className="flex items-center gap-2 font-mono text-xs">
                         <span className="font-bold text-slate-950">{ord.freelancerName}</span>
                         <span className="text-slate-400">({ord.code || `#${ord.id}`})</span>
-                        <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-[#0a5c36]">
+                        <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-[#047857]">
                           {ord.statusLabel || "IN PROGRESS"}
                         </span>
                       </div>

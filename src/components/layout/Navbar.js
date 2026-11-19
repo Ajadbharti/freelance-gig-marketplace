@@ -76,12 +76,12 @@ export default function Navbar() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-4 w-4 items-center justify-center bg-[#0a5c36] text-[10px] text-white">■</span>
+            <span className="flex h-4 w-4 items-center justify-center bg-[#047857] text-[10px] text-white">■</span>
             <span className="font-serif text-xl font-bold tracking-tight text-slate-950">GIGCRAFT</span>
           </Link>
           <Link
             href="/gigs"
-            className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-600 transition hover:text-[#0a5c36]"
+            className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-600 transition hover:text-[#047857]"
           >
             BACK TO MARKETPLACE →
           </Link>
@@ -96,7 +96,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
         {/* Brand Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <span className="flex h-4 w-4 items-center justify-center bg-[#0a5c36] text-[10px] text-white">■</span>
+          <span className="flex h-4 w-4 items-center justify-center bg-[#047857] text-[10px] text-white">■</span>
           <span className="font-serif text-2xl font-bold tracking-tight text-slate-950">GIGCRAFT</span>
         </Link>
 
@@ -112,7 +112,7 @@ export default function Navbar() {
             />
             <button
               type="submit"
-              className="h-full bg-[#0a5c36] px-4 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+              className="h-full bg-[#047857] px-4 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
             >
               SEARCH
             </button>
@@ -123,8 +123,8 @@ export default function Navbar() {
         <nav className="ml-auto hidden items-center gap-6 lg:flex" aria-label="Main">
           <Link
             href="/gigs"
-            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#0a5c36] ${
-              pathname === "/gigs" ? "text-[#0a5c36] underline underline-offset-8" : "text-slate-700"
+            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
+              pathname === "/gigs" ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
             }`}
           >
             Explore Gigs
@@ -132,8 +132,8 @@ export default function Navbar() {
 
           <Link
             href="/orders"
-            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#0a5c36] ${
-              pathname.startsWith("/orders") ? "text-[#0a5c36] underline underline-offset-8" : "text-slate-700"
+            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
+              pathname.startsWith("/orders") ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
             }`}
           >
             My Orders
@@ -141,8 +141,8 @@ export default function Navbar() {
 
           <Link
             href="/messages"
-            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#0a5c36] ${
-              pathname === "/messages" ? "text-[#0a5c36] underline underline-offset-8" : "text-slate-700"
+            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
+              pathname === "/messages" ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
             }`}
           >
             Messages
@@ -151,7 +151,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={handleToggleSelling}
-            className="text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#0a5c36]"
+            className="text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#047857]"
           >
             {mounted && user?.role === "freelancer" ? "Switch to Buying" : "Switch to Selling"}
           </button>
@@ -166,20 +166,20 @@ export default function Navbar() {
             className="relative flex h-8 w-8 items-center justify-center rounded border border-slate-200 text-slate-600 transition hover:bg-slate-50"
           >
             <Bell className="h-4 w-4" />
-            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#0a5c36]" />
+            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#047857]" />
           </Link>
 
           {!mounted ? (
             <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#0a5c36]"
+                className="px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#047857]"
               >
                 Log In
               </Link>
               <Link
                 href="/register"
-                className="bg-[#0a5c36] px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+                className="bg-[#047857] px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
               >
                 Sign Up
               </Link>
@@ -209,7 +209,7 @@ export default function Navbar() {
                 >
                   <div className="border-b border-slate-100 px-3 py-2">
                     <p className="truncate text-xs font-bold uppercase tracking-wider text-slate-900">{user.name}</p>
-                    <p className="font-mono text-[10px] uppercase text-[#0a5c36]">
+                    <p className="font-mono text-[10px] uppercase text-[#047857]">
                       {user.role === "freelancer" ? "BUILDER WORKSPACE" : "BUYER ESCROW MODE"}
                     </p>
                   </div>
@@ -255,13 +255,13 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#0a5c36]"
+                className="px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#047857]"
               >
                 Log In
               </Link>
               <Link
                 href="/register"
-                className="bg-[#0a5c36] px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+                className="bg-[#047857] px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
               >
                 Sign Up
               </Link>
@@ -287,7 +287,7 @@ export default function Navbar() {
               <span key={cat.slug} className="flex items-center gap-6">
                 <Link
                   href={`/gigs?category=${cat.slug}`}
-                  className="transition hover:text-[#0a5c36] hover:underline"
+                  className="transition hover:text-[#047857] hover:underline"
                 >
                   {cat.name}
                 </Link>
@@ -309,7 +309,7 @@ export default function Navbar() {
               placeholder="Search services..."
               className="h-full flex-1 rounded-l border border-slate-300 px-3 text-xs"
             />
-            <button type="submit" className="bg-[#0a5c36] px-3 font-mono text-xs text-white">
+            <button type="submit" className="bg-[#047857] px-3 font-mono text-xs text-white">
               SEARCH
             </button>
           </form>
@@ -317,28 +317,28 @@ export default function Navbar() {
             <Link
               href="/gigs"
               onClick={() => setMobileOpen(false)}
-              className="block py-1 text-slate-800 hover:text-[#0a5c36]"
+              className="block py-1 text-slate-800 hover:text-[#047857]"
             >
               Explore Gigs
             </Link>
             <Link
               href="/orders"
               onClick={() => setMobileOpen(false)}
-              className="block py-1 text-slate-800 hover:text-[#0a5c36]"
+              className="block py-1 text-slate-800 hover:text-[#047857]"
             >
               My Orders
             </Link>
             <Link
               href="/messages"
               onClick={() => setMobileOpen(false)}
-              className="block py-1 text-slate-800 hover:text-[#0a5c36]"
+              className="block py-1 text-slate-800 hover:text-[#047857]"
             >
               Messages
             </Link>
             <Link
               href="/dashboard/client"
               onClick={() => setMobileOpen(false)}
-              className="block py-1 text-slate-800 hover:text-[#0a5c36]"
+              className="block py-1 text-slate-800 hover:text-[#047857]"
             >
               Dashboard
             </Link>

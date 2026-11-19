@@ -24,7 +24,7 @@ function SettingsForm({ user }) {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 font-mono">
-      <div className="flex items-center gap-2 text-xs text-[#0a5c36] font-bold uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-xs text-[#047857] font-bold uppercase tracking-wider">
         <span>■</span>
         <span>SECURITY & PROTOCOL IDENTIFICATION</span>
       </div>
@@ -77,14 +77,14 @@ function SettingsForm({ user }) {
           </div>
           <div className="border border-slate-100 bg-[#FAFBFB] p-3">
             <span className="text-[10px] text-slate-400 uppercase">NODE ARCHETYPE</span>
-            <p className="mt-1 font-bold text-[#0a5c36] uppercase">{user.role || "CLIENT"}</p>
+            <p className="mt-1 font-bold text-[#047857] uppercase">{user.role || "CLIENT"}</p>
           </div>
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#0a5c36] py-3 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+          className="w-full bg-[#047857] py-3 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
         >
           SAVE CONFIGURATION
         </button>

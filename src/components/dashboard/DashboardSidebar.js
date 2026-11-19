@@ -55,7 +55,7 @@ export default function DashboardSidebar({ role, userId }) {
             className={cn(
               "flex shrink-0 items-center gap-2 px-3.5 py-2.5 transition",
               active
-                ? "bg-[#0a5c36] font-bold text-white"
+                ? "bg-[#047857] font-bold text-white"
                 : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
             )}
           >

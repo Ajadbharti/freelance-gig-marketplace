@@ -101,7 +101,7 @@ export default function FilterSidebar({
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleServiceType(st.label)}
-                      className="h-3.5 w-3.5 rounded-none accent-[#0a5c36]"
+                      className="h-3.5 w-3.5 rounded-none accent-[#047857]"
                     />
                     <span className={checked ? "font-semibold text-slate-900" : ""}>
                       {st.label}
@@ -132,7 +132,7 @@ export default function FilterSidebar({
                   value={opt.value}
                   checked={deliveryTime === opt.value}
                   onChange={(e) => setDeliveryTime && setDeliveryTime(e.target.value)}
-                  className="h-3.5 w-3.5 accent-[#0a5c36]"
+                  className="h-3.5 w-3.5 accent-[#047857]"
                 />
                 <span className={deliveryTime === opt.value ? "font-semibold text-slate-900" : ""}>
                   {opt.label}
@@ -209,14 +209,14 @@ export default function FilterSidebar({
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleTier(tier.label)}
-                      className="h-3.5 w-3.5 rounded-none accent-[#0a5c36]"
+                      className="h-3.5 w-3.5 rounded-none accent-[#047857]"
                     />
                     <span className={checked ? "font-semibold text-slate-900" : ""}>
                       {tier.label}
                     </span>
                   </div>
                   {tier.badge ? (
-                    <span className="border border-emerald-300 bg-emerald-50 px-1 font-mono text-[9px] font-bold text-[#0a5c36]">
+                    <span className="border border-emerald-300 bg-emerald-50 px-1 font-mono text-[9px] font-bold text-[#047857]">
                       {tier.badge}
                     </span>
                   ) : (
@@ -242,7 +242,7 @@ export default function FilterSidebar({
                 value="4.5"
                 checked={minRating === "4.5"}
                 onChange={(e) => setMinRating && setMinRating(e.target.value)}
-                className="h-3.5 w-3.5 accent-[#0a5c36]"
+                className="h-3.5 w-3.5 accent-[#047857]"
               />
               <span>★ 4.5 & above</span>
             </label>
@@ -253,7 +253,7 @@ export default function FilterSidebar({
                 value="4.0"
                 checked={minRating === "4.0"}
                 onChange={(e) => setMinRating && setMinRating(e.target.value)}
-                className="h-3.5 w-3.5 accent-[#0a5c36]"
+                className="h-3.5 w-3.5 accent-[#047857]"
               />
               <span>★ 4.0 & above</span>
             </label>
@@ -265,7 +265,7 @@ export default function FilterSidebar({
           <button
             type="button"
             onClick={onApply}
-            className="w-full bg-[#0a5c36] py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+            className="w-full bg-[#047857] py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
           >
             APPLY FILTER STATE
           </button>

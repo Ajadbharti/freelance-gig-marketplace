@@ -36,7 +36,7 @@ function Notice({ title, text, href, linkLabel }) {
       <p className="mt-2 text-xs text-slate-600">{text}</p>
       <Link
         href={href}
-        className="mt-6 bg-[#0a5c36] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+        className="mt-6 bg-[#047857] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
       >
         {linkLabel}
       </Link>
@@ -62,13 +62,13 @@ export default function DashboardShell({ role, path, title, subtitle, actions, c
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl lg:grid lg:grid-cols-[240px_1fr] lg:gap-8">
         <DashboardSidebar role={user.role} userId={user.id} />
         <div className="mt-6 min-w-0 lg:mt-0">
           <div className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
-              <div className="flex items-center gap-2 font-mono text-xs text-[#0a5c36]">
+              <div className="flex items-center gap-2 font-mono text-xs text-[#047857]">
                 <span className="text-[10px]">■</span>
                 <span className="font-bold uppercase tracking-wider">
                   WORKSPACE MODE: {user.role === "freelancer" ? "BUILDER NODE" : "BUYER ESCROW CONSOLE"}

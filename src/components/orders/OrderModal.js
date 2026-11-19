@@ -63,7 +63,7 @@ function OrderForm({ gig, selectedPackage, onClose }) {
         <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-2.5 text-[11px] text-slate-600">
           <span>⚡ {deliveryDays}-Day SLA Delivery</span>
           <span>↺ {revisions} Iteration Revisions</span>
-          <span className="text-[#0a5c36] font-bold">100% Escrow Protected</span>
+          <span className="text-[#047857] font-bold">100% Escrow Protected</span>
         </div>
       </div>
 
@@ -86,7 +86,7 @@ function OrderForm({ gig, selectedPackage, onClose }) {
         )}
       </div>
 
-      <div className="border border-emerald-200 bg-[#f7fcf9] p-3 flex items-start gap-2.5 font-mono text-xs text-[#0a5c36]">
+      <div className="border border-emerald-200 bg-[#f7fcf9] p-3 flex items-start gap-2.5 font-mono text-xs text-[#047857]">
         <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5" />
         <p className="text-[11px] leading-relaxed text-slate-700">
           <strong>Deterministic Escrow Vault:</strong> Funds are locked in a neutral smart-contract vault and disbursed in automated tranches as milestone deliverables pass review.
@@ -104,7 +104,7 @@ function OrderForm({ gig, selectedPackage, onClose }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-[#0a5c36] px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#084c2c] disabled:opacity-50"
+          className="bg-[#047857] px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#065f46] disabled:opacity-50"
         >
           {isSubmitting ? "Locking Escrow..." : `LOCK IN ESCROW VAULT (₹${price.toLocaleString("en-IN")}) →`}
         </button>

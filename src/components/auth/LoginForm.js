@@ -71,12 +71,12 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         {/* Protocol Breadcrumb */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-slate-600">
           <div className="flex items-center gap-2">
-            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#0a5c36] text-[9px] text-white">■</span>
+            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#047857] text-[9px] text-white">■</span>
             <span className="bg-slate-100 px-2 py-0.5 font-bold uppercase tracking-wider text-slate-800">
               AUTH-GATEWAY // NODE-04: SECURE
             </span>
@@ -85,10 +85,10 @@ export default function LoginForm() {
           </div>
           <div className="flex items-center gap-4 text-[11px]">
             <span className="flex items-center gap-1 text-slate-700">
-              <ShieldCheck className="h-3.5 w-3.5 text-[#0a5c36]" /> SOC-2 TYPE II
+              <ShieldCheck className="h-3.5 w-3.5 text-[#047857]" /> SOC-2 TYPE II
             </span>
             <span className="flex items-center gap-1 text-slate-700">
-              <Lock className="h-3.5 w-3.5 text-[#0a5c36]" /> MULTI-SIG ESCROW ACTIVE
+              <Lock className="h-3.5 w-3.5 text-[#047857]" /> MULTI-SIG ESCROW ACTIVE
             </span>
           </div>
         </div>
@@ -98,7 +98,7 @@ export default function LoginForm() {
           {/* Left Column: Login Card */}
           <div className="border border-slate-200 bg-white p-6 sm:p-10 shadow-sm">
             <div className="inline-flex items-center gap-1.5 border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-700">
-              <Shield className="h-3 w-3 text-[#0a5c36]" />
+              <Shield className="h-3 w-3 text-[#047857]" />
               SECURE ESCROW AUTHENTICATION
             </div>
 
@@ -163,7 +163,7 @@ export default function LoginForm() {
                   </label>
                   <Link
                     href="/login?reset=1"
-                    className="font-mono text-xs text-slate-600 underline hover:text-[#0a5c36]"
+                    className="font-mono text-xs text-slate-600 underline hover:text-[#047857]"
                   >
                     Forgot password?
                   </Link>
@@ -195,7 +195,7 @@ export default function LoginForm() {
                     type="checkbox"
                     checked={rememberHardware}
                     onChange={(e) => setRememberHardware(e.target.checked)}
-                    className="h-4 w-4 rounded-none accent-[#0a5c36]"
+                    className="h-4 w-4 rounded-none accent-[#047857]"
                   />
                   <span>Keep me signed in on this hardware</span>
                 </label>
@@ -208,7 +208,7 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex h-12 w-full items-center justify-center gap-2 bg-[#0a5c36] font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c] disabled:opacity-50"
+                className="flex h-12 w-full items-center justify-center gap-2 bg-[#047857] font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46] disabled:opacity-50"
               >
                 → Sign In to Workspace
               </button>
@@ -223,7 +223,7 @@ export default function LoginForm() {
                       setValue("email", "developer@agency.in");
                       setValue("password", "demo123");
                     }}
-                    className="border border-slate-300 bg-white px-2 py-1 text-[11px] hover:border-[#0a5c36]"
+                    className="border border-slate-300 bg-white px-2 py-1 text-[11px] hover:border-[#047857]"
                   >
                     Client: developer@agency.in
                   </button>
@@ -233,7 +233,7 @@ export default function LoginForm() {
                       setValue("email", "ananya@gigcraft.in");
                       setValue("password", "demo123");
                     }}
-                    className="border border-slate-300 bg-white px-2 py-1 text-[11px] hover:border-[#0a5c36]"
+                    className="border border-slate-300 bg-white px-2 py-1 text-[11px] hover:border-[#047857]"
                   >
                     Freelancer: ananya@gigcraft.in
                   </button>
@@ -269,7 +269,7 @@ export default function LoginForm() {
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                   PLATFORM LEDGER & METRICS
                 </span>
-                <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-[#0a5c36]">
+                <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-[#047857]">
                   REAL-TIME
                 </span>
               </div>
@@ -293,7 +293,7 @@ export default function LoginForm() {
                     <span className="font-bold text-slate-900">94.8% SLA Clearance</span>
                   </div>
                   <div className="mt-2 h-1.5 w-full bg-slate-100">
-                    <div className="h-full bg-[#0a5c36] w-[94.8%]" />
+                    <div className="h-full bg-[#047857] w-[94.8%]" />
                   </div>
                 </div>
               </div>
@@ -340,7 +340,7 @@ export default function LoginForm() {
             <div className="border border-slate-200 bg-white p-5 font-mono text-xs space-y-2.5 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <span className="text-slate-600">Zero-Knowledge Token Proof</span>
-                <span className="font-bold text-[#0a5c36]">ACTIVE</span>
+                <span className="font-bold text-[#047857]">ACTIVE</span>
               </div>
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <span className="text-slate-600">Hardware Security Module (HSM)</span>
@@ -348,7 +348,7 @@ export default function LoginForm() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-600">Instant Automated Escrow Release</span>
-                <span className="font-bold text-[#0a5c36]">UPON GIT COMMIT VERIFY</span>
+                <span className="font-bold text-[#047857]">UPON GIT COMMIT VERIFY</span>
               </div>
             </div>
           </div>
@@ -357,7 +357,7 @@ export default function LoginForm() {
         {/* Bottom Security Row */}
         <div className="mt-8 grid gap-4 border border-slate-200 bg-white p-6 sm:grid-cols-3 shadow-sm">
           <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
+            <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 SOC-2 & CERT-IN COMPLIANT
@@ -369,7 +369,7 @@ export default function LoginForm() {
           </div>
 
           <div className="flex items-start gap-3 border-slate-200 sm:border-l sm:pl-4">
-            <Lock className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
+            <Lock className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 RBI COMPLIANT ESCROW VAULT
@@ -381,7 +381,7 @@ export default function LoginForm() {
           </div>
 
           <div className="flex items-start gap-3 border-slate-200 sm:border-l sm:pl-4">
-            <KeyRound className="mt-1 h-5 w-5 shrink-0 text-[#0a5c36]" />
+            <KeyRound className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
             <div>
               <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
                 256-BIT ENCRYPTION & UPI/IMPS

@@ -95,7 +95,7 @@ export default function GigsExplorer() {
   }, [gigs, queryTerm, minBudget, maxBudget, minRating, sortMode]);
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Protocol Breadcrumb */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3 font-mono text-xs text-slate-500">
@@ -106,7 +106,7 @@ export default function GigsExplorer() {
             <span>/</span>
             <span className="text-slate-900 font-semibold">UI/UX & WEB DESIGN</span>
           </div>
-          <div className="flex items-center gap-1.5 font-bold text-[#0a5c36]">
+          <div className="flex items-center gap-1.5 font-bold text-[#047857]">
             <span className="text-[10px]">■</span>
             <span>VERIFIED CONTRACT CATALOG</span>
           </div>
@@ -161,7 +161,7 @@ export default function GigsExplorer() {
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="font-mono text-xs font-bold uppercase text-[#0a5c36] underline hover:text-[#084c2c]"
+                className="font-mono text-xs font-bold uppercase text-[#047857] underline hover:text-[#065f46]"
               >
                 CLEAR ALL
               </button>
@@ -169,7 +169,7 @@ export default function GigsExplorer() {
           </div>
           <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
             <span>FAST ESCROW CHECKOUT</span>
-            <span className="text-[#0a5c36]">■</span>
+            <span className="text-[#047857]">■</span>
           </div>
         </div>
 
@@ -212,7 +212,7 @@ export default function GigsExplorer() {
             {/* Feed Status Header */}
             <div className="flex items-center justify-between border border-slate-200 bg-white px-4 py-2 font-mono text-xs text-slate-600 shadow-sm">
               <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#0a5c36]" />
+                <span className="h-2 w-2 rounded-full bg-[#047857]" />
                 <span className="font-bold text-slate-900 uppercase">FEED STATUS: ESCROW ACTIVE</span>
                 <span className="text-slate-400">|</span>
                 <span>{filteredGigs.length} OF 1,428 CONTRACTS LOADED</span>
@@ -233,7 +233,7 @@ export default function GigsExplorer() {
             <div className="mt-10 border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-emerald-300 bg-emerald-50 text-[#0a5c36]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-emerald-300 bg-emerald-50 text-[#047857]">
                     <ShieldCheck className="h-6 w-6" />
                   </div>
                   <div>
@@ -272,7 +272,7 @@ export default function GigsExplorer() {
                   onClick={() => setCurrentPage(1)}
                   className={`border px-3 py-1 ${
                     currentPage === 1
-                      ? "border-[#0a5c36] bg-[#0a5c36] font-bold text-white"
+                      ? "border-[#047857] bg-[#047857] font-bold text-white"
                       : "border-slate-200 hover:bg-slate-50"
                   }`}
                 >
@@ -283,7 +283,7 @@ export default function GigsExplorer() {
                   onClick={() => setCurrentPage(2)}
                   className={`border px-3 py-1 ${
                     currentPage === 2
-                      ? "border-[#0a5c36] bg-[#0a5c36] font-bold text-white"
+                      ? "border-[#047857] bg-[#047857] font-bold text-white"
                       : "border-slate-200 hover:bg-slate-50"
                   }`}
                 >
@@ -294,7 +294,7 @@ export default function GigsExplorer() {
                   onClick={() => setCurrentPage(3)}
                   className={`border px-3 py-1 ${
                     currentPage === 3
-                      ? "border-[#0a5c36] bg-[#0a5c36] font-bold text-white"
+                      ? "border-[#047857] bg-[#047857] font-bold text-white"
                       : "border-slate-200 hover:bg-slate-50"
                   }`}
                 >
@@ -306,7 +306,7 @@ export default function GigsExplorer() {
                   onClick={() => setCurrentPage(48)}
                   className={`border px-3 py-1 ${
                     currentPage === 48
-                      ? "border-[#0a5c36] bg-[#0a5c36] font-bold text-white"
+                      ? "border-[#047857] bg-[#047857] font-bold text-white"
                       : "border-slate-200 hover:bg-slate-50"
                   }`}
                 >

@@ -95,7 +95,7 @@ export default function ClientDashboard() {
       actions={
         <Link
           href="/gigs"
-          className="bg-[#0a5c36] px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c] shadow-sm"
+          className="bg-[#047857] px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46] shadow-sm"
         >
           BROWSE GIGS CATALOG →
         </Link>
@@ -116,7 +116,7 @@ export default function ClientDashboard() {
           </h2>
           <Link
             href="/orders"
-            className="font-mono text-xs font-bold uppercase tracking-wider text-[#0a5c36] hover:underline"
+            className="font-mono text-xs font-bold uppercase tracking-wider text-[#047857] hover:underline"
           >
             OPEN FULL CONSOLE VIEW →
           </Link>
@@ -134,7 +134,7 @@ export default function ClientDashboard() {
               className={cn(
                 "border px-3.5 py-1.5 uppercase tracking-wider transition",
                 tab === t.value
-                  ? "border-[#0a5c36] bg-[#0a5c36] font-bold text-white"
+                  ? "border-[#047857] bg-[#047857] font-bold text-white"
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               )}
             >
@@ -152,7 +152,7 @@ export default function ClientDashboard() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-slate-950">{order.code || `#${order.id}`}</span>
-                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-[#0a5c36] uppercase">
+                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-[#047857] uppercase">
                     {order.statusLabel || order.status.toUpperCase()}
                   </span>
                   <span className="text-slate-400">·</span>

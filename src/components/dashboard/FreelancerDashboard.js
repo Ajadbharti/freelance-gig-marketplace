@@ -85,7 +85,7 @@ export default function FreelancerDashboard() {
           </button>
           <Link
             href="/dashboard/freelancer/gigs/new"
-            className="bg-[#0a5c36] px-4 py-2 font-bold uppercase tracking-wider text-white hover:bg-[#084c2c]"
+            className="bg-[#047857] px-4 py-2 font-bold uppercase tracking-wider text-white hover:bg-[#065f46]"
           >
             + PUBLISH NEW SPEC
           </Link>
@@ -108,7 +108,7 @@ export default function FreelancerDashboard() {
           </h2>
           <Link
             href="/dashboard/freelancer/gigs/new"
-            className="font-mono text-xs font-bold uppercase text-[#0a5c36] hover:underline"
+            className="font-mono text-xs font-bold uppercase text-[#047857] hover:underline"
           >
             + ADD SPECIFICATION
           </Link>
@@ -124,13 +124,13 @@ export default function FreelancerDashboard() {
                 <SafeImage src={g.image} alt="" className="h-14 w-20 object-cover border border-slate-200" />
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-[#0a5c36]">
+                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-[#047857]">
                       {g.tier || "VERIFIED"}
                     </span>
                     <span className="text-slate-400">·</span>
                     <span className="text-slate-500">{g.deliveryBadge || `⚡ ${g.deliveryDays}-Day SLA`}</span>
                   </div>
-                  <Link href={`/gigs/${g.id}`} className="font-serif text-base font-bold text-slate-950 font-sans hover:text-[#0a5c36]">
+                  <Link href={`/gigs/${g.id}`} className="font-serif text-base font-bold text-slate-950 font-sans hover:text-[#047857]">
                     {g.title}
                   </Link>
                 </div>
@@ -158,7 +158,7 @@ export default function FreelancerDashboard() {
           </h2>
           <Link
             href="/orders"
-            className="font-mono text-xs font-bold uppercase text-[#0a5c36] hover:underline"
+            className="font-mono text-xs font-bold uppercase text-[#047857] hover:underline"
           >
             OPEN CONTRACT OPERATIONS CONSOLE →
           </Link>
@@ -173,7 +173,7 @@ export default function FreelancerDashboard() {
               className={cn(
                 "border px-3 py-1.5 uppercase tracking-wider transition",
                 tab === t.value
-                  ? "border-[#0a5c36] bg-[#0a5c36] font-bold text-white"
+                  ? "border-[#047857] bg-[#047857] font-bold text-white"
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               )}
             >
@@ -191,7 +191,7 @@ export default function FreelancerDashboard() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-slate-950">{ord.code || `#${ord.id}`}</span>
-                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-[#0a5c36] uppercase">
+                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-[#047857] uppercase">
                     {ord.statusLabel || ord.status.toUpperCase()}
                   </span>
                   <span className="text-slate-400">·</span>
@@ -209,7 +209,7 @@ export default function FreelancerDashboard() {
                 <button
                   type="button"
                   onClick={() => setDeliverTarget(ord)}
-                  className="bg-[#0a5c36] px-4 py-2 font-bold uppercase tracking-wider text-white hover:bg-[#084c2c]"
+                  className="bg-[#047857] px-4 py-2 font-bold uppercase tracking-wider text-white hover:bg-[#065f46]"
                 >
                   PUSH DELIVERABLE →
                 </button>

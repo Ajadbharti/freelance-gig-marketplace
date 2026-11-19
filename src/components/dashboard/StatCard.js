@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 
 const TONES = {
-  indigo: "bg-[#eaf6ee] text-[#0a5c36]",
-  emerald: "bg-[#eaf6ee] text-[#0a5c36]",
+  indigo: "bg-[#eaf6ee] text-[#047857]",
+  emerald: "bg-[#eaf6ee] text-[#047857]",
   amber: "bg-amber-50 text-amber-700",
   slate: "bg-slate-100 text-slate-700",
 };

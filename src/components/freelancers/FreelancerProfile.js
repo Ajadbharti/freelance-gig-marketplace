@@ -46,17 +46,17 @@ export default function FreelancerProfile({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9ff] py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Top Protocol Header matching Image 4 */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3 font-mono text-xs text-slate-600">
           <div className="flex items-center gap-2">
-            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#0a5c36] text-[9px] text-white">■</span>
+            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#047857] text-[9px] text-white">■</span>
             <span className="font-bold text-slate-900">
               CONTRACTOR #{freelancer.contractCode || "PRO-08914-ELENA"}
             </span>
             <span className="text-slate-400">|</span>
-            <span className="text-[#0a5c36] font-bold">STATUS: AVAILABLE FOR SPRINTS & DIRECT ESCROW</span>
+            <span className="text-[#047857] font-bold">STATUS: AVAILABLE FOR SPRINTS & DIRECT ESCROW</span>
           </div>
           <div className="flex items-center gap-4 text-[11px] text-slate-500">
             <span>AVG RESPONSE: {freelancer.avgResponse || "18 MINS"}</span>
@@ -76,7 +76,7 @@ export default function FreelancerProfile({ params }) {
                   alt={freelancer.name}
                   className="h-28 w-28 object-cover border border-slate-200 shadow-sm"
                 />
-                <span className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center bg-[#0a5c36] text-xs text-white">
+                <span className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center bg-[#047857] text-xs text-white">
                   ✓
                 </span>
               </div>
@@ -86,7 +86,7 @@ export default function FreelancerProfile({ params }) {
                   <h1 className="font-serif text-3xl font-bold tracking-tight text-slate-950">
                     {freelancer.name.toUpperCase()}
                   </h1>
-                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-[#0a5c36]">
+                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-[#047857]">
                     {freelancer.tier || "TOP RATED SELLER"}
                   </span>
                   <span className="flex items-center gap-1 font-mono text-xs text-slate-500">
@@ -130,7 +130,7 @@ export default function FreelancerProfile({ params }) {
                 <button
                   type="button"
                   onClick={handleContact}
-                  className="w-full bg-[#0a5c36] py-2 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+                  className="w-full bg-[#047857] py-2 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
                 >
                   CONTACT SELLER
                 </button>
@@ -147,14 +147,14 @@ export default function FreelancerProfile({ params }) {
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="flex items-center gap-1 text-slate-600 hover:text-[#0a5c36]"
+                  className="flex items-center gap-1 text-slate-600 hover:text-[#047857]"
                 >
                   <Share2 className="h-3 w-3" /> SHARE PROFILE
                 </button>
                 <button
                   type="button"
                   onClick={handleContact}
-                  className="flex items-center gap-1 text-slate-600 hover:text-[#0a5c36]"
+                  className="flex items-center gap-1 text-slate-600 hover:text-[#047857]"
                 >
                   <MessageSquare className="h-3 w-3" /> MESSAGE
                 </button>
@@ -169,11 +169,11 @@ export default function FreelancerProfile({ params }) {
               <p className="text-[10px] uppercase text-slate-500">248 CLIENT REVIEWS</p>
             </div>
             <div className="border-r border-slate-100 last:border-none p-2">
-              <p className="text-xs font-bold text-[#0a5c36]">98%</p>
+              <p className="text-xs font-bold text-[#047857]">98%</p>
               <p className="text-[10px] uppercase text-slate-500">JOB SUCCESS SCORE</p>
             </div>
             <div className="border-r border-slate-100 last:border-none p-2">
-              <p className="text-xs font-bold text-[#0a5c36]">100%</p>
+              <p className="text-xs font-bold text-[#047857]">100%</p>
               <p className="text-[10px] uppercase text-slate-500">ON-TIME SETTLEMENT</p>
             </div>
             <div className="border-r border-slate-100 last:border-none p-2">
@@ -195,18 +195,18 @@ export default function FreelancerProfile({ params }) {
             <div className="border border-slate-200 bg-white p-5 shadow-sm font-mono text-xs">
               <div className="border-b border-slate-100 pb-3 font-bold uppercase tracking-wider text-slate-900 flex justify-between">
                 <span>ID PHASE & VERIFICATION</span>
-                <span className="text-[#0a5c36]">L2 VERIFIED</span>
+                <span className="text-[#047857]">L2 VERIFIED</span>
               </div>
               <ul className="mt-3 space-y-2.5">
                 <li className="flex items-center justify-between">
                   <span className="text-slate-600">Identity Document</span>
-                  <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-[#0a5c36]">
+                  <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-[#047857]">
                     VERIFIED
                   </span>
                 </li>
                 <li className="flex items-center justify-between">
                   <span className="text-slate-600">Payment & Escrow</span>
-                  <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-[#0a5c36]">
+                  <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-[#047857]">
                     VERIFIED
                   </span>
                 </li>
@@ -232,7 +232,7 @@ export default function FreelancerProfile({ params }) {
                 <span className="text-slate-400">EVALUATED</span>
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5">
-                <span className="border border-[#0a5c36] bg-[#eaf6ee] px-2 py-1 text-[11px] font-bold text-[#0a5c36]">
+                <span className="border border-[#047857] bg-[#eaf6ee] px-2 py-1 text-[11px] font-bold text-[#047857]">
                   Figma [PRO]
                 </span>
                 <span className="border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-800">
@@ -266,7 +266,7 @@ export default function FreelancerProfile({ params }) {
                 <span className="text-slate-400">AUDITED</span>
               </div>
               <div className="mt-3 space-y-3">
-                <div className="border-l-2 border-[#0a5c36] pl-2.5">
+                <div className="border-l-2 border-[#047857] pl-2.5">
                   <p className="font-bold text-slate-900">Golden Hummingbird Group / FDM</p>
                   <p className="text-[10px] text-slate-500">Design Sprint Facilitator · 2023</p>
                 </div>
@@ -289,7 +289,7 @@ export default function FreelancerProfile({ params }) {
                 </li>
                 <li className="flex justify-between">
                   <span className="text-slate-600">English</span>
-                  <span className="font-bold text-[#0a5c36]">FLUENT / VERIFIED</span>
+                  <span className="font-bold text-[#047857]">FLUENT / VERIFIED</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text-slate-600">Spanish</span>
@@ -308,7 +308,7 @@ export default function FreelancerProfile({ params }) {
                 onClick={() => setActiveTab("gigs")}
                 className={`px-5 py-3 whitespace-nowrap uppercase tracking-wider transition ${
                   activeTab === "gigs"
-                    ? "bg-[#0a5c36] text-white"
+                    ? "bg-[#047857] text-white"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -319,7 +319,7 @@ export default function FreelancerProfile({ params }) {
                 onClick={() => setActiveTab("case-studies")}
                 className={`px-5 py-3 whitespace-nowrap uppercase tracking-wider border-l border-slate-200 transition ${
                   activeTab === "case-studies"
-                    ? "bg-[#0a5c36] text-white"
+                    ? "bg-[#047857] text-white"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -330,7 +330,7 @@ export default function FreelancerProfile({ params }) {
                 onClick={() => setActiveTab("reviews")}
                 className={`px-5 py-3 whitespace-nowrap uppercase tracking-wider border-l border-slate-200 transition ${
                   activeTab === "reviews"
-                    ? "bg-[#0a5c36] text-white"
+                    ? "bg-[#047857] text-white"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -341,7 +341,7 @@ export default function FreelancerProfile({ params }) {
                 onClick={() => setActiveTab("work-history")}
                 className={`px-5 py-3 whitespace-nowrap uppercase tracking-wider border-l border-slate-200 transition ${
                   activeTab === "work-history"
-                    ? "bg-[#0a5c36] text-white"
+                    ? "bg-[#047857] text-white"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -354,7 +354,7 @@ export default function FreelancerProfile({ params }) {
               <div className="mt-6">
                 <div className="mb-4 flex items-center justify-between font-mono text-xs">
                   <span className="font-bold text-slate-900 uppercase">AVAILABLE DIRECT CONTRACTS</span>
-                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[#0a5c36] font-bold">
+                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[#047857] font-bold">
                     2 GIGS ACTIVE
                   </span>
                 </div>
@@ -401,7 +401,7 @@ export default function FreelancerProfile({ params }) {
                       <button
                         type="button"
                         onClick={() => showToast(`Opening audit spec for ${cs.title}`, "info")}
-                        className="mt-3 text-left font-mono text-xs font-bold text-[#0a5c36] hover:underline"
+                        className="mt-3 text-left font-mono text-xs font-bold text-[#047857] hover:underline"
                       >
                         VIEW DETAILED CASE STUDY →
                       </button>
@@ -419,7 +419,7 @@ export default function FreelancerProfile({ params }) {
                     <span className="font-bold uppercase text-slate-900">
                       VERIFIED CLIENT TESTIMONIALS & AUDIT LOGS
                     </span>
-                    <span className="text-[#0a5c36] font-bold">VIEW ALL (242)</span>
+                    <span className="text-[#047857] font-bold">VIEW ALL (242)</span>
                   </div>
 
                   <div className="mt-4 space-y-4">
@@ -428,7 +428,7 @@ export default function FreelancerProfile({ params }) {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-xs text-slate-900">{rev.clientName}</span>
-                            <span className="border border-emerald-300 bg-emerald-50 px-1 font-mono text-[9px] text-[#0a5c36]">
+                            <span className="border border-emerald-300 bg-emerald-50 px-1 font-mono text-[9px] text-[#047857]">
                               VERIFIED GIGCRAFT ESCROW
                             </span>
                           </div>
@@ -455,12 +455,12 @@ export default function FreelancerProfile({ params }) {
                 </div>
                 <div className="mt-6 space-y-6">
                   {(freelancer.workHistory || []).map((wh, idx) => (
-                    <div key={idx} className="border-l-2 border-[#0a5c36] pl-4">
+                    <div key={idx} className="border-l-2 border-[#047857] pl-4">
                       <div className="flex items-baseline justify-between font-mono text-xs">
                         <h3 className="font-bold uppercase text-slate-900">{wh.role}</h3>
                         <span className="text-slate-500">{wh.period}</span>
                       </div>
-                      <p className="font-mono text-[11px] text-[#0a5c36] font-semibold">{wh.company}</p>
+                      <p className="font-mono text-[11px] text-[#047857] font-semibold">{wh.company}</p>
                       <p className="mt-2 text-xs text-slate-600 leading-relaxed">{wh.desc}</p>
                     </div>
                   ))}

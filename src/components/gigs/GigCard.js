@@ -41,7 +41,7 @@ export default function GigCard({ gig }) {
     tier === "TOP RATED"
       ? "bg-slate-950 text-white"
       : tier === "PRO VERIFIED"
-      ? "bg-[#0a5c36] text-white"
+      ? "bg-[#047857] text-white"
       : tier === "RISING TALENT"
       ? "bg-blue-700 text-white"
       : "bg-slate-700 text-white";
@@ -49,7 +49,7 @@ export default function GigCard({ gig }) {
   const deliveryBadge = gig.deliveryBadge || `⚡ ${gig.deliveryDays}-DAY DELIVERY`;
 
   return (
-    <div className="group flex flex-col border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm">
+    <div className="group flex flex-col border border-slate-200 bg-white transition hover:border-[#0F172A] hover:shadow-[3px_3px_0px_#0F172A]">
       {/* Top Image Box */}
       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
         {/* Tier Badge Top Left */}
@@ -97,8 +97,8 @@ export default function GigCard({ gig }) {
               alt=""
               className="h-6 w-6 rounded-full object-cover"
             />
-            <span className="truncate text-xs font-semibold text-slate-900 group-hover/author:text-[#0a5c36]">
-              {freelancer?.name || "Ananya Sharma"} <span className="text-[#0a5c36]">✓</span>
+            <span className="truncate text-xs font-semibold text-slate-900 group-hover/author:text-[#047857]">
+              {freelancer?.name || "Ananya Sharma"} <span className="text-[#047857]">✓</span>
             </span>
           </Link>
           <div className="flex items-center gap-1 font-mono text-xs font-bold text-slate-800">
@@ -110,7 +110,7 @@ export default function GigCard({ gig }) {
 
         {/* Title */}
         <Link href={`/gigs/${gig.id}`} className="mt-3 block">
-          <h3 className="line-clamp-2 font-sans text-sm font-bold leading-snug text-slate-950 transition group-hover:text-[#0a5c36]">
+          <h3 className="line-clamp-2 font-sans text-sm font-bold leading-snug text-slate-950 transition group-hover:text-[#047857]">
             {gig.title}
           </h3>
         </Link>
@@ -135,7 +135,7 @@ export default function GigCard({ gig }) {
           </div>
           <Link
             href={`/gigs/${gig.id}`}
-            className="bg-[#0a5c36] px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#084c2c]"
+            className="bg-[#047857] px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
           >
             INSPECT SPEC
           </Link>
