@@ -93,19 +93,19 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
         {/* Brand Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <span className="flex h-4 w-4 items-center justify-center bg-[#047857] text-[10px] text-white">■</span>
-          <span className="font-serif text-2xl font-bold tracking-tight text-slate-950">GIGCRAFT</span>
+          <span className="font-headline text-2xl font-bold tracking-tight text-[#047857] uppercase">GIGCRAFT</span>
         </Link>
 
         {/* Search Bar matching image */}
         <div className="hidden max-w-md flex-1 md:block">
-          <form onSubmit={handleSearchSubmit} className="flex h-9 items-center rounded border border-slate-300 bg-white shadow-none focus-within:border-slate-800">
+          <form onSubmit={handleSearchSubmit} className="flex h-9 items-center border border-slate-300 bg-white shadow-none focus-within:border-slate-800">
+            <Search className="ml-2.5 h-4 w-4 text-slate-400 shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search services, talent, or gigs..."
-              className="h-full min-w-0 flex-1 px-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              className="h-full min-w-0 flex-1 px-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
             />
             <button
               type="submit"
@@ -120,147 +120,140 @@ export default function Navbar() {
         <nav className="ml-auto hidden items-center gap-6 lg:flex" aria-label="Main">
           <Link
             href="/gigs"
-            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
-              pathname === "/gigs" ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
+            className={`text-xs font-bold uppercase tracking-wider transition ${
+              pathname.startsWith("/gigs")
+                ? "border-b-2 border-[#047857] pb-1 text-[#047857]"
+                : "text-slate-700 hover:text-[#047857]"
             }`}
           >
             Explore Gigs
           </Link>
 
-          <Link
-            href="/orders"
-            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
-              pathname.startsWith("/orders") ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
-            }`}
-          >
-            My Orders
-          </Link>
+          {mounted && user && (
+            <>
+              <Link
+                href="/orders"
+                className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
+                  pathname.startsWith("/orders") ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
+                }`}
+              >
+                My Orders
+              </Link>
 
-          <Link
-            href="/messages"
-            className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
-              pathname === "/messages" ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
-            }`}
-          >
-            Messages
-          </Link>
+              <Link
+                href="/messages"
+                className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
+                  pathname === "/messages" ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
+                }`}
+              >
+                Messages
+              </Link>
 
-          <button
-            type="button"
-            onClick={handleToggleSelling}
-            className="text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#047857]"
-          >
-            {mounted && user?.role === "freelancer" ? "Switch to Buying" : "Switch to Selling"}
-          </button>
+              <button
+                type="button"
+                onClick={handleToggleSelling}
+                className="text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#047857]"
+              >
+                {user?.role === "freelancer" ? "Switch to Buying" : "Switch to Selling"}
+              </button>
+            </>
+          )}
         </nav>
 
         {/* User & Auth Right controls */}
         <div className="flex items-center gap-3">
-          {/* Notification bell */}
-          <Link
-            href="/messages"
-            aria-label="Notifications"
-            className="relative flex h-8 w-8 items-center justify-center rounded border border-slate-200 text-slate-600 transition hover:bg-slate-50"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#047857]" />
-          </Link>
-
-          {!mounted ? (
-            <div className="flex items-center gap-2">
+          {mounted && user ? (
+            <>
+              {/* Notification bell */}
               <Link
-                href="/login"
-                className="px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#047857]"
+                href="/messages"
+                aria-label="Notifications"
+                className="relative flex h-8 w-8 items-center justify-center rounded border border-slate-200 text-slate-600 transition hover:bg-slate-50"
               >
-                Log In
+                <Bell className="h-4 w-4" />
+                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#047857]" />
               </Link>
-              <Link
-                href="/register"
-                className="bg-[#047857] px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
-              >
-                Sign Up
-              </Link>
-            </div>
-          ) : user ? (
-            <div className="relative" ref={userRef}>
-              <button
-                type="button"
-                onClick={() => setUserOpen((v) => !v)}
-                className="flex items-center gap-2 rounded border border-slate-200 p-1 pr-2 transition hover:bg-slate-50"
-              >
-                <SafeImage
-                  src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80"}
-                  alt=""
-                  className="h-6 w-6 rounded-full object-cover"
-                />
-                <span className="hidden max-w-[100px] truncate text-xs font-semibold text-slate-900 sm:block">
-                  {user.name}
-                </span>
-                <ChevronDown className="h-3 w-3 text-slate-500" />
-              </button>
 
-              {userOpen && (
-                <div
-                  role="menu"
-                  className="absolute right-0 mt-2 w-56 rounded border border-slate-200 bg-white p-2 shadow-lg"
+              <div className="relative" ref={userRef}>
+                <button
+                  type="button"
+                  onClick={() => setUserOpen((v) => !v)}
+                  className="flex items-center gap-2 rounded border border-slate-200 p-1 pr-2 transition hover:bg-slate-50"
                 >
-                  <div className="border-b border-slate-100 px-3 py-2">
-                    <p className="truncate text-xs font-bold uppercase tracking-wider text-slate-900">{user.name}</p>
-                    <p className="font-mono text-[10px] uppercase text-[#047857]">
-                      {user.role === "freelancer" ? "BUILDER WORKSPACE" : "BUYER ESCROW MODE"}
-                    </p>
+                  <SafeImage
+                    src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80"}
+                    alt=""
+                    className="h-6 w-6 rounded-full object-cover"
+                  />
+                  <span className="hidden max-w-[100px] truncate text-xs font-semibold text-slate-900 sm:block">
+                    {user.name}
+                  </span>
+                  <ChevronDown className="h-3 w-3 text-slate-500" />
+                </button>
+
+                {userOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-2 w-56 rounded border border-slate-200 bg-white p-2 shadow-lg"
+                  >
+                    <div className="border-b border-slate-100 px-3 py-2">
+                      <p className="truncate text-xs font-bold uppercase tracking-wider text-slate-900">{user.name}</p>
+                      <p className="font-mono text-[10px] uppercase text-[#047857]">
+                        {user.role === "freelancer" ? "BUILDER WORKSPACE" : "BUYER ESCROW MODE"}
+                      </p>
+                    </div>
+                    <Link
+                      href={dashboardHref}
+                      onClick={() => setUserOpen(false)}
+                      className="mt-1 flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      <LayoutDashboard className="h-3.5 w-3.5" /> Workspace Dashboard
+                    </Link>
+                    <Link
+                      href="/orders"
+                      onClick={() => setUserOpen(false)}
+                      className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      <ShieldCheck className="h-3.5 w-3.5" /> Active Contracts Ledger
+                    </Link>
+                    <Link
+                      href="/gigs"
+                      onClick={() => setUserOpen(false)}
+                      className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      <User className="h-3.5 w-3.5" /> Browse Specialists Catalog
+                    </Link>
+                    <Link
+                      href="/account"
+                      onClick={() => setUserOpen(false)}
+                      className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      <User className="h-3.5 w-3.5" /> Account Settings
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 rounded px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="h-3.5 w-3.5" /> Sign Out
+                    </button>
                   </div>
-                  <Link
-                    href={dashboardHref}
-                    onClick={() => setUserOpen(false)}
-                    className="mt-1 flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    <LayoutDashboard className="h-3.5 w-3.5" /> Workspace Dashboard
-                  </Link>
-                  <Link
-                    href="/orders"
-                    onClick={() => setUserOpen(false)}
-                    className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    <ShieldCheck className="h-3.5 w-3.5" /> Active Contracts Ledger
-                  </Link>
-                  <Link
-                    href="/gigs"
-                    onClick={() => setUserOpen(false)}
-                    className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    <User className="h-3.5 w-3.5" /> Browse Specialists Catalog
-                  </Link>
-                  <Link
-                    href="/account"
-                    onClick={() => setUserOpen(false)}
-                    className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    <User className="h-3.5 w-3.5" /> Account Settings
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
-                  >
-                    <LogOut className="h-3.5 w-3.5" /> Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#047857]"
+                className="px-2 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-slate-800 transition hover:text-[#047857]"
               >
-                Log In
+                LOG IN
               </Link>
               <Link
                 href="/register"
-                className="bg-[#047857] px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
+                className="bg-[#047857] px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
               >
-                Sign Up
+                JOIN
               </Link>
             </div>
           )}
