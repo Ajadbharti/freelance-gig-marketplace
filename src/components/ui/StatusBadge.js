@@ -1,10 +1,11 @@
 import { cn } from "@/lib/utils";
 
 const STYLES = {
-  active: "bg-indigo-50 text-indigo-700 ring-indigo-200",
-  delivered: "bg-amber-50 text-amber-800 ring-amber-200",
-  completed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  cancelled: "bg-slate-100 text-slate-600 ring-slate-300",
+  active: "bg-[#DBEAFE] text-[#2563EB] border border-[#BFDBFE]",
+  delivered: "bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A]",
+  completed: "bg-[#D1FAE5] text-[#047857] border border-[#A7F3D0]",
+  cancelled: "bg-[#FEE2E2] text-[#DC2626] border border-[#FECACA]",
+  standard: "bg-[#F1F5F9] text-[#0F172A] border border-[#E2E8F0]",
 };
 
 const LABELS = {
@@ -18,8 +19,8 @@ export default function StatusBadge({ status, className }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset",
-        STYLES[status] ?? STYLES.cancelled,
+        "inline-flex h-6 items-center px-2 font-mono text-[11px] font-semibold uppercase tracking-[0.05em] rounded-none",
+        STYLES[status] ?? STYLES.standard,
         className
       )}
     >

@@ -7,9 +7,9 @@ import { generateId } from "@/lib/utils";
 const ToastContext = createContext(null);
 
 const STYLES = {
-  success: { icon: CheckCircle2, color: "text-emerald-600" },
-  error: { icon: XCircle, color: "text-red-600" },
-  info: { icon: Info, color: "text-indigo-600" },
+  success: { icon: CheckCircle2, color: "text-[#047857]" },
+  error: { icon: XCircle, color: "text-[#DC2626]" },
+  info: { icon: Info, color: "text-[#2563EB]" },
 };
 
 export function ToastProvider({ children }) {
@@ -44,15 +44,15 @@ export function ToastProvider({ children }) {
             <div
               key={t.id}
               role="status"
-              className="pointer-events-auto flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-lg"
+              className="pointer-events-auto flex items-start gap-3 rounded-none border border-[#0F172A] bg-white p-4 shadow-[3px_3px_0px_#0F172A]"
             >
               <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${style.color}`} />
-              <p className="flex-1 text-sm text-slate-800">{t.message}</p>
+              <p className="flex-1 font-mono text-xs text-[#0B1C30]">{t.message}</p>
               <button
                 type="button"
                 onClick={() => dismiss(t.id)}
                 aria-label="Dismiss notification"
-                className="text-slate-400 transition hover:text-slate-600"
+                className="text-slate-400 transition hover:text-[#0F172A]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -66,6 +66,8 @@ export function ToastProvider({ children }) {
 
 export function useToast() {
   const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error("useToast must be used inside ToastProvider");
+  if (!ctx) {
+    throw new Error("useToast must be used within a ToastProvider");
+  }
   return ctx;
 }

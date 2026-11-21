@@ -1,16 +1,16 @@
 export const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100";
+  "w-full rounded-none border border-[#CBD5E1] bg-white px-3.5 py-2.5 text-sm text-[#0F172A] placeholder:text-slate-400 focus:border-2 focus:border-[#0F172A] focus:outline-none focus:ring-0 transition-colors";
 
 export default function FormField({ id, label, error, hint, children }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-slate-800">
+      <label htmlFor={id} className="mb-1.5 block font-mono text-xs font-semibold uppercase tracking-wider text-[#0F172A]">
         {label}
       </label>
       {children}
-      {hint && !error && <p className="mt-1.5 text-xs text-slate-500">{hint}</p>}
+      {hint && !error && <p className="mt-1.5 font-mono text-[11px] text-slate-500">{hint}</p>}
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-1.5 text-sm text-red-600">
+        <p id={`${id}-error`} role="alert" className="mt-1.5 font-mono text-xs font-semibold text-[#DC2626]">
           {error}
         </p>
       )}
