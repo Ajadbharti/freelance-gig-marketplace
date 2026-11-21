@@ -13,9 +13,10 @@ function OrderForm({ gig, selectedPackage, onClose }) {
   const { createOrder } = useMarketplace();
   const { showToast } = useToast();
 
-  const price = selectedPackage?.price || gig.price || 280;
-  const deliveryDays = selectedPackage?.deliveryDays || gig.deliveryDays || 3;
-  const revisions = selectedPackage?.revisions || gig.revisions || 4;
+  const price = selectedPackage?.price || gig?.price || 7999;
+  const deliveryDays = selectedPackage?.deliveryDays || gig?.deliveryDays || 3;
+  const revisions = selectedPackage?.revisions || gig?.revisions || 3;
+
 
   const {
     register,
@@ -50,7 +51,7 @@ function OrderForm({ gig, selectedPackage, onClose }) {
         <div className="flex items-start justify-between">
           <div>
             <span className="font-bold uppercase tracking-wider text-slate-900">
-              CONTRACT: {gig.title}
+              CONTRACT: {gig?.title || "Technical Contract"}
             </span>
             <p className="mt-1 text-slate-500">
               TIER: {selectedPackage?.name || "STANDARD CORE SUITE"}

@@ -43,55 +43,58 @@ export default function GigDetails({ params }) {
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState(0);
 
-  const packages = gig?.packages || {
-    basic: {
+  const basePrice = Number(gig?.price) || 24000;
+  const rawPackages = gig?.packages && typeof gig.packages === "object" ? gig.packages : {};
+
+  const packages = {
+    basic: rawPackages.basic || {
       name: "STARTER SPEC",
-      price: 120,
-      deliveryDays: 2,
+      price: Math.round(basePrice * 0.6),
+      deliveryDays: Math.max(1, (gig?.deliveryDays || 3) - 1),
       revisions: 2,
       screens: "Up to 3 Screens",
       features: [
         "Core user flow layout",
         "Responsive breakpoint stacking",
-        "Source Figma (.fig) file",
+        "Source files included",
         "2 Business Days delivery",
         "2 Iteration revisions",
       ],
     },
-    standard: {
+    standard: rawPackages.standard || {
       name: "STANDARD CORE SUITE",
-      price: 280,
-      deliveryDays: 3,
-      revisions: 4,
+      price: basePrice,
+      deliveryDays: gig?.deliveryDays || 3,
+      revisions: gig?.revisions || 4,
       screens: "4 to 8 Screens",
       recommended: true,
       features: [
-        "Complete UI environment (8 screens)",
-        "Strict Auto-Layout 5.0 architecture",
+        "Complete feature environment",
+        "Strict Auto-Layout architecture",
         "Interactive micro-prototypes included",
-        "Source Figma (.fig) file + variables",
-        "Design system token exports (JSON)",
+        "Source files + variables",
+        "Design system token exports",
         "Developer handoff blueprints",
       ],
     },
-    premium: {
+    premium: rawPackages.premium || {
       name: "ENTERPRISE SYSTEM",
-      price: 450,
-      deliveryDays: 5,
+      price: Math.round(basePrice * 1.6),
+      deliveryDays: (gig?.deliveryDays || 3) + 2,
       revisions: 999,
       screens: "10+ Complete Views",
       features: [
-        "Full SaaS platform spec (12+ views)",
+        "Full platform spec (10+ views)",
         "Design Tokens & JSON theme schema",
         "Clickable hi-fi user flow prototype",
-        "Design system tokens (JSON & CSS)",
-        "Direct developer handoff Zoom walk",
+        "Direct developer handoff",
         "Unlimited revisions during sprint",
       ],
     },
   };
 
-  const selectedPkg = packages[activePackageTab] || packages.standard;
+  const selectedPkg = packages[activePackageTab] || packages.standard || packages.basic || {};
+
 
   function handleOrderClick() {
     if (!user) {
@@ -293,16 +296,23 @@ export default function GigDetails({ params }) {
                       <th className="p-3 text-slate-500 font-normal">FEATURES / PRODUCTION</th>
                       <th className="p-3 font-bold text-slate-900">
                         BASIC
-                        <p className="text-sm font-serif font-bold text-slate-950">₹{packages.basic.price?.toLocaleString("en-IN")}</p>
+                        <p className="text-sm font-serif font-bold text-slate-950">
+                          ₹{(packages?.basic?.price ?? Math.round(basePrice * 0.6)).toLocaleString("en-IN")}
+                        </p>
                       </th>
                       <th className="border-x border-t border-[#047857] bg-[#eaf6ee] p-3 font-bold text-[#047857]">
                         STANDARD (RECOMMENDED)
-                        <p className="text-sm font-serif font-bold text-slate-950">₹{packages.standard.price?.toLocaleString("en-IN")}</p>
+                        <p className="text-sm font-serif font-bold text-slate-950">
+                          ₹{(packages?.standard?.price ?? basePrice).toLocaleString("en-IN")}
+                        </p>
                       </th>
                       <th className="p-3 font-bold text-slate-900">
                         PREMIUM
-                        <p className="text-sm font-serif font-bold text-slate-950">₹{packages.premium.price?.toLocaleString("en-IN")}</p>
+                        <p className="text-sm font-serif font-bold text-slate-950">
+                          ₹{(packages?.premium?.price ?? Math.round(basePrice * 1.6)).toLocaleString("en-IN")}
+                        </p>
                       </th>
+
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -566,7 +576,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  BASIC ₹{packages.basic.price?.toLocaleString("en-IN")}
+                  BASIC ₹{(packages?.basic?.price ?? Math.round(basePrice * 0.6)).toLocaleString("en-IN")}
                 </button>
                 <button
                   type="button"
@@ -577,7 +587,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  STANDARD ₹{packages.standard.price?.toLocaleString("en-IN")}
+                  STANDARD ₹{(packages?.standard?.price ?? basePrice).toLocaleString("en-IN")}
                 </button>
                 <button
                   type="button"
@@ -588,33 +598,34 @@ export default function GigDetails({ params }) {
                       : "bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  PREMIUM ₹{packages.premium.price?.toLocaleString("en-IN")}
+                  PREMIUM ₹{(packages?.premium?.price ?? Math.round(basePrice * 1.6)).toLocaleString("en-IN")}
                 </button>
               </div>
 
               {/* Selected Tier Title & Price */}
               <div className="mt-5 flex items-baseline justify-between border-b border-slate-100 pb-3">
                 <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-                  {selectedPkg.name}
+                  {selectedPkg?.name || "STANDARD SUITE"}
                 </h3>
                 <span className="font-serif text-2xl font-bold text-slate-950">
-                  ₹{selectedPkg.price?.toLocaleString("en-IN")}
+                  ₹{(selectedPkg?.price ?? basePrice).toLocaleString("en-IN")}
                 </span>
               </div>
 
               <p className="mt-3 text-xs leading-relaxed text-slate-600">
-                Complete UI environment for {selectedPkg.screens} with responsive layout, handoff specs and interactive prototype.
+                Complete UI environment for {selectedPkg?.screens || "4 to 8 Screens"} with responsive layout, handoff specs and interactive prototype.
               </p>
 
               {/* Delivery & Revisions row */}
               <div className="mt-4 flex items-center justify-between border-y border-slate-100 py-2.5 font-mono text-xs text-slate-700">
                 <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-[#047857]" /> {selectedPkg.deliveryDays}-Day Delivery
+                  <Clock className="h-3.5 w-3.5 text-[#047857]" /> {selectedPkg?.deliveryDays || 3}-Day Delivery
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <RefreshCw className="h-3.5 w-3.5 text-[#047857]" /> {selectedPkg.revisions} Revisions
+                  <RefreshCw className="h-3.5 w-3.5 text-[#047857]" /> {selectedPkg?.revisions || 3} Revisions
                 </span>
               </div>
+
 
               {/* Checklist */}
               <ul className="mt-4 space-y-2 text-xs text-slate-700">
