@@ -157,81 +157,75 @@ export function MarketplaceProvider({ children }) {
   const { user } = useAuth();
   const userId = user?.id ?? null;
 
-  const [gigs, setGigs] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("gigcraft_real:gigs");
-        if (saved) return JSON.parse(saved);
-      } catch {}
-    }
-    return seedGigs;
-  });
+  // Initial state strictly starts with seed data on both server and client for 100% hydration match
+  const [gigs, setGigs] = useState(seedGigs);
+  const [freelancers, setFreelancers] = useState(seedFreelancers);
+  const [orders, setOrders] = useState(seedOrders);
+  const [reviews, setReviews] = useState(seedReviews);
 
-  const [freelancers, setFreelancers] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("gigcraft_real:freelancers");
-        if (saved) return JSON.parse(saved);
-      } catch {}
-    }
-    return seedFreelancers;
-  });
-
-  const [orders, setOrders] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("gigcraft_real:orders");
-        if (saved) return JSON.parse(saved);
-      } catch {}
-    }
-    return seedOrders;
-  });
-
-  const [reviews, setReviews] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("gigcraft_real:reviews");
-        if (saved) return JSON.parse(saved);
-      } catch {}
-    }
-    return seedReviews;
-  });
-
-  const [hydrated, setHydrated] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
   const [liveConnected, setLiveConnected] = useState(false);
 
-  // Sync state to localStorage on changes
+  // Restore client-side localStorage ONLY after component mounts on client to avoid hydration mismatch
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    setHydrated(true);
+    try {
+      const savedGigs = localStorage.getItem("gigcraft_real:gigs");
+      if (savedGigs) {
+        const parsed = JSON.parse(savedGigs);
+        if (Array.isArray(parsed) && parsed.length > 0) setGigs(parsed);
+      }
+      const savedFreelancers = localStorage.getItem("gigcraft_real:freelancers");
+      if (savedFreelancers) {
+        const parsed = JSON.parse(savedFreelancers);
+        if (Array.isArray(parsed) && parsed.length > 0) setFreelancers(parsed);
+      }
+      const savedOrders = localStorage.getItem("gigcraft_real:orders");
+      if (savedOrders) {
+        const parsed = JSON.parse(savedOrders);
+        if (Array.isArray(parsed) && parsed.length > 0) setOrders(parsed);
+      }
+      const savedReviews = localStorage.getItem("gigcraft_real:reviews");
+      if (savedReviews) {
+        const parsed = JSON.parse(savedReviews);
+        if (Array.isArray(parsed) && parsed.length > 0) setReviews(parsed);
+      }
+    } catch {}
+  }, []);
+
+  // Sync state to localStorage only when hydrated
+  useEffect(() => {
+    if (hydrated) {
       try {
         localStorage.setItem("gigcraft_real:gigs", JSON.stringify(gigs));
       } catch {}
     }
-  }, [gigs]);
+  }, [gigs, hydrated]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (hydrated) {
       try {
         localStorage.setItem("gigcraft_real:freelancers", JSON.stringify(freelancers));
       } catch {}
     }
-  }, [freelancers]);
+  }, [freelancers, hydrated]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (hydrated) {
       try {
         localStorage.setItem("gigcraft_real:orders", JSON.stringify(orders));
       } catch {}
     }
-  }, [orders]);
+  }, [orders, hydrated]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (hydrated) {
       try {
         localStorage.setItem("gigcraft_real:reviews", JSON.stringify(reviews));
       } catch {}
     }
-  }, [reviews]);
+  }, [reviews, hydrated]);
+
 
   // Fetch real data from live Supabase tables
   useEffect(() => {

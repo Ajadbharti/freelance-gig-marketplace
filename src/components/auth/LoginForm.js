@@ -291,19 +291,27 @@ export default function LoginForm() {
             <div className="grid grid-cols-2 gap-3">
               <div className="border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">PUBLISHED GIGS</p>
-                <p className="mt-1 font-serif text-3xl font-bold text-slate-950">{platformMetrics.publishedGigs}</p>
+                <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold text-slate-950">
+                  {platformMetrics.publishedGigs}
+                </p>
               </div>
               <div className="border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">FREELANCERS</p>
-                <p className="mt-1 font-serif text-3xl font-bold text-slate-950">{platformMetrics.freelancersCount}</p>
+                <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold text-slate-950">
+                  {platformMetrics.freelancersCount}
+                </p>
               </div>
               <div className="border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">COMPLETED ORDERS</p>
-                <p className="mt-1 font-serif text-3xl font-bold text-slate-950">{platformMetrics.completedOrders}</p>
+                <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold text-slate-950">
+                  {platformMetrics.completedOrders}
+                </p>
               </div>
               <div className="border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">AVERAGE RATING</p>
-                <p className="mt-1 font-serif text-3xl font-bold text-slate-950">{platformMetrics.averageRating} ★</p>
+                <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold text-slate-950">
+                  {platformMetrics.averageRating} ★
+                </p>
               </div>
             </div>
 
@@ -312,7 +320,7 @@ export default function LoginForm() {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">SIMULATED ESCROW RELEASED</p>
-                  <p className="mt-1 font-serif text-3xl font-bold tracking-tight text-slate-950">
+                  <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold tracking-tight text-slate-950">
                     ₹{platformMetrics.totalEscrowReleased.toLocaleString("en-IN")}
                   </p>
                 </div>
@@ -328,13 +336,13 @@ export default function LoginForm() {
             {/* Real Verified Review Card */}
             {platformMetrics.featuredReview && (
               <div className="border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center gap-1 text-[#047857] text-sm">
+                <div suppressHydrationWarning className="flex items-center gap-1 text-[#047857] text-sm">
                   {"★".repeat(platformMetrics.featuredReview.rating || 5)}
                 </div>
-                <p className="mt-2 text-xs italic leading-relaxed text-slate-800">
+                <p suppressHydrationWarning className="mt-2 text-xs italic leading-relaxed text-slate-800">
                   “{platformMetrics.featuredReview.comment}”
                 </p>
-                <p className="mt-3 border-t border-slate-100 pt-2 text-[11px] text-slate-600">
+                <p suppressHydrationWarning className="mt-3 border-t border-slate-100 pt-2 text-[11px] text-slate-600">
                   <span className="font-semibold text-slate-900">{platformMetrics.featuredReview.clientName}</span> on “{platformMetrics.featuredReview.gigTitle}”
                 </p>
               </div>
