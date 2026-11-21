@@ -14,12 +14,12 @@ export default function ConfirmModal({
 }) {
   return (
     <Modal open={open} onClose={onClose} title={title}>
-      <p className="text-sm leading-relaxed text-[#3E4943]">{message}</p>
-      <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-4">
+      <p className="text-sm leading-relaxed text-[#3e4943]">{message}</p>
+      <div className="mt-6 flex justify-end gap-3 border-t border-[#e5e7eb] pt-4">
         <button
           type="button"
           onClick={onClose}
-          className="rounded-none border border-[#0F172A] bg-white px-4 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-[#0F172A] shadow-[2px_2px_0px_#0F172A] transition hover:bg-[#F8FAFC] active:translate-x-[1px] active:translate-y-[1px]"
+          className="px-5 py-2.5 border border-[#0b1c30] text-[#0b1c30] font-semibold text-sm uppercase tracking-wide hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all bg-white"
         >
           Cancel
         </button>
@@ -27,10 +27,10 @@ export default function ConfirmModal({
           type="button"
           onClick={onConfirm}
           className={cn(
-            "rounded-none px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white shadow-[2px_2px_0px_#0F172A] transition active:translate-x-[1px] active:translate-y-[1px]",
+            "px-5 py-2.5 font-semibold text-sm uppercase tracking-wide text-white shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all",
             danger
-              ? "border border-[#DC2626] bg-[#DC2626] hover:bg-[#B91C1C]"
-              : "border border-[#047857] bg-[#047857] hover:bg-[#065F46]"
+              ? "border border-[#ba1a1a] bg-[#ba1a1a] hover:bg-[#93000a]"
+              : "border border-[#005d42] bg-[#005d42] hover:bg-[#047857]"
           )}
         >
           {confirmLabel}

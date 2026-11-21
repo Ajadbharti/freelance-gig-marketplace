@@ -59,16 +59,16 @@ export default function FilterSidebar({
     (sellerExperience ? 1 : 0);
 
   return (
-    <aside aria-label="Filters" className="border border-slate-300 bg-white p-5">
+    <aside aria-label="Filters" className="border border-[#e5e7eb] bg-white p-5 shadow-[3px_3px_0px_#0b1c30]">
       {/* Filters Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+      <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-base text-[#047857]">tune</span>
-          <h2 className="font-headline text-base font-bold uppercase tracking-wider text-slate-950">
+          <span className="material-symbols-outlined text-base text-[#005d42]">tune</span>
+          <h2 className="font-headline text-base font-bold uppercase tracking-wider text-[#0b1c30]">
             FILTERS
           </h2>
         </div>
-        <span className="border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-700">
+        <span className="border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold text-[#0b1c30]">
           ACTIVE: {activeCount}
         </span>
       </div>
@@ -76,12 +76,12 @@ export default function FilterSidebar({
       <div className="space-y-6 pt-4">
         {/* [01] SERVICE TYPE */}
         <div>
-          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
             <span>SERVICE TYPE</span>
-            <span className="text-slate-400 font-mono">[01]</span>
+            <span className="text-[#6e7a73] font-mono">[01]</span>
           </div>
           <div className="mt-3 space-y-2">
-            <label className="flex cursor-pointer items-center justify-between text-xs text-slate-800 hover:text-[#047857]">
+            <label className="flex cursor-pointer items-center justify-between text-xs text-[#0b1c30] hover:text-[#005d42]">
               <div className="flex items-center gap-2">
                 <input
                   type="radio"
@@ -89,9 +89,9 @@ export default function FilterSidebar({
                   value=""
                   checked={selectedCategory === ""}
                   onChange={() => setSelectedCategory && setSelectedCategory("")}
-                  className="h-3.5 w-3.5 accent-[#047857]"
+                  className="h-3.5 w-3.5 accent-[#005d42]"
                 />
-                <span className={selectedCategory === "" ? "font-bold text-slate-950" : ""}>
+                <span className={selectedCategory === "" ? "font-bold text-[#0b1c30]" : ""}>
                   All services
                 </span>
               </div>
@@ -103,7 +103,7 @@ export default function FilterSidebar({
               return (
                 <label
                   key={cat.slug}
-                  className="flex cursor-pointer items-center justify-between text-xs text-slate-800 hover:text-[#047857]"
+                  className="flex cursor-pointer items-center justify-between text-xs text-[#0b1c30] hover:text-[#005d42]"
                 >
                   <div className="flex items-center gap-2">
                     <input
@@ -112,13 +112,13 @@ export default function FilterSidebar({
                       value={cat.slug}
                       checked={isChecked}
                       onChange={() => setSelectedCategory && setSelectedCategory(cat.slug)}
-                      className="h-3.5 w-3.5 accent-[#047857]"
+                      className="h-3.5 w-3.5 accent-[#005d42]"
                     />
-                    <span className={isChecked ? "font-bold text-slate-950" : ""}>
+                    <span className={isChecked ? "font-bold text-[#0b1c30]" : ""}>
                       {cat.name}
                     </span>
                   </div>
-                  <span className="font-mono text-[11px] text-slate-400">{count}</span>
+                  <span className="font-mono text-[11px] text-[#6e7a73]">{count}</span>
                 </label>
               );
             })}
@@ -126,16 +126,16 @@ export default function FilterSidebar({
         </div>
 
         {/* [02] DELIVERY TIME */}
-        <div className="border-t border-slate-200 pt-5">
-          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+        <div className="border-t border-[#e5e7eb] pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
             <span>DELIVERY TIME</span>
-            <span className="text-slate-400 font-mono">[02]</span>
+            <span className="text-[#6e7a73] font-mono">[02]</span>
           </div>
           <div className="mt-3 space-y-2">
             {DELIVERY_OPTIONS.map((opt) => (
               <label
                 key={opt.value}
-                className="flex cursor-pointer items-center gap-2 text-xs text-slate-800 hover:text-[#047857]"
+                className="flex cursor-pointer items-center gap-2 text-xs text-[#0b1c30] hover:text-[#005d42]"
               >
                 <input
                   type="radio"
@@ -143,9 +143,9 @@ export default function FilterSidebar({
                   value={opt.value}
                   checked={deliveryTime === opt.value}
                   onChange={(e) => setDeliveryTime && setDeliveryTime(e.target.value)}
-                  className="h-3.5 w-3.5 accent-[#047857]"
+                  className="h-3.5 w-3.5 accent-[#005d42]"
                 />
-                <span className={deliveryTime === opt.value ? "font-bold text-slate-950" : ""}>
+                <span className={deliveryTime === opt.value ? "font-bold text-[#0b1c30]" : ""}>
                   {opt.label}
                 </span>
               </label>
@@ -154,31 +154,31 @@ export default function FilterSidebar({
         </div>
 
         {/* [03] BUDGET (INR / ₹) */}
-        <div className="border-t border-slate-200 pt-5">
-          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+        <div className="border-t border-[#e5e7eb] pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
             <span>BUDGET (₹ INR)</span>
-            <span className="text-slate-400 font-mono">[03]</span>
+            <span className="text-[#6e7a73] font-mono">[03]</span>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <div className="flex flex-1 items-center border border-slate-300 bg-white px-2 py-1">
-              <span className="font-mono text-xs font-bold text-slate-500 mr-1">₹</span>
+            <div className="flex flex-1 items-center border border-[#6e7a73] bg-white px-2 py-1 focus-within:border-2 focus-within:border-[#0b1c30]">
+              <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">₹</span>
               <input
                 type="number"
                 placeholder="MIN"
                 value={minBudget}
                 onChange={(e) => setMinBudget && setMinBudget(e.target.value)}
-                className="w-full font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
               />
             </div>
-            <span className="font-mono text-xs text-slate-400">-</span>
-            <div className="flex flex-1 items-center border border-slate-300 bg-white px-2 py-1">
-              <span className="font-mono text-xs font-bold text-slate-500 mr-1">₹</span>
+            <span className="font-mono text-xs text-[#6e7a73]">-</span>
+            <div className="flex flex-1 items-center border border-[#6e7a73] bg-white px-2 py-1 focus-within:border-2 focus-within:border-[#0b1c30]">
+              <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">₹</span>
               <input
                 type="number"
                 placeholder="MAX"
                 value={maxBudget}
                 onChange={(e) => setMaxBudget && setMaxBudget(e.target.value)}
-                className="w-full font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
               />
             </div>
           </div>
@@ -197,8 +197,8 @@ export default function FilterSidebar({
                   }}
                   className={`border py-1 font-mono text-[10px] uppercase transition ${
                     active
-                      ? "border-slate-950 bg-slate-950 text-white font-bold"
-                      : "border-slate-200 bg-[#FAFBFB] text-slate-700 hover:border-slate-300 hover:bg-white"
+                      ? "border-[#0b1c30] bg-[#0b1c30] text-white font-bold"
+                      : "border-[#e5e7eb] bg-[#eff4ff] text-[#0b1c30] hover:border-[#6e7a73] hover:bg-white"
                   }`}
                 >
                   {chip.label}
@@ -209,10 +209,10 @@ export default function FilterSidebar({
         </div>
 
         {/* [04] SELLER TIER */}
-        <div className="border-t border-slate-200 pt-5">
-          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+        <div className="border-t border-[#e5e7eb] pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
             <span>SELLER TIER</span>
-            <span className="text-slate-400 font-mono">[04]</span>
+            <span className="text-[#6e7a73] font-mono">[04]</span>
           </div>
           <div className="mt-3 space-y-2">
             {SELLER_TIERS.map((tier) => {
@@ -220,16 +220,16 @@ export default function FilterSidebar({
               return (
                 <label
                   key={tier.key}
-                  className="flex cursor-pointer items-center justify-between text-xs text-slate-800 hover:text-[#047857]"
+                  className="flex cursor-pointer items-center justify-between text-xs text-[#0b1c30] hover:text-[#005d42]"
                 >
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleTier(tier.key)}
-                      className="h-3.5 w-3.5 accent-[#047857]"
+                      className="h-3.5 w-3.5 accent-[#005d42]"
                     />
-                    <span className={checked ? "font-bold text-slate-950" : ""}>
+                    <span className={checked ? "font-bold text-[#0b1c30]" : ""}>
                       {tier.label}
                     </span>
                   </div>
@@ -240,44 +240,44 @@ export default function FilterSidebar({
         </div>
 
         {/* [05] REVIEW SCORE */}
-        <div className="border-t border-slate-200 pt-5">
-          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+        <div className="border-t border-[#e5e7eb] pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
             <span>REVIEW SCORE</span>
-            <span className="text-slate-400 font-mono">[05]</span>
+            <span className="text-[#6e7a73] font-mono">[05]</span>
           </div>
           <div className="mt-3 space-y-2">
-            <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-800 hover:text-[#047857]">
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-[#0b1c30] hover:text-[#005d42]">
               <input
                 type="radio"
                 name="minRating"
                 value="0"
                 checked={minRating === "0" || !minRating}
                 onChange={() => setMinRating && setMinRating("0")}
-                className="h-3.5 w-3.5 accent-[#047857]"
+                className="h-3.5 w-3.5 accent-[#005d42]"
               />
               <span>Any rating</span>
             </label>
-            <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-800 hover:text-[#047857]">
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-[#0b1c30] hover:text-[#005d42]">
               <input
                 type="radio"
                 name="minRating"
                 value="4.5"
                 checked={minRating === "4.5"}
                 onChange={(e) => setMinRating && setMinRating(e.target.value)}
-                className="h-3.5 w-3.5 accent-[#047857]"
+                className="h-3.5 w-3.5 accent-[#005d42]"
               />
               <span className="flex items-center gap-1">
                 <span className="text-amber-500">★</span> 4.5 & above
               </span>
             </label>
-            <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-800 hover:text-[#047857]">
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-[#0b1c30] hover:text-[#005d42]">
               <input
                 type="radio"
                 name="minRating"
                 value="4.0"
                 checked={minRating === "4.0"}
                 onChange={(e) => setMinRating && setMinRating(e.target.value)}
-                className="h-3.5 w-3.5 accent-[#047857]"
+                className="h-3.5 w-3.5 accent-[#005d42]"
               />
               <span className="flex items-center gap-1">
                 <span className="text-amber-500">★</span> 4.0 & above
@@ -287,10 +287,10 @@ export default function FilterSidebar({
         </div>
 
         {/* [06] SELLER EXPERIENCE */}
-        <div className="border-t border-slate-200 pt-5">
-          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+        <div className="border-t border-[#e5e7eb] pt-5">
+          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
             <span>SELLER EXPERIENCE</span>
-            <span className="text-slate-400 font-mono">[06]</span>
+            <span className="text-[#6e7a73] font-mono">[06]</span>
           </div>
           <div className="mt-3 space-y-2">
             {[
@@ -301,7 +301,7 @@ export default function FilterSidebar({
             ].map(([val, label]) => (
               <label
                 key={val}
-                className="flex cursor-pointer items-center gap-2 text-xs text-slate-800 hover:text-[#047857]"
+                className="flex cursor-pointer items-center gap-2 text-xs text-[#0b1c30] hover:text-[#005d42]"
               >
                 <input
                   type="radio"
@@ -309,9 +309,9 @@ export default function FilterSidebar({
                   value={val}
                   checked={(sellerExperience || "") === val}
                   onChange={() => setSellerExperience && setSellerExperience(val)}
-                  className="h-3.5 w-3.5 accent-[#047857]"
+                  className="h-3.5 w-3.5 accent-[#005d42]"
                 />
-                <span className={(sellerExperience || "") === val ? "font-bold text-slate-950" : ""}>
+                <span className={(sellerExperience || "") === val ? "font-bold text-[#0b1c30]" : ""}>
                   {label}
                 </span>
               </label>
@@ -320,18 +320,18 @@ export default function FilterSidebar({
         </div>
 
         {/* Filter Action Buttons */}
-        <div className="space-y-2 border-t border-slate-200 pt-5">
+        <div className="space-y-2 border-t border-[#e5e7eb] pt-5">
           <button
             type="button"
             onClick={onApply}
-            className="w-full bg-[#047857] py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white shadow-[2px_2px_0px_#0b1c30] transition hover:bg-[#065f46]"
+            className="w-full px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
           >
             APPLY FILTER STATE
           </button>
           <button
             type="button"
             onClick={onReset}
-            className="w-full border border-slate-900 bg-white py-2 font-mono text-xs font-bold uppercase tracking-wider text-slate-900 transition hover:bg-slate-50"
+            className="w-full px-5 py-2.5 border border-[#0b1c30] text-[#0b1c30] font-semibold text-sm uppercase tracking-wide hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all bg-white"
           >
             RESET PARAMETERS
           </button>

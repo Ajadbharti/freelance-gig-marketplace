@@ -7,9 +7,9 @@ import { generateId } from "@/lib/utils";
 const ToastContext = createContext(null);
 
 const STYLES = {
-  success: { icon: CheckCircle2, color: "text-[#047857]" },
-  error: { icon: XCircle, color: "text-[#DC2626]" },
-  info: { icon: Info, color: "text-[#2563EB]" },
+  success: { icon: CheckCircle2, color: "text-[#005d42]" },
+  error: { icon: XCircle, color: "text-[#ba1a1a]" },
+  info: { icon: Info, color: "text-[#0047bf]" },
 };
 
 export function ToastProvider({ children }) {
@@ -44,15 +44,15 @@ export function ToastProvider({ children }) {
             <div
               key={t.id}
               role="status"
-              className="pointer-events-auto flex items-start gap-3 rounded-none border border-[#0F172A] bg-white p-4 shadow-[3px_3px_0px_#0F172A]"
+              className="pointer-events-auto flex items-start gap-3 border border-[#e5e7eb] bg-white p-4 shadow-[3px_3px_0px_#0b1c30]"
             >
               <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${style.color}`} />
-              <p className="flex-1 font-mono text-xs text-[#0B1C30]">{t.message}</p>
+              <p className="flex-1 font-sans text-xs font-semibold text-[#0b1c30]">{t.message}</p>
               <button
                 type="button"
                 onClick={() => dismiss(t.id)}
                 aria-label="Dismiss notification"
-                className="text-slate-400 transition hover:text-[#0F172A]"
+                className="text-[#6e7a73] transition hover:text-[#0b1c30]"
               >
                 <X className="h-4 w-4" />
               </button>

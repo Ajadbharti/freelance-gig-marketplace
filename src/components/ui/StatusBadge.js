@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils";
 
 const STYLES = {
-  active: "bg-[#DBEAFE] text-[#2563EB] border border-[#BFDBFE]",
-  delivered: "bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A]",
-  completed: "bg-[#D1FAE5] text-[#047857] border border-[#A7F3D0]",
-  cancelled: "bg-[#FEE2E2] text-[#DC2626] border border-[#FECACA]",
-  standard: "bg-[#F1F5F9] text-[#0F172A] border border-[#E2E8F0]",
+  active: "bg-[#dae2fd] text-[#0047bf] border border-[#1e5fe7]",
+  delivered: "bg-[#e5eeff] text-[#005d42] border border-[#047857]",
+  completed: "bg-[#9ffdd3] text-[#005d42] border border-[#005d42]",
+  cancelled: "bg-[#ffdad6] text-[#ba1a1a] border border-[#ba1a1a]",
+  standard: "bg-[#eff4ff] text-[#0b1c30] border border-[#6e7a73]",
 };
 
 const LABELS = {

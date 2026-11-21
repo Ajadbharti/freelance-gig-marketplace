@@ -103,16 +103,16 @@ export default function LoginForm() {
         {/* 2-Column Split: Form (Left) + Platform Metrics (Right) */}
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           {/* Left Column: Login Card */}
-          <div className="border border-slate-200 bg-white p-6 sm:p-10 shadow-sm">
-            <div className="inline-flex items-center gap-1.5 border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-700">
-              <Shield className="h-3 w-3 text-[#047857]" />
+          <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6 sm:p-10">
+            <div className="inline-flex items-center gap-1.5 border border-[#e5e7eb] bg-[#eff4ff] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#0b1c30]">
+              <Shield className="h-3 w-3 text-[#005d42]" />
               SECURE ESCROW AUTHENTICATION
             </div>
 
-            <h1 className="mt-4 font-serif text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+            <h1 className="mt-4 font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-4xl">
               Sign in to GigCraft
             </h1>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-[#3e4943]">
               Access your digital contracts, active sprints, and milestone disbursements.
             </p>
 
@@ -121,7 +121,7 @@ export default function LoginForm() {
               <button
                 type="button"
                 onClick={() => handleSocial("github")}
-                className="flex h-11 items-center justify-center gap-2 border border-slate-300 bg-white font-mono text-xs font-semibold uppercase tracking-wider text-slate-800 transition hover:bg-slate-50"
+                className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               >
                 <GithubIcon className="h-4 w-4" />
                 GitHub Workspace
@@ -129,7 +129,7 @@ export default function LoginForm() {
               <button
                 type="button"
                 onClick={() => handleSocial("google")}
-                className="flex h-11 items-center justify-center gap-2 border border-slate-300 bg-white font-mono text-xs font-semibold uppercase tracking-wider text-slate-800 transition hover:bg-slate-50"
+                className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               >
                 <span className="font-bold text-blue-600">G</span>
                 Google Cloud Identity
@@ -137,34 +137,34 @@ export default function LoginForm() {
             </div>
 
             {/* Divider */}
-            <div className="my-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-slate-400">
-              <span className="h-px flex-1 bg-slate-200" />
+            <div className="my-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-[#6e7a73]">
+              <span className="h-px flex-1 bg-[#e5e7eb]" />
               OR WITH WORK EMAIL
-              <span className="h-px flex-1 bg-slate-200" />
+              <span className="h-px flex-1 bg-[#e5e7eb]" />
             </div>
 
             {/* Login Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
                 <div className="flex items-center justify-between">
-                  <label htmlFor="login-email" className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-800">
+                  <label htmlFor="login-email" className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
                     CORPORATE EMAIL
                   </label>
-                  <span className="font-mono text-[10px] font-bold text-slate-500">REQUIRED</span>
+                  <span className="font-mono text-[10px] font-bold text-[#6e7a73]">REQUIRED</span>
                 </div>
-                <div className="relative mt-1.5 flex h-11 items-center border border-slate-300 bg-white focus-within:border-slate-800">
-                  <span className="px-3 font-mono text-sm text-slate-400">@</span>
+                <div className="relative mt-1.5 flex h-11 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
+                  <span className="px-3 font-mono text-sm text-[#6e7a73]">@</span>
                   <input
                     id="login-email"
                     type="email"
                     autoComplete="email"
                     placeholder="name@company.com"
-                    className="h-full w-full bg-transparent pr-3 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                    className="h-full w-full bg-transparent pr-3 font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
                     {...register("email", { required: "Email is required" })}
                   />
                 </div>
                 {errors.email && (
-                  <p role="alert" className="mt-1 font-mono text-xs text-red-600">
+                  <p role="alert" className="mt-1 font-mono text-xs text-[#ba1a1a]">
                     {errors.email.message}
                   </p>
                 )}
@@ -172,77 +172,77 @@ export default function LoginForm() {
 
               <div>
                 <div className="flex items-center justify-between">
-                  <label htmlFor="login-pass" className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-800">
+                  <label htmlFor="login-pass" className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
                     ACCESS KEY / PASSWORD
                   </label>
-                  <Link href="/register" className="font-mono text-xs font-semibold text-[#047857] hover:underline">
+                  <Link href="/register" className="font-mono text-xs font-semibold text-[#005d42] hover:underline">
                     Forgot password?
                   </Link>
                 </div>
-                <div className="relative mt-1.5 flex h-11 items-center border border-slate-300 bg-white focus-within:border-slate-800">
-                  <span className="px-3 text-slate-400 shrink-0">
+                <div className="relative mt-1.5 flex h-11 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
+                  <span className="px-3 text-[#6e7a73] shrink-0">
                     <KeyRound className="h-4 w-4" />
                   </span>
                   <input
                     id="login-pass"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className="h-full flex-1 bg-transparent px-1 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                    className="h-full flex-1 bg-transparent px-1 font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
                     {...register("password", { required: "Password is required" })}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer focus:outline-none"
+                    className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center text-[#6e7a73] hover:text-[#0b1c30] cursor-pointer focus:outline-none"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p role="alert" className="mt-1 font-mono text-xs text-red-600">
+                  <p role="alert" className="mt-1 font-mono text-xs text-[#ba1a1a]">
                     {errors.password.message}
                   </p>
                 )}
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer font-mono text-xs text-slate-700">
+                <label className="flex items-center gap-2 cursor-pointer font-mono text-xs text-[#0b1c30]">
                   <input
                     type="checkbox"
                     checked={rememberHardware}
                     onChange={(e) => setRememberHardware(e.target.checked)}
-                    className="h-4 w-4 rounded-none accent-[#047857]"
+                    className="h-4 w-4 rounded-none accent-[#005d42]"
                   />
                   <span>Keep me signed in on this hardware</span>
                 </label>
-                <span className="flex items-center gap-1 border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] text-slate-600">
-                  <ShieldCheck className="h-3 w-3 text-[#047857]" /> HTTPS session
+                <span className="flex items-center gap-1 border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] text-[#0b1c30]">
+                  <ShieldCheck className="h-3 w-3 text-[#005d42]" /> HTTPS session
                 </span>
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex h-12 w-full items-center justify-center gap-2 bg-[#047857] font-mono text-sm font-bold uppercase tracking-wider text-white shadow-[2px_2px_0px_#0F172A] transition hover:bg-[#065f46] active:translate-x-[1px] active:translate-y-[1px] disabled:opacity-70"
+                className="flex h-12 w-full items-center justify-center gap-2 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-70"
               >
                 <LogIn className="h-4 w-4" />
                 <span>{isSubmitting ? "Authenticating..." : "Sign In to Workspace"}</span>
               </button>
 
               {/* Bottom Register Switch */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 pt-4 font-mono text-xs text-slate-600">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#e5e7eb] pt-4 font-mono text-xs text-[#3e4943]">
                 <span>Don&apos;t have an enterprise account?</span>
                 <div className="flex items-center gap-2">
                   <Link
                     href="/register?role=client"
-                    className="border border-slate-200 px-2 py-1 uppercase text-slate-900 transition hover:bg-slate-100 font-semibold"
+                    className="border border-[#0b1c30] px-2.5 py-1 uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] font-semibold transition"
                   >
                     SIGN UP AS CLIENT
                   </Link>
                   <Link
                     href="/register?role=freelancer"
-                    className="border border-slate-200 px-2 py-1 uppercase text-slate-900 transition hover:bg-slate-100 font-semibold"
+                    className="border border-[#0b1c30] px-2.5 py-1 uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] font-semibold transition"
                   >
                     APPLY AS FREELANCER
                   </Link>

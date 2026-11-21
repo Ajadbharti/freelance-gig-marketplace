@@ -88,28 +88,28 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
+    <header className="sticky top-0 z-40 border-b border-[#e5e7eb] bg-white">
       {/* Top Main Navigation Bar */}
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
         {/* Brand Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <span className="font-headline text-2xl font-bold tracking-tight text-[#047857] uppercase">GIGCRAFT</span>
+          <span className="font-headline text-2xl font-bold tracking-tight text-[#005d42] uppercase">GIGCRAFT</span>
         </Link>
 
         {/* Search Bar matching image */}
         <div className="hidden max-w-md flex-1 md:block">
-          <form onSubmit={handleSearchSubmit} className="flex h-9 items-center border border-slate-300 bg-white shadow-none focus-within:border-slate-800">
-            <Search className="ml-2.5 h-4 w-4 text-slate-400 shrink-0" />
+          <form onSubmit={handleSearchSubmit} className="flex h-9 items-center border border-[#6e7a73] bg-white shadow-none focus-within:border-[#0b1c30]">
+            <Search className="ml-2.5 h-4 w-4 text-[#6e7a73] shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search services, talent, or gigs..."
-              className="h-full min-w-0 flex-1 px-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              className="h-full min-w-0 flex-1 px-2.5 text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
             />
             <button
               type="submit"
-              className="h-full bg-[#047857] px-4 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
+              className="h-full bg-[#005d42] px-4 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
             >
               SEARCH
             </button>
@@ -122,8 +122,8 @@ export default function Navbar() {
             href="/gigs"
             className={`text-xs font-bold uppercase tracking-wider transition ${
               pathname.startsWith("/gigs")
-                ? "border-b-2 border-[#047857] pb-1 text-[#047857]"
-                : "text-slate-700 hover:text-[#047857]"
+                ? "border-b-2 border-[#005d42] pb-1 text-[#005d42]"
+                : "text-[#3e4943] hover:text-[#005d42]"
             }`}
           >
             Explore Gigs
@@ -245,13 +245,13 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="px-2 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-slate-800 transition hover:text-[#047857]"
+                className="px-2 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] transition hover:text-[#005d42]"
               >
                 LOG IN
               </Link>
               <Link
                 href="/register"
-                className="bg-[#047857] px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
+                className="px-4 py-1.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-xs uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               >
                 JOIN
               </Link>
@@ -262,7 +262,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
-            className="flex h-8 w-8 items-center justify-center rounded border border-slate-200 text-slate-700 lg:hidden"
+            className="flex h-8 w-8 items-center justify-center border border-[#e5e7eb] text-[#0b1c30] lg:hidden"
           >
             {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
@@ -270,18 +270,18 @@ export default function Navbar() {
       </div>
 
       {/* Subcategory Technical Strip matching image */}
-      <div className="border-t border-slate-200 bg-[#FAFAFA]">
-        <div className="mx-auto flex h-9 max-w-7xl items-center overflow-x-auto px-4 text-[11px] font-mono tracking-wider text-slate-600 sm:px-6">
+      <div className="border-t border-[#e5e7eb] bg-[#eff4ff]">
+        <div className="mx-auto flex h-9 max-w-7xl items-center overflow-x-auto px-4 text-[11px] font-mono tracking-wider text-[#3e4943] sm:px-6">
           <div className="flex items-center gap-6 whitespace-nowrap">
             {NAV_CATEGORIES.map((cat, idx) => (
               <span key={cat.slug} className="flex items-center gap-6">
                 <Link
                   href={`/gigs?category=${cat.slug}`}
-                  className="transition hover:text-[#047857] hover:underline"
+                  className="transition hover:text-[#005d42] hover:underline"
                 >
                   {cat.name}
                 </Link>
-                {idx < NAV_CATEGORIES.length - 1 && <span className="text-slate-300">/</span>}
+                {idx < NAV_CATEGORIES.length - 1 && <span className="text-[#6e7a73]/40">/</span>}
               </span>
             ))}
           </div>

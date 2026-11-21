@@ -30,22 +30,22 @@ export default function Modal({ open, onClose, title, children }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-[#0F172A]/60" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-[#0b1c30]/60 backdrop-blur-xs" onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-none border-2 border-[#0F172A] bg-white p-6 shadow-[4px_4px_0px_#0F172A] outline-none"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6 outline-none"
       >
-        <div className="mb-4 flex items-start justify-between gap-4 border-b border-slate-200 pb-3">
-          <h2 className="font-serif text-lg font-bold text-[#0F172A]">{title}</h2>
+        <div className="mb-4 flex items-start justify-between gap-4 border-b border-[#e5e7eb] pb-3">
+          <h2 className="font-headline text-lg font-bold uppercase tracking-tight text-[#0b1c30]">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="rounded-none border border-slate-200 p-1 text-slate-500 transition hover:border-[#0F172A] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+            className="border border-[#6e7a73] p-1 text-[#3e4943] transition hover:border-[#0b1c30] hover:bg-[#dce9ff] hover:text-[#0b1c30]"
           >
             <X className="h-4 w-4" />
           </button>

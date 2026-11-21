@@ -162,16 +162,16 @@ export default function GigsExplorer() {
   return (
     <div className="min-h-screen bg-[#f8f9ff]">
       {/* Top Header Section */}
-      <section className="w-full border-b border-slate-300 bg-white">
+      <section className="w-full border-b border-[#e5e7eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-          <nav className="mb-2 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-slate-500">
-            <Link href="/gigs" className="hover:text-[#047857]">
+          <nav className="mb-2 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#6e7a73]">
+            <Link href="/gigs" className="hover:text-[#005d42]">
               MARKETPLACE
             </Link>
             {currentCategoryObj && (
               <>
-                <span className="text-slate-300">/</span>
-                <span className="font-bold text-slate-900">{currentCategoryObj.name}</span>
+                <span className="text-[#6e7a73]/40">/</span>
+                <span className="font-bold text-[#0b1c30]">{currentCategoryObj.name}</span>
               </>
             )}
           </nav>
@@ -181,29 +181,29 @@ export default function GigsExplorer() {
               {/* Published Gig Catalog Badge */}
               <div className="mb-2 inline-flex items-center gap-1.5 bg-[#eff4ff] px-2 py-0.5">
                 <span className="h-1.5 w-1.5 bg-[#005d42]" />
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-900">
+                <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[#0b1c30]">
                   PUBLISHED GIG CATALOG
                 </span>
               </div>
 
               {/* Title */}
-              <h1 className="font-headline text-3xl font-bold uppercase tracking-tight text-slate-950 sm:text-4xl">
+              <h1 className="font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-4xl">
                 {pageTitle}
               </h1>
 
               {/* Subtext Count */}
-              <p className="mt-1 font-sans text-sm text-slate-600">
+              <p className="mt-1 font-sans text-sm text-[#3e4943]">
                 Displaying{" "}
-                <strong className="font-bold text-slate-950">{filteredGigs.length}</strong>{" "}
+                <strong className="font-bold text-[#0b1c30]">{filteredGigs.length}</strong>{" "}
                 published {filteredGigs.length === 1 ? "gig" : "gigs"}
               </p>
             </div>
 
             {/* Brutalist Sort Box */}
-            <div className="flex items-center self-start border border-slate-900 bg-white md:self-auto">
+            <div className="flex items-center self-start border border-[#0b1c30] bg-white md:self-auto">
               <label
                 htmlFor="sortSelect"
-                className="border-r border-slate-900 bg-[#eff4ff] px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-slate-900"
+                className="border-r border-[#0b1c30] bg-[#eff4ff] px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]"
               >
                 SORT
               </label>
@@ -212,7 +212,7 @@ export default function GigsExplorer() {
                   id="sortSelect"
                   value={sortMode}
                   onChange={(e) => setSortMode(e.target.value)}
-                  className="cursor-pointer appearance-none bg-white py-1.5 pl-3 pr-8 font-mono text-xs font-semibold text-slate-900 focus:outline-none"
+                  className="cursor-pointer appearance-none bg-white py-1.5 pl-3 pr-8 font-mono text-xs font-semibold text-[#0b1c30] focus:outline-none"
                 >
                   <option value="best-match">Best Match</option>
                   <option value="rating">Highest Rated</option>
@@ -221,7 +221,7 @@ export default function GigsExplorer() {
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-2 top-2 h-3.5 w-3.5 text-slate-700" />
+                <ChevronDown className="pointer-events-none absolute right-2 top-2 h-3.5 w-3.5 text-[#565e74]" />
               </div>
             </div>
           </div>
@@ -230,24 +230,24 @@ export default function GigsExplorer() {
 
       {/* Active Criteria Chips (only when filters applied) */}
       {activeChips.length > 0 && (
-        <section className="w-full border-b border-slate-300 bg-[#eff4ff] py-2.5">
+        <section className="w-full border-b border-[#e5e7eb] bg-[#eff4ff] py-2.5">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 sm:px-6">
-            <span className="mr-1 font-mono text-xs font-bold uppercase tracking-wider text-slate-600">
+            <span className="mr-1 font-mono text-xs font-bold uppercase tracking-wider text-[#3e4943]">
               ACTIVE CRITERIA:
             </span>
             {activeChips.map((chip, idx) => (
               <div
                 key={idx}
-                className="inline-flex items-center border border-slate-900 bg-white px-2 py-0.5 shadow-[2px_2px_0px_#0b1c30]"
+                className="inline-flex items-center border border-[#0b1c30] bg-white px-2 py-0.5 shadow-[2px_2px_0px_#0b1c30]"
               >
-                <span className="mr-1.5 font-mono text-[11px] font-bold text-slate-900">
+                <span className="mr-1.5 font-mono text-[11px] font-bold text-[#0b1c30]">
                   {chip.label}
                 </span>
                 <button
                   type="button"
                   aria-label={`Remove ${chip.label}`}
                   onClick={() => removeChip(chip)}
-                  className="flex items-center text-slate-600 hover:text-rose-600"
+                  className="flex items-center text-[#565e74] hover:text-[#ba1a1a]"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -256,7 +256,7 @@ export default function GigsExplorer() {
             <button
               type="button"
               onClick={clearAllFilters}
-              className="ml-2 font-mono text-xs font-bold uppercase text-[#047857] underline hover:text-[#065f46]"
+              className="ml-2 font-mono text-xs font-bold uppercase text-[#005d42] underline hover:text-[#047857]"
             >
               CLEAR ALL
             </button>
@@ -271,9 +271,9 @@ export default function GigsExplorer() {
           <button
             type="button"
             onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-            className="flex w-full items-center justify-center gap-2 border border-slate-900 bg-white py-2 font-mono text-xs font-bold uppercase"
+            className="flex w-full items-center justify-center gap-2 border border-[#0b1c30] bg-white py-2 font-mono text-xs font-bold uppercase text-[#0b1c30] shadow-[2px_2px_0px_#0b1c30]"
           >
-            <SlidersHorizontal className="h-4 w-4 text-[#047857]" />
+            <SlidersHorizontal className="h-4 w-4 text-[#005d42]" />
             {mobileFilterOpen ? "HIDE FILTERS" : "SHOW FILTERS"}
           </button>
         </div>
@@ -312,14 +312,14 @@ export default function GigsExplorer() {
           {/* Right Column: Feed Grid */}
           <div className="lg:col-span-9">
             {/* Feed Status Header matching screenshot */}
-            <div className="mb-4 flex items-center justify-between border border-slate-300 bg-white px-3 py-2">
-              <div className="flex items-center gap-2 font-mono text-xs text-slate-900">
-                <span className="h-2 w-2 bg-[#047857]" />
+            <div className="mb-4 flex items-center justify-between border border-[#e5e7eb] bg-white px-3 py-2 shadow-[2px_2px_0px_#0b1c30]">
+              <div className="flex items-center gap-2 font-mono text-xs text-[#0b1c30]">
+                <span className="h-2 w-2 bg-[#005d42]" />
                 <span>
                   FEED STATUS: <strong>LIVE</strong>
                 </span>
-                <span className="text-slate-300">|</span>
-                <span className="text-slate-500 uppercase">
+                <span className="text-[#6e7a73]/40">|</span>
+                <span className="text-[#565e74] uppercase">
                   {filteredGigs.length} OF {gigs.length} GIGS LOADED
                 </span>
               </div>
@@ -327,17 +327,17 @@ export default function GigsExplorer() {
 
             {/* Empty State */}
             {filteredGigs.length === 0 ? (
-              <div className="border border-slate-300 bg-white p-12 text-center">
-                <h3 className="font-headline text-lg font-bold uppercase text-slate-950">
+              <div className="border border-[#e5e7eb] bg-white p-12 text-center shadow-[3px_3px_0px_#0b1c30]">
+                <h3 className="font-headline text-lg font-bold uppercase text-[#0b1c30]">
                   NO GIGS MATCH THESE CRITERIA
                 </h3>
-                <p className="mt-1 font-sans text-sm text-slate-600">
+                <p className="mt-1 font-sans text-sm text-[#3e4943]">
                   Try adjusting or clearing your filters to see more results.
                 </p>
                 <button
                   type="button"
                   onClick={clearAllFilters}
-                  className="mt-4 border border-slate-900 bg-[#047857] px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#065f46]"
+                  className="mt-4 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
                 >
                   CLEAR ALL FILTERS
                 </button>

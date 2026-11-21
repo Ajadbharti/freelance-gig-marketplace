@@ -52,20 +52,20 @@ export default function Landing() {
           </p>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mt-8 flex max-w-2xl border border-slate-300 bg-white shadow-sm focus-within:border-slate-800">
+          <form onSubmit={handleSearch} className="mt-8 flex max-w-2xl border border-[#6e7a73] bg-white shadow-[2px_2px_0px_#0b1c30] focus-within:border-2 focus-within:border-[#0b1c30]">
             <div className="flex flex-1 items-center px-4">
-              <Search className="h-4 w-4 text-slate-400 mr-2 shrink-0" />
+              <Search className="h-4 w-4 text-[#6e7a73] mr-2 shrink-0" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search technical specs, Figma UI, Next.js, or engineers..."
-                className="w-full font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
               />
             </div>
             <button
               type="submit"
-              className="bg-[#047857] px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
+              className="px-6 py-3 bg-[#005d42] text-white border-l border-[#005d42] font-semibold text-xs uppercase tracking-wide hover:bg-[#047857] transition-all"
             >
               SEARCH CATALOG
             </button>
@@ -168,54 +168,54 @@ export default function Landing() {
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {freelancers.slice(0, 3).map((f) => (
-              <div key={f.id} className="border border-slate-200 bg-white p-5 shadow-sm flex flex-col justify-between">
+              <div key={f.id} className="border border-[#e5e7eb] bg-white p-5 shadow-[3px_3px_0px_#0b1c30] flex flex-col justify-between">
                 <div>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <SafeImage
                         src={f.avatar}
                         alt={f.name}
-                        className="h-12 w-12 rounded-full object-cover border border-slate-200"
+                        className="h-12 w-12 rounded-full object-cover border border-[#e5e7eb]"
                       />
                       <div>
                         <Link
                           href={`/freelancers/${f.id}`}
-                          className="font-sans text-sm font-bold text-slate-950 hover:underline"
+                          className="font-sans text-sm font-bold text-[#0b1c30] hover:underline"
                         >
-                          {f.name} <span className="text-[#047857]">✓</span>
+                          {f.name} <span className="text-[#005d42]">✓</span>
                         </Link>
-                        <p className="font-mono text-[10px] text-slate-500">{f.location}</p>
+                        <p className="font-mono text-[10px] text-[#6e7a73]">{f.location}</p>
                       </div>
                     </div>
-                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#047857]">
+                    <span className="border border-[#005d42] bg-[#eff4ff] px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#005d42]">
                       {f.tier || "TOP RATED"}
                     </span>
                   </div>
 
-                  <p className="mt-3 font-mono text-xs font-semibold text-slate-800">
+                  <p className="mt-3 font-mono text-xs font-semibold text-[#0b1c30]">
                     {f.headline}
                   </p>
-                  <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-slate-600">
+                  <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-[#3e4943]">
                     {f.bio}
                   </p>
 
                   <div className="mt-4 flex flex-wrap gap-1">
                     {(f.skills?.slice(0, 4) || []).map((s) => (
-                      <span key={s} className="border border-slate-200 bg-[#FAFBFB] px-2 py-0.5 font-mono text-[9px] text-slate-700">
+                      <span key={s} className="border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[9px] text-[#0b1c30]">
                         {s}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 font-mono text-xs">
+                <div className="mt-5 flex items-center justify-between border-t border-[#e5e7eb] pt-3 font-mono text-xs">
                   <div>
-                    <span className="text-[10px] text-slate-400">RATE</span>
-                    <p className="font-bold text-slate-900">${f.hourlyRate || 95}/hr</p>
+                    <span className="text-[10px] text-[#6e7a73]">RATE</span>
+                    <p className="font-bold text-[#0b1c30]">₹{f.hourlyRate || 2000}/hr</p>
                   </div>
                   <Link
                     href={`/freelancers/${f.id}`}
-                    className="border border-slate-300 bg-white px-3 py-1 font-bold uppercase text-slate-800 hover:bg-slate-50"
+                    className="px-4 py-1.5 border border-[#0b1c30] text-[#0b1c30] font-semibold text-xs uppercase tracking-wide hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all bg-white"
                   >
                     VIEW SPECS
                   </Link>
@@ -227,35 +227,35 @@ export default function Landing() {
       </section>
 
       {/* Escrow Guarantee Architecture Banner */}
-      <section className="border-t border-slate-200 bg-[#FAFBFB] py-14">
+      <section className="border-t border-[#e5e7eb] bg-[#eff4ff] py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="border border-slate-200 bg-white p-6 shadow-sm">
-              <ShieldCheck className="h-8 w-8 text-[#047857]" />
-              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+              <ShieldCheck className="h-8 w-8 text-[#005d42]" />
+              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                 100% ESCROW VAULT SETTLEMENT
               </h3>
-              <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+              <p className="mt-2 text-xs text-[#3e4943] leading-relaxed">
                 Client funds remain safely in cold multi-signature escrow vaults until pull requests, Figma deliverables, or architectural milestones pass verification.
               </p>
             </div>
 
-            <div className="border border-slate-200 bg-white p-6 shadow-sm">
-              <Lock className="h-8 w-8 text-[#047857]" />
-              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+              <Lock className="h-8 w-8 text-[#005d42]" />
+              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                 SOC-2 TYPE II PROTOCOL SECURITY
               </h3>
-              <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+              <p className="mt-2 text-xs text-[#3e4943] leading-relaxed">
                 Full enterprise compliance with automated tax reporting, zero-leak credential isolation, and verified 256-bit hardware session tokens.
               </p>
             </div>
 
-            <div className="border border-slate-200 bg-white p-6 shadow-sm">
-              <Zap className="h-8 w-8 text-[#047857]" />
-              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+              <Zap className="h-8 w-8 text-[#005d42]" />
+              <h3 className="mt-4 font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                 AUTOMATED GIT REPO DISBURSEMENT
               </h3>
-              <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+              <p className="mt-2 text-xs text-[#3e4943] leading-relaxed">
                 Auto-sync pull requests with GitHub actions and automated code quality suites for zero-friction milestone releases.
               </p>
             </div>

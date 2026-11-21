@@ -2,11 +2,54 @@
 @source "../";
 
 @theme {
-  /* ---- Font families exact from rohit6522/Freelance-marketplace-react ---- */
+  /* ---- Colors exact from Design System specification ---- */
+  --color-background: #f8f9ff;
+  --color-surface: #ffffff;
+  --color-surface-lowest: #ffffff;
+  --color-surface-card: #ffffff;
+  --color-surface-low: #eff4ff;
+  --color-surface-mid: #e5eeff;
+  --color-surface-high: #dce9ff;
+  --color-surface-highest: #d3e4fe;
+
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container: #e5eeff;
+  --color-surface-container-high: #dce9ff;
+  --color-surface-container-highest: #d3e4fe;
+
+  --color-on-surface: #0b1c30;
+  --color-on-surface-variant: #3e4943;
+  --color-outline: #6e7a73;
+  --color-outline-variant: #e5e7eb;
+
+  --color-primary: #005d42;
+  --color-primary-hover: #047857;
+  --color-primary-container: #047857;
+  --color-on-primary: #ffffff;
+  --color-primary-mint: #9ffdd3;
+  --color-primary-mint-accent: #97f5cc;
+
+  --color-secondary: #565e74;
+  --color-secondary-container: #dae2fd;
+  --color-on-secondary: #ffffff;
+
+  --color-tertiary: #0047bf;
+  --color-tertiary-container: #1e5fe7;
+  --color-on-tertiary: #ffffff;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #93000a;
+
+  /* ---- Typography ---- */
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Space Grotesk", sans-serif;
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-mono: "Geist Mono", monospace;
+
   --font-headline-xl: "Space Grotesk", sans-serif;
-  --font-headline-xl-mobile: "Space Grotesk", sans-serif;
   --font-headline-lg: "Space Grotesk", sans-serif;
-  --font-headline-lg-mobile: "Space Grotesk", sans-serif;
   --font-headline-md: "Space Grotesk", sans-serif;
   --font-headline-sm: "Space Grotesk", sans-serif;
   --font-body-lg: "Geist", sans-serif;
@@ -14,43 +57,28 @@
   --font-body-sm: "Geist", sans-serif;
   --font-label-md: "Geist", sans-serif;
   --font-label-sm: "Geist", sans-serif;
-  --font-code-sm: "Geist Mono", "Geist", monospace;
+  --font-code-sm: "Geist Mono", monospace;
 
-  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-serif: "Space Grotesk", sans-serif;
-  --font-headline: "Space Grotesk", sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
-
-  /* ---- Font scales exact from rohit6522/Freelance-marketplace-react ---- */
+  /* ---- Font scales ---- */
   --text-headline-xl: 3rem;
   --text-headline-xl--line-height: 3.5rem;
-  --text-headline-xl--letter-spacing: -0.03em;
+  --text-headline-xl--letter-spacing: -0.02em;
   --text-headline-xl--font-weight: 700;
-
-  --text-headline-xl-mobile: 2.25rem;
-  --text-headline-xl-mobile--line-height: 2.75rem;
-  --text-headline-xl-mobile--letter-spacing: -0.02em;
-  --text-headline-xl-mobile--font-weight: 700;
 
   --text-headline-lg: 2.25rem;
   --text-headline-lg--line-height: 2.75rem;
   --text-headline-lg--letter-spacing: -0.02em;
-  --text-headline-lg--font-weight: 600;
-
-  --text-headline-lg-mobile: 1.75rem;
-  --text-headline-lg-mobile--line-height: 2.25rem;
-  --text-headline-lg-mobile--letter-spacing: -0.02em;
-  --text-headline-lg-mobile--font-weight: 600;
+  --text-headline-lg--font-weight: 700;
 
   --text-headline-md: 1.5rem;
   --text-headline-md--line-height: 2rem;
-  --text-headline-md--letter-spacing: -0.01em;
-  --text-headline-md--font-weight: 600;
+  --text-headline-md--letter-spacing: -0.02em;
+  --text-headline-md--font-weight: 700;
 
   --text-headline-sm: 1.25rem;
   --text-headline-sm--line-height: 1.75rem;
-  --text-headline-sm--letter-spacing: 0em;
-  --text-headline-sm--font-weight: 600;
+  --text-headline-sm--letter-spacing: -0.02em;
+  --text-headline-sm--font-weight: 700;
 
   --text-body-lg: 1.125rem;
   --text-body-lg--line-height: 1.75rem;
@@ -66,7 +94,7 @@
 
   --text-label-md: 0.875rem;
   --text-label-md--line-height: 1.25rem;
-  --text-label-md--letter-spacing: 0.02em;
+  --text-label-md--letter-spacing: 0.025em;
   --text-label-md--font-weight: 600;
 
   --text-label-sm: 0.75rem;
@@ -79,51 +107,34 @@
   --text-code-sm--font-weight: 500;
 }
 
-@layer theme {
-  :root {
-    /* Technical Marketplace Precision Palette */
-    --background: #f8f9ff;
-    --foreground: #0b1c30;
-    --surface: #f8f9ff;
-    --surface-dim: #cbdbf5;
-    --surface-bright: #f8f9ff;
-    --surface-container-lowest: #ffffff;
-    --surface-container-low: #eff4ff;
-    --surface-container: #e5eeff;
-    --surface-container-high: #dce9ff;
-    --surface-container-highest: #d3e4fe;
-    --on-surface: #0b1c30;
-    --on-surface-variant: #3e4943;
-    --inverse-surface: #213145;
-    --inverse-on-surface: #eaf1ff;
-    --outline: #6e7a73;
-    --outline-variant: #bdc9c1;
+:root {
+  /* Design Tokens CSS Variables */
+  --background: #f8f9ff;
+  --foreground: #0b1c30;
+  --surface: #ffffff;
+  --surface-low: #eff4ff;
+  --surface-mid: #e5eeff;
+  --surface-high: #dce9ff;
+  --surface-highest: #d3e4fe;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #3e4943;
+  --outline: #6e7a73;
+  --outline-variant: #e5e7eb;
 
-    /* Primary Precision Emerald */
-    --primary: #047857;
-    --primary-hover: #065f46;
-    --on-primary: #ffffff;
-    --primary-container: #047857;
-    --on-primary-container: #9ffdd3;
-    --inverse-primary: #7bd8b1;
+  --primary: #005d42;
+  --primary-hover: #047857;
+  --on-primary: #ffffff;
+  --primary-mint: #9ffdd3;
+  --primary-mint-accent: #97f5cc;
 
-    /* Secondary Solid Slate */
-    --secondary: #0f172a;
-    --on-secondary: #ffffff;
-    --secondary-container: #dae2fd;
-    --on-secondary-container: #5c647a;
+  --secondary: #565e74;
+  --secondary-container: #dae2fd;
+  --tertiary: #0047bf;
+  --tertiary-container: #1e5fe7;
 
-    /* Tertiary Cobalt */
-    --tertiary: #2563eb;
-    --on-tertiary: #ffffff;
-    --tertiary-container: #1e5fe7;
-    --on-tertiary-container: #e6e9ff;
-
-    /* Strict Borders */
-    --border: #e2e8f0;
-    --border-strong: #0f172a;
-    --muted: #64748b;
-  }
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+  --on-error: #93000a;
 }
 
 @layer base {
@@ -143,7 +154,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Space Grotesk for All Headlines & Titles */
+  /* Headings & Brand: Space Grotesk (uppercase, bold, tracking: -0.02em) */
   h1,
   h2,
   h3,
@@ -151,88 +162,120 @@
   h5,
   h6,
   .font-serif,
-  .font-editorial,
   .font-headline {
     font-family: "Space Grotesk", sans-serif !important;
+    text-transform: uppercase;
+    font-weight: 700;
     letter-spacing: -0.02em;
   }
 
-  /* Geist Mono for Code & Monospace Tags */
+  /* Body, Inputs, UI & Labels: Geist */
+  body,
+  input,
+  textarea,
+  select,
+  label,
+  button,
+  .font-sans {
+    font-family: "Geist", sans-serif;
+  }
+
+  /* Geist Mono for Code & Monospace Badges */
   code,
   kbd,
   pre,
   samp,
-  .font-mono,
-  .font-mono-tag {
-    font-family: "Geist Mono", ui-monospace, SFMono-Regular, monospace !important;
+  .font-mono {
+    font-family: "Geist Mono", monospace !important;
   }
-
-  /* Form controls focus without soft blur glow */
-  input:focus,
-  select:focus,
-  textarea:focus {
-    outline: none !important;
-    border-color: #0f172a !important;
-    box-shadow: 2px 2px 0px #0f172a !important;
-  }
-}
-
-/* Hard Brutalist Elevation - No soft blurred drop shadows */
-.shadow-sm,
-.shadow {
-  box-shadow: 2px 2px 0px #0f172a !important;
-}
-
-.shadow-md,
-.shadow-lg,
-.shadow-xl {
-  box-shadow: 3px 3px 0px #0f172a !important;
-}
-
-.shadow-none {
-  box-shadow: none !important;
-}
-
-/* Primary Button Styling with hard solid offset on hover */
-.bg-\[\#047857\],
-.bg-\[\#047857\] {
-  background-color: #047857 !important;
-  color: #ffffff !important;
-}
-
-.bg-\[\#047857\]:hover,
-.bg-\[\#047857\]:hover,
-.hover\:bg-\[\#065f46\]:hover,
-.hover\:bg-\[\#065f46\]:hover {
-  background-color: #065f46 !important;
-  box-shadow: 2px 2px 0px #0f172a !important;
-}
-
-.text-\[\#047857\],
-.text-\[\#047857\] {
-  color: #047857 !important;
-}
-
-.border-\[\#047857\],
-.border-\[\#047857\] {
-  border-color: #047857 !important;
-}
-
-/* Strict Selection Color */
-::selection {
-  background-color: #047857;
-  color: #ffffff;
-}
-
-/* Architectural Grid Pattern */
-.bg-tech-grid {
-  background-size: 32px 32px;
-  background-image:
-    linear-gradient(to right, rgba(11, 28, 48, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(11, 28, 48, 0.05) 1px, transparent 1px);
 }
 
 @layer components {
+  /* Primary Buttons Rule:
+     px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background-color: #005d42;
+    color: #ffffff;
+    border: 1px solid #005d42;
+    font-family: "Geist", sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    box-shadow: 2px 2px 0px #0b1c30;
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+  }
+  .btn-primary:hover {
+    background-color: #047857;
+  }
+  .btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  /* Secondary / Ghost Buttons Rule:
+     px-5 py-2.5 border border-[#0b1c30] text-[#0b1c30] font-semibold text-sm uppercase tracking-wide hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all */
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background-color: transparent;
+    color: #0b1c30;
+    border: 1px solid #0b1c30;
+    font-family: "Geist", sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    box-shadow: 2px 2px 0px #0b1c30;
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+  }
+  .btn-secondary:hover {
+    background-color: #dce9ff;
+  }
+  .btn-secondary:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  /* Input Fields Rule:
+     w-full px-4 py-2.5 bg-white border border-[#6e7a73] text-[#0b1c30] text-sm focus:border-2 focus:border-[#0b1c30] focus:outline-none */
+  .input-field {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    background-color: #ffffff;
+    border: 1px solid #6e7a73;
+    color: #0b1c30;
+    font-family: "Geist", sans-serif;
+    font-size: 0.875rem;
+    transition: border-color 150ms ease-in-out;
+  }
+  .input-field:focus {
+    border-width: 2px;
+    border-color: #0b1c30;
+    outline: none;
+  }
+
+  /* Cards Rule:
+     bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6 */
+  .card-neo {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 3px 3px 0px #0b1c30;
+    padding: 1.5rem;
+  }
+
   .material-symbols-outlined {
     font-family: "Material Symbols Outlined";
     font-weight: normal;

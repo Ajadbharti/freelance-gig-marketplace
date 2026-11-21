@@ -141,17 +141,17 @@ export default function RegisterForm() {
         {/* 2-Column Split: Form (Left) + Telemetry (Right) */}
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           {/* Left Column: Form */}
-          <div className="border border-slate-200 bg-white p-6 sm:p-10 shadow-sm">
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+          <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6 sm:p-10">
+            <h1 className="font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-4xl">
               Create your GigCraft account
             </h1>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-[#3e4943]">
               Join thousands of engineering teams and top-tier technical freelancers contracting under deterministic milestones.
             </p>
 
             {/* Archetype Selector */}
             <div className="mt-8">
-              <p className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800">
+              <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                 SELECT ACCOUNT ARCHETYPE
               </p>
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
@@ -160,36 +160,36 @@ export default function RegisterForm() {
                   onClick={() => setArchetype("client")}
                   className={`cursor-pointer border p-4 transition ${
                     archetype === "client"
-                      ? "border-[#047857] bg-[#f7fcf9] ring-1 ring-[#047857]"
-                      : "border-slate-200 bg-white hover:border-slate-300"
+                      ? "border-[#005d42] bg-[#eff4ff] ring-1 ring-[#005d42]"
+                      : "border-[#e5e7eb] bg-white hover:border-[#6e7a73]"
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-xs">💼</span>
-                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                         HIRE TALENT
                       </span>
                     </div>
                     <div
                       className={`flex h-4 w-4 items-center justify-center border text-[10px] ${
                         archetype === "client"
-                          ? "border-[#047857] bg-[#047857] text-white"
-                          : "border-slate-300"
+                          ? "border-[#005d42] bg-[#005d42] text-white"
+                          : "border-[#6e7a73]"
                       }`}
                     >
                       {archetype === "client" && "✓"}
                     </div>
                   </div>
-                  <h3 className="mt-3 font-sans text-sm font-bold text-slate-950">
+                  <h3 className="mt-3 font-sans text-sm font-bold text-[#0b1c30]">
                     Client / Engineering Lead
                   </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                  <p className="mt-1 text-xs leading-relaxed text-[#3e4943]">
                     Post technical gigs, escrow milestone contracts, and hire vetted engineers & architects with automated deliverables verification.
                   </p>
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 font-mono text-[11px] text-slate-600">
-                    <span className="uppercase tracking-wider font-semibold text-slate-800">BUYER ESCROW MODE</span>
-                    <span className="text-[#047857]">0% Upfront Post</span>
+                  <div className="mt-4 flex items-center justify-between border-t border-[#e5e7eb] pt-3 font-mono text-[11px] text-[#3e4943]">
+                    <span className="uppercase tracking-wider font-semibold text-[#0b1c30]">BUYER ESCROW MODE</span>
+                    <span className="text-[#005d42]">0% Upfront Post</span>
                   </div>
                 </div>
 
@@ -198,36 +198,36 @@ export default function RegisterForm() {
                   onClick={() => setArchetype("freelancer")}
                   className={`cursor-pointer border p-4 transition ${
                     archetype === "freelancer"
-                      ? "border-[#047857] bg-[#f7fcf9] ring-1 ring-[#047857]"
-                      : "border-slate-200 bg-white hover:border-slate-300"
+                      ? "border-[#005d42] bg-[#eff4ff] ring-1 ring-[#005d42]"
+                      : "border-[#e5e7eb] bg-white hover:border-[#6e7a73]"
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-xs">💻</span>
-                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                         WORK & SELL
                       </span>
                     </div>
                     <div
                       className={`flex h-4 w-4 items-center justify-center border text-[10px] ${
                         archetype === "freelancer"
-                          ? "border-[#047857] bg-[#047857] text-white"
-                          : "border-slate-300"
+                          ? "border-[#005d42] bg-[#005d42] text-white"
+                          : "border-[#6e7a73]"
                       }`}
                     >
                       {archetype === "freelancer" && "✓"}
                     </div>
                   </div>
-                  <h3 className="mt-3 font-sans text-sm font-bold text-slate-950">
+                  <h3 className="mt-3 font-sans text-sm font-bold text-[#0b1c30]">
                     Freelancer / Specialist
                   </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                  <p className="mt-1 text-xs leading-relaxed text-[#3e4943]">
                     Publish pre-scoped technical services, pass verified code audits, and unlock immediate milestone settlement upon PR approvals.
                   </p>
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 font-mono text-[11px] text-slate-600">
-                    <span className="uppercase tracking-wider font-semibold text-slate-800">BUILDER WORKSPACE</span>
-                    <span className="text-[#047857]">Direct Settlement</span>
+                  <div className="mt-4 flex items-center justify-between border-t border-[#e5e7eb] pt-3 font-mono text-[11px] text-[#3e4943]">
+                    <span className="uppercase tracking-wider font-semibold text-[#0b1c30]">BUILDER WORKSPACE</span>
+                    <span className="text-[#005d42]">Direct Settlement</span>
                   </div>
                 </div>
               </div>
@@ -238,7 +238,7 @@ export default function RegisterForm() {
               <button
                 type="button"
                 onClick={() => handleSocialAuth("github")}
-                className="flex h-10 items-center justify-center gap-2 border border-slate-300 bg-white font-mono text-xs font-semibold uppercase tracking-wider text-slate-800 transition hover:bg-slate-50"
+                className="flex h-10 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               >
                 <GithubIcon className="h-4 w-4" />
                 Sign up with GitHub
@@ -246,7 +246,7 @@ export default function RegisterForm() {
               <button
                 type="button"
                 onClick={() => handleSocialAuth("google")}
-                className="flex h-10 items-center justify-center gap-2 border border-slate-300 bg-white font-mono text-xs font-semibold uppercase tracking-wider text-slate-800 transition hover:bg-slate-50"
+                className="flex h-10 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               >
                 <span className="font-bold text-blue-600">G</span>
                 Sign up with Google
@@ -254,34 +254,34 @@ export default function RegisterForm() {
             </div>
 
             {/* Divider */}
-            <div className="my-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-slate-400">
-              <span className="h-px flex-1 bg-slate-200" />
+            <div className="my-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-[#6e7a73]">
+              <span className="h-px flex-1 bg-[#e5e7eb]" />
               OR COMPLETE REGISTRATION
-              <span className="h-px flex-1 bg-slate-200" />
+              <span className="h-px flex-1 bg-[#e5e7eb]" />
             </div>
 
             {/* Registration Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-800">
+                  <label className="block font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
                     First Name *
                   </label>
                   <input
                     type="text"
                     {...register("firstName", { required: true })}
-                    className="mt-1.5 h-10 w-full border border-slate-300 bg-white px-3 font-sans text-sm text-slate-900 focus:border-slate-800 focus:outline-none"
+                    className="mt-1.5 h-10 w-full border border-[#6e7a73] bg-white px-3 font-sans text-sm text-[#0b1c30] focus:border-2 focus:border-[#0b1c30] focus:outline-none"
                     placeholder="Aarav"
                   />
                 </div>
                 <div>
-                  <label className="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-800">
+                  <label className="block font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
                     Last Name *
                   </label>
                   <input
                     type="text"
                     {...register("lastName", { required: true })}
-                    className="mt-1.5 h-10 w-full border border-slate-300 bg-white px-3 font-sans text-sm text-slate-900 focus:border-slate-800 focus:outline-none"
+                    className="mt-1.5 h-10 w-full border border-[#6e7a73] bg-white px-3 font-sans text-sm text-[#0b1c30] focus:border-2 focus:border-[#0b1c30] focus:outline-none"
                     placeholder="Sharma"
                   />
                 </div>
@@ -289,34 +289,34 @@ export default function RegisterForm() {
 
               <div>
                 <div className="flex items-center justify-between">
-                  <label className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-800">
+                  <label className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
                     Work Email *
                   </label>
-                  <span className="font-mono text-[11px] text-slate-500">
+                  <span className="font-mono text-[11px] text-[#6e7a73]">
                     Used for escrow confirmations
                   </span>
                 </div>
-                <div className="relative mt-1.5 flex h-10 items-center border border-slate-300 bg-white">
+                <div className="relative mt-1.5 flex h-10 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
                   <input
                     type="email"
                     {...register("email", { required: true })}
-                    className="h-full flex-1 px-3 font-sans text-sm text-slate-900 focus:outline-none"
+                    className="h-full flex-1 px-3 font-sans text-sm text-[#0b1c30] focus:outline-none"
                     placeholder="name@enterprise.in"
                   />
-                  <span className="px-3 font-mono text-xs text-slate-400">@</span>
+                  <span className="px-3 font-mono text-xs text-[#6e7a73]">@</span>
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between">
-                  <label className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-800">
+                  <label className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
                     Password *
                   </label>
-                  <span className="font-mono text-[11px] font-semibold text-slate-600">
+                  <span className="font-mono text-[11px] font-semibold text-[#6e7a73]">
                     STRENGTH: {strengthLevel}
                   </span>
                 </div>
-                <div className="relative mt-1.5 flex h-10 items-center border border-slate-300 bg-white focus-within:border-slate-800">
+                <div className="relative mt-1.5 flex h-10 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
                   <input
                     type={showPassword ? "text" : "password"}
                     {...register("password")}
@@ -325,33 +325,33 @@ export default function RegisterForm() {
                       setPasswordValue(e.target.value);
                       setValue("password", e.target.value);
                     }}
-                    className="h-full flex-1 px-3 font-sans text-sm text-slate-900 focus:outline-none"
+                    className="h-full flex-1 px-3 font-sans text-sm text-[#0b1c30] focus:outline-none"
                     placeholder="Create a strong password (min 6 chars)"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="mr-2.5 flex h-7 w-7 shrink-0 items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer focus:outline-none"
+                    className="mr-2.5 flex h-7 w-7 shrink-0 items-center justify-center text-[#6e7a73] hover:text-[#0b1c30] cursor-pointer focus:outline-none"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
                 {/* 3-segment strength meter matching image */}
-                <div className="mt-2 grid grid-cols-3 gap-1 font-mono text-[9px] uppercase tracking-wider text-slate-500">
+                <div className="mt-2 grid grid-cols-3 gap-1 font-mono text-[9px] uppercase tracking-wider text-[#6e7a73]">
                   <div
                     className={`h-1.5 ${
-                      strengthPercent >= 33 ? "bg-[#047857]" : "bg-slate-200"
+                      strengthPercent >= 33 ? "bg-[#005d42]" : "bg-slate-200"
                     }`}
                   />
                   <div
                     className={`h-1.5 ${
-                      strengthPercent >= 66 ? "bg-[#047857]" : "bg-slate-200"
+                      strengthPercent >= 66 ? "bg-[#005d42]" : "bg-slate-200"
                     }`}
                   />
                   <div
                     className={`h-1.5 ${
-                      strengthPercent >= 100 ? "bg-[#047857]" : "bg-slate-200"
+                      strengthPercent >= 100 ? "bg-[#005d42]" : "bg-slate-200"
                     }`}
                   />
                 </div>
@@ -434,7 +434,7 @@ export default function RegisterForm() {
               <button
                 type="submit"
                 disabled={isSubmitting || !agreeTerms}
-                className="mt-4 flex h-12 w-full items-center justify-center gap-2 bg-[#047857] font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46] disabled:opacity-50"
+                className="mt-4 flex h-12 w-full items-center justify-center gap-2 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50"
               >
                 CREATE FREE ACCOUNT & START BOOKING →
               </button>
@@ -442,10 +442,10 @@ export default function RegisterForm() {
               <div className="pt-2 text-center">
                 <Link
                   href="/login"
-                  className="font-mono text-xs text-slate-600 transition hover:text-[#047857]"
+                  className="font-mono text-xs text-[#3e4943] transition hover:text-[#005d42]"
                 >
                   Already verified on the GigCraft node network?{" "}
-                  <span className="font-bold underline text-slate-900">Log In →</span>
+                  <span className="font-bold underline text-[#0b1c30]">Log In →</span>
                 </Link>
               </div>
             </form>
@@ -454,12 +454,12 @@ export default function RegisterForm() {
           {/* Right Column: Telemetry & Protocol Guarantee */}
           <div className="space-y-6">
             {/* Box 1: Protocol Guarantee */}
-            <div className="border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+            <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-5">
+              <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                   PROTOCOL GUARANTEE
                 </span>
-                <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-[#047857]">
+                <span className="border border-[#005d42] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold text-[#005d42]">
                   ACTIVE
                 </span>
               </div>
