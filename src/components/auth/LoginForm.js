@@ -180,20 +180,20 @@ export default function LoginForm() {
                   </Link>
                 </div>
                 <div className="relative mt-1.5 flex h-11 items-center border border-slate-300 bg-white focus-within:border-slate-800">
-                  <span className="px-3 text-slate-400">
+                  <span className="px-3 text-slate-400 shrink-0">
                     <KeyRound className="h-4 w-4" />
                   </span>
                   <input
                     id="login-pass"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className="h-full w-full bg-transparent pr-10 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                    className="h-full flex-1 bg-transparent px-1 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
                     {...register("password", { required: "Password is required" })}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 text-slate-400 hover:text-slate-600"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer focus:outline-none"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

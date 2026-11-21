@@ -8,6 +8,8 @@ import {
   Check,
   CheckCircle2,
   Code,
+  Eye,
+  EyeOff,
   Globe,
   Lock,
   Shield,
@@ -54,6 +56,7 @@ export default function RegisterForm() {
     searchParams.get("role") === "freelancer" ? "freelancer" : "client"
   );
   const [passwordValue, setPasswordValue] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState(DOMAIN_OPTIONS[0]);
   const [selectedTags, setSelectedTags] = useState(["#Next.js & Edge"]);
   const [agreeTerms, setAgreeTerms] = useState(true);
@@ -313,9 +316,9 @@ export default function RegisterForm() {
                     STRENGTH: {strengthLevel}
                   </span>
                 </div>
-                <div className="relative mt-1.5 flex h-10 items-center border border-slate-300 bg-white">
+                <div className="relative mt-1.5 flex h-10 items-center border border-slate-300 bg-white focus-within:border-slate-800">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     {...register("password")}
                     value={passwordValue}
                     onChange={(e) => {
@@ -325,7 +328,14 @@ export default function RegisterForm() {
                     className="h-full flex-1 px-3 font-sans text-sm text-slate-900 focus:outline-none"
                     placeholder="Create a strong password (min 6 chars)"
                   />
-                  <span className="px-3 font-mono text-xs text-slate-400">👁</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="mr-2.5 flex h-7 w-7 shrink-0 items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer focus:outline-none"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
                 {/* 3-segment strength meter matching image */}
                 <div className="mt-2 grid grid-cols-3 gap-1 font-mono text-[9px] uppercase tracking-wider text-slate-500">
