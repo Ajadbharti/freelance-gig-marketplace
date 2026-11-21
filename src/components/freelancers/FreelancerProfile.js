@@ -382,7 +382,7 @@ export default function FreelancerProfile({ params }) {
                       <div className="relative aspect-[16/10] overflow-hidden bg-slate-950">
                         <SafeImage src={cs.image} alt={cs.title} className="h-full w-full object-cover" />
                         <span className="absolute top-2 left-2 bg-black/80 px-2 py-0.5 font-mono text-[9px] font-bold text-white uppercase">
-                          {cs.category} // {cs.sprint}
+                          {cs.category} {"//"} {cs.sprint}
                         </span>
                       </div>
                       <h3 className="mt-3 font-serif text-lg font-bold text-slate-950">

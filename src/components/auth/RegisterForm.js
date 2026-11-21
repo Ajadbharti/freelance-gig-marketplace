@@ -66,10 +66,10 @@ export default function RegisterForm() {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      firstName: "Aakash",
-      lastName: "Verma",
-      email: "engineer@enterprise.in",
-      password: "••••••••••••",
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
     },
   });
 
@@ -95,11 +95,16 @@ export default function RegisterForm() {
   }
 
   async function onSubmit(data) {
-    const fullName = `${data.firstName.trim()} ${data.lastName.trim()}`.trim();
+    const fullName = `${(data.firstName || "").trim()} ${(data.lastName || "").trim()}`.trim();
+    const finalPassword = passwordValue || data.password;
+    if (!finalPassword || finalPassword.length < 6) {
+      showToast("Password must be at least 6 characters long.", "error");
+      return;
+    }
     const result = await registerUser({
       name: fullName || "Engineer",
       email: data.email,
-      password: data.password || "demo123",
+      password: finalPassword,
       role: archetype,
     });
 
@@ -263,7 +268,7 @@ export default function RegisterForm() {
                     type="text"
                     {...register("firstName", { required: true })}
                     className="mt-1.5 h-10 w-full border border-slate-300 bg-white px-3 font-sans text-sm text-slate-900 focus:border-slate-800 focus:outline-none"
-                    placeholder="Linus"
+                    placeholder="Aarav"
                   />
                 </div>
                 <div>
@@ -274,7 +279,7 @@ export default function RegisterForm() {
                     type="text"
                     {...register("lastName", { required: true })}
                     className="mt-1.5 h-10 w-full border border-slate-300 bg-white px-3 font-sans text-sm text-slate-900 focus:border-slate-800 focus:outline-none"
-                    placeholder="Torvalds"
+                    placeholder="Sharma"
                   />
                 </div>
               </div>
@@ -293,7 +298,7 @@ export default function RegisterForm() {
                     type="email"
                     {...register("email", { required: true })}
                     className="h-full flex-1 px-3 font-sans text-sm text-slate-900 focus:outline-none"
-                    placeholder="engineer@enterprise.io"
+                    placeholder="name@enterprise.in"
                   />
                   <span className="px-3 font-mono text-xs text-slate-400">@</span>
                 </div>
@@ -311,10 +316,14 @@ export default function RegisterForm() {
                 <div className="relative mt-1.5 flex h-10 items-center border border-slate-300 bg-white">
                   <input
                     type="password"
+                    {...register("password")}
                     value={passwordValue}
-                    onChange={(e) => setPasswordValue(e.target.value)}
+                    onChange={(e) => {
+                      setPasswordValue(e.target.value);
+                      setValue("password", e.target.value);
+                    }}
                     className="h-full flex-1 px-3 font-sans text-sm text-slate-900 focus:outline-none"
-                    placeholder="••••••••••••"
+                    placeholder="Create a strong password (min 6 chars)"
                   />
                   <span className="px-3 font-mono text-xs text-slate-400">👁</span>
                 </div>

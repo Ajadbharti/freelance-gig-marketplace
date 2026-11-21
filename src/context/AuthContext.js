@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { demoUsers } from "@/data/users";
 
 const AuthContext = createContext(null);
 
@@ -15,63 +14,125 @@ export function AuthProvider({ children }) {
       if (saved) {
         setUser(JSON.parse(saved));
       } else {
-        // Default to client user for demo preview so user sees dashboard & active contracts right away
-        setUser(demoUsers[0]);
+        setUser(null);
       }
     } catch {
-      setUser(demoUsers[0]);
+      setUser(null);
     }
     setHydrated(true);
   }, []);
 
   const login = useCallback(async (email, password) => {
     const cleanEmail = (email || "").trim().toLowerCase();
-    const found = demoUsers.find((u) => u.email.toLowerCase() === cleanEmail);
-    if (found) {
-      setUser(found);
-      try {
-        localStorage.setItem("gigcraft_in:user", JSON.stringify(found));
-      } catch {}
-      return { ok: true, user: found };
+    if (!cleanEmail) {
+      return { ok: false, error: "Please enter your corporate email." };
     }
-    // Any other email can also log in as client or based on domain
-    const newUser = {
-      id: "u-" + Date.now(),
-      name: cleanEmail.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      email: cleanEmail,
-      role: cleanEmail.includes("freelance") || cleanEmail.includes("designer") ? "freelancer" : "client",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
-    };
-    setUser(newUser);
+    if (!password) {
+      return { ok: false, error: "Please enter your access key / password." };
+    }
+
+    // Check registered accounts in storage
+    let registeredUsers = [];
     try {
-      localStorage.setItem("gigcraft_in:user", JSON.stringify(newUser));
+      const raw = localStorage.getItem("gigcraft_in:registered_users");
+      if (raw) registeredUsers = JSON.parse(raw);
     } catch {}
-    return { ok: true, user: newUser };
+
+    const found = registeredUsers.find((u) => u.email.toLowerCase() === cleanEmail);
+    if (found) {
+      if (found.password && found.password !== password) {
+        return { ok: false, error: "Invalid password for this account." };
+      }
+      const sessionUser = {
+        id: found.id,
+        name: found.name,
+        email: found.email,
+        role: found.role,
+        avatar: found.avatar,
+        joinedAt: found.joinedAt,
+      };
+      setUser(sessionUser);
+      try {
+        localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
+      } catch {}
+      return { ok: true, user: sessionUser };
+    }
+
+    return {
+      ok: false,
+      error: "No account found with this email. Please register as a Client or apply as a Freelancer.",
+    };
   }, []);
 
   const loginWithProvider = useCallback(async (provider) => {
-    const providerUser = provider === "github" ? demoUsers[1] : demoUsers[0];
-    setUser(providerUser);
+    const providerName = provider === "github" ? "GitHub Workspace User" : "Google Cloud User";
+    const providerEmail = provider === "github" ? "developer@github.com" : "developer@google.com";
+    const sessionUser = {
+      id: `usr-${provider}-${Date.now().toString(36)}`,
+      name: providerName,
+      email: providerEmail,
+      role: "client",
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${provider}&backgroundColor=047857`,
+      joinedAt: new Date().toISOString(),
+    };
+    setUser(sessionUser);
     try {
-      localStorage.setItem("gigcraft_in:user", JSON.stringify(providerUser));
+      localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
     } catch {}
-    return { ok: true, user: providerUser };
+    return { ok: true, user: sessionUser };
   }, []);
 
   const register = useCallback(async ({ name, email, password, role }) => {
     const cleanEmail = (email || "").trim().toLowerCase();
-    const newUser = {
-      id: "u-" + Date.now(),
-      name: name.trim(),
-      email: cleanEmail,
-      role: role || "client",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80",
-    };
-    setUser(newUser);
+    if (!cleanEmail) {
+      return { ok: false, error: "Email is required." };
+    }
+    if (!password || password.length < 6) {
+      return { ok: false, error: "Password must be at least 6 characters." };
+    }
+
+    let registeredUsers = [];
     try {
-      localStorage.setItem("gigcraft_in:user", JSON.stringify(newUser));
+      const raw = localStorage.getItem("gigcraft_in:registered_users");
+      if (raw) registeredUsers = JSON.parse(raw);
     } catch {}
-    return { ok: true, user: newUser };
+
+    const existing = registeredUsers.find((u) => u.email.toLowerCase() === cleanEmail);
+    if (existing) {
+      return { ok: false, error: "An account with this email already exists. Please log in." };
+    }
+
+    const trimmedName = (name || cleanEmail.split("@")[0]).trim();
+    const newUser = {
+      id: "usr-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: trimmedName,
+      email: cleanEmail,
+      password: password,
+      role: role || "client",
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(trimmedName)}&backgroundColor=047857,0f172a`,
+      joinedAt: new Date().toISOString(),
+    };
+
+    registeredUsers.push(newUser);
+    try {
+      localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(registeredUsers));
+    } catch {}
+
+    const sessionUser = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      avatar: newUser.avatar,
+      joinedAt: newUser.joinedAt,
+    };
+
+    setUser(sessionUser);
+    try {
+      localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
+    } catch {}
+
+    return { ok: true, user: sessionUser };
   }, []);
 
   const logout = useCallback(async () => {

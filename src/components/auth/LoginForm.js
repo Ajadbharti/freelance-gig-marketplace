@@ -51,8 +51,8 @@ export default function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      email: "developer@agency.io",
-      password: "••••••••••••",
+      email: "",
+      password: "",
     },
   });
 
@@ -158,7 +158,7 @@ export default function LoginForm() {
                     id="login-email"
                     type="email"
                     autoComplete="email"
-                    placeholder="developer@agency.io"
+                    placeholder="name@company.com"
                     className="h-full w-full bg-transparent pr-3 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
                     {...register("email", { required: "Email is required" })}
                   />
@@ -186,7 +186,7 @@ export default function LoginForm() {
                   <input
                     id="login-pass"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••••••"
+                    placeholder="Enter your password"
                     className="h-full w-full bg-transparent pr-10 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
                     {...register("password", { required: "Password is required" })}
                   />
@@ -232,7 +232,7 @@ export default function LoginForm() {
 
               {/* Bottom Register Switch */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 pt-4 font-mono text-xs text-slate-600">
-                <span>Don't have an enterprise account?</span>
+                <span>Don&apos;t have an enterprise account?</span>
                 <div className="flex items-center gap-2">
                   <Link
                     href="/register?role=client"

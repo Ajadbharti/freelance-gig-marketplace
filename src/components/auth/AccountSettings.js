@@ -94,6 +94,18 @@ function SettingsForm({ user }) {
 }
 
 export default function AccountSettings() {
-  const { user } = useAuth();
-  return <SettingsForm user={user || { name: "Linus Torvalds", email: "engineer@enterprise.io", role: "client" }} />;
+  const { user, hydrated } = useAuth();
+  if (!hydrated) return null;
+  if (!user) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-16 text-center font-mono">
+        <h1 className="font-serif text-2xl font-bold text-slate-950">Authentication Required</h1>
+        <p className="mt-2 text-xs text-slate-600">Please sign in to access your account settings.</p>
+        <Link href="/login" className="mt-4 inline-block bg-[#047857] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">
+          Sign In
+        </Link>
+      </div>
+    );
+  }
+  return <SettingsForm user={user} />;
 }

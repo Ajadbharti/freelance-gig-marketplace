@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Bell, ChevronDown, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, User, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -9,21 +9,19 @@ import { useToast } from "@/components/ui/ToastProvider";
 import { NAV_CATEGORIES } from "@/data/categories";
 import SafeImage from "@/components/ui/SafeImage";
 
+const emptySubscribe = () => () => {};
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, switchRole } = useAuth();
   const { showToast } = useToast();
 
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const userRef = useRef(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
 
@@ -227,11 +225,11 @@ export default function Navbar() {
                     <ShieldCheck className="h-3.5 w-3.5" /> Active Contracts Ledger
                   </Link>
                   <Link
-                    href="/freelancers/f1"
+                    href="/gigs"
                     onClick={() => setUserOpen(false)}
                     className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    <User className="h-3.5 w-3.5" /> View Sample Profile (Ananya)
+                    <User className="h-3.5 w-3.5" /> Browse Specialists Catalog
                   </Link>
                   <Link
                     href="/account"
