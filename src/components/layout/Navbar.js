@@ -70,20 +70,19 @@ export default function Navbar() {
   const dashboardHref =
     user?.role === "admin" ? "/admin" : user?.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
 
-  // Streamlined Minimal Header for Auth Pages (Image 1 & Image 6)
+  // Streamlined Minimal Header for Auth Pages (Matching Screenshot)
   if (isAuthPage) {
     return (
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-4 w-4 items-center justify-center bg-[#047857] text-[10px] text-white">■</span>
-            <span className="font-serif text-xl font-bold tracking-tight text-slate-950">GIGCRAFT</span>
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="font-serif text-xl font-bold tracking-tight text-[#047857]">
+            GIGCRAFT
           </Link>
           <Link
             href="/gigs"
             className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-600 transition hover:text-[#047857]"
           >
-            BACK TO MARKETPLACE →
+            BACK TO MARKETPLACE
           </Link>
         </div>
       </header>

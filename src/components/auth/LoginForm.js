@@ -6,9 +6,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
   CheckCircle2,
+  Eye,
+  EyeOff,
   KeyRound,
   Landmark,
   Lock,
+  LogIn,
   Mail,
   Shield,
   ShieldCheck,
@@ -81,7 +84,7 @@ export default function LoginForm() {
         {/* Top Protocol Subheader matching user screenshot */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3 font-mono text-xs text-slate-600">
           <div className="flex items-center gap-2">
-            <span className="border border-slate-200 bg-slate-100 px-2 py-0.5 font-bold uppercase tracking-wider text-slate-800">
+            <span className="border border-slate-200 bg-slate-50 px-2 py-0.5 font-bold uppercase tracking-wider text-[#047857]">
               ■ SECURE SIGN-IN
             </span>
             <span className="text-slate-500">HTTPS // HTTPONLY SESSION COOKIE</span>
@@ -193,7 +196,7 @@ export default function LoginForm() {
                     className="absolute right-3 text-slate-400 hover:text-slate-600"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? "👁" : "👁‍🗨"}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
                 {errors.password && (
@@ -223,36 +226,9 @@ export default function LoginForm() {
                 disabled={isSubmitting}
                 className="flex h-12 w-full items-center justify-center gap-2 bg-[#047857] font-mono text-sm font-bold uppercase tracking-wider text-white shadow-[2px_2px_0px_#0F172A] transition hover:bg-[#065f46] active:translate-x-[1px] active:translate-y-[1px] disabled:opacity-70"
               >
-                <span>&rarr;</span>
+                <LogIn className="h-4 w-4" />
                 <span>{isSubmitting ? "Authenticating..." : "Sign In to Workspace"}</span>
               </button>
-
-              {/* Direct Access Demo Presets */}
-              <div className="border border-slate-200 bg-slate-50 p-2.5 font-mono text-xs text-slate-600">
-                <p className="text-[10px] uppercase font-bold text-slate-500 mb-1.5">Direct Access Presets:</p>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValue("email", "developer@agency.io");
-                      setValue("password", "demo123");
-                    }}
-                    className="border border-slate-300 bg-white px-2 py-1 text-[11px] hover:border-[#047857]"
-                  >
-                    Client: developer@agency.io
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValue("email", "ananya@gigcraft.in");
-                      setValue("password", "demo123");
-                    }}
-                    className="border border-slate-300 bg-white px-2 py-1 text-[11px] hover:border-[#047857]"
-                  >
-                    Freelancer: ananya@gigcraft.in
-                  </button>
-                </div>
-              </div>
 
               {/* Bottom Register Switch */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 pt-4 font-mono text-xs text-slate-600">
@@ -347,43 +323,6 @@ export default function LoginForm() {
                 </p>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Bottom Security Row */}
-        <div className="mt-8 grid gap-4 border border-slate-200 bg-white p-6 sm:grid-cols-3 shadow-sm">
-          <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
-            <div>
-              <p className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-                SOC-2 TYPE II CERTIFIED
-              </p>
-              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-                Continuous third-party audits ensure complete financial and credential protection.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <Lock className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
-            <div>
-              <p className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-                MULTI-SIG ESCROW VAULT
-              </p>
-              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-                Funds are held neutral until acceptance criteria and code deliverable verification meet specs.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[#047857]" />
-            <div>
-              <p className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
-                256-BIT HARDWARE ENCRYPTION
-              </p>
-              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-                Strict hardware token integration with encrypted payload transmission and session pinning.
-              </p>
-            </div>
           </div>
         </div>
       </div>
