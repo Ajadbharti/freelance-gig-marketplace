@@ -179,6 +179,7 @@ export function MarketplaceProvider({ children }) {
       localStorage.removeItem("gigcraft:freelancers");
       localStorage.removeItem("gigcraft:orders");
       localStorage.removeItem("gigcraft:reviews");
+      localStorage.removeItem("gigcraft_v3:orders");
 
       const savedGigs = localStorage.getItem("gigcraft_v3:gigs");
       if (savedGigs) {
@@ -190,7 +191,7 @@ export function MarketplaceProvider({ children }) {
         const parsed = JSON.parse(savedFreelancers);
         if (Array.isArray(parsed) && parsed.length > 0) setFreelancers(parsed);
       }
-      const savedOrders = localStorage.getItem("gigcraft_v3:orders");
+      const savedOrders = localStorage.getItem("gigcraft_v4:orders");
       if (savedOrders) {
         const parsed = JSON.parse(savedOrders);
         if (Array.isArray(parsed) && parsed.length > 0) setOrders(parsed);
@@ -223,7 +224,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v3:orders", JSON.stringify(orders));
+        localStorage.setItem("gigcraft_v4:orders", JSON.stringify(orders));
       } catch {}
     }
   }, [orders, hydrated]);
