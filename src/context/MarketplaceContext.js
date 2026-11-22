@@ -31,32 +31,32 @@ function mapSupabaseGig(g) {
     id: String(g.id),
     title: g.title,
     description: g.description,
-    category: g.category || "development-tech",
-    serviceType: g.service_type || g.serviceType || "Fullstack Web App",
-    freelancerId: g.freelancer_id || g.freelancerId || "f2",
-    price: Number(g.price) || 7999,
-    deliveryDays: Number(g.delivery_days || g.deliveryDays || 5),
-    deliveryBadge: `⚡ ${g.delivery_days || g.deliveryDays || 5}-DAY DELIVERY`,
+    category: g.category || "graphics-design",
+    serviceType: g.service_type || g.serviceType || "Figma UI Design",
+    freelancerId: g.freelancer_id || g.freelancerId || "f-elena",
+    price: Number(g.price) || 280,
+    deliveryDays: Number(g.delivery_days || g.deliveryDays || 2),
+    deliveryBadge: `⚡ ${g.delivery_days || g.deliveryDays || 2}-DAY DELIVERY`,
     revisions: Number(g.revisions || 3),
-    tier: g.tier || "PRO VERIFIED",
-    image: g.image || "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1000&q=80",
-    skills: Array.isArray(g.skills) ? g.skills : (typeof g.skills === "string" ? g.skills.split(",").map(s => s.trim()) : ["Next.js", "React"]),
-    tags: Array.isArray(g.tags) ? g.tags : ["Web App", "Fullstack"],
-    rating: Number(g.rating) || 5.0,
-    reviewsCount: Number(g.reviews_count || g.reviewsCount) || 1,
-    ordersInQueue: Number(g.orders_in_queue || g.ordersInQueue) || 1,
+    tier: g.tier || "TOP RATED",
+    image: g.image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
+    skills: Array.isArray(g.skills) ? g.skills : (typeof g.skills === "string" ? g.skills.split(",").map(s => s.trim()) : ["Figma", "SaaS", "UI/UX"]),
+    tags: Array.isArray(g.tags) ? g.tags : ["Figma", "SaaS", "UI/UX"],
+    rating: Number(g.rating) || 4.9,
+    reviewsCount: Number(g.reviews_count || g.reviewsCount) || 248,
+    ordersInQueue: Number(g.orders_in_queue || g.ordersInQueue) || 3,
     packages: g.packages || {
       standard: {
-        name: "FULL RENTAL PLATFORM",
-        price: Number(g.price) || 7999,
-        deliveryDays: Number(g.delivery_days || g.deliveryDays || 5),
+        name: "FULL SAAS SYSTEM",
+        price: Number(g.price) || 280,
+        deliveryDays: Number(g.delivery_days || g.deliveryDays || 2),
         revisions: 3,
-        screens: "6 Complete Views",
+        screens: "8 Complete Views",
         recommended: true,
-        features: ["Full custom vehicle rental system", "Booking calendar & reservation", "Admin dashboard", "Milestone escrow settlement"],
+        features: ["Full 8-screen SaaS dashboard", "Design tokens spec (JSON)", "Auto-Layout 5.0 system", "Interactive prototype"],
       },
     },
-    featuresList: Array.isArray(g.features_list) ? g.features_list : ["DYNAMIC BOOKING ENGINE", "FLEET MANAGEMENT", "SECURE ESCROW PROTOCOL"],
+    featuresList: Array.isArray(g.features_list) ? g.features_list : ["ENTERPRISE SAAS UI", "FIGMA DESIGN TOKENS", "DEVELOPER READY HANDOFF"],
     faqs: Array.isArray(g.faqs) ? g.faqs : [],
     createdAt: g.created_at || g.createdAt || new Date().toISOString(),
   };
@@ -65,25 +65,25 @@ function mapSupabaseGig(g) {
 function mapSupabaseProfile(p) {
   return {
     id: String(p.id),
-    name: p.full_name || p.name || "Specialist",
-    headline: p.headline || "Technical Specialist",
+    name: p.full_name || p.name || "Elena Rostova",
+    headline: p.headline || "Staff UI/UX & Design Systems Architect",
     tier: p.tier || "TOP RATED",
     verified: true,
-    rating: Number(p.rating) || 5.0,
-    reviewsCount: Number(p.reviews_count) || 24,
+    rating: Number(p.rating) || 4.9,
+    reviewsCount: Number(p.reviews_count) || 248,
     bio: p.bio || "Specialist contracting under deterministic cryptographic escrow milestones on GigCraft.",
-    avatar: p.avatar_url || p.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-    location: p.location || "Bengaluru, India (IST)",
-    skills: Array.isArray(p.skills) ? p.skills : ["Next.js", "Fullstack", "API Design"],
-    languages: ["English (Fluent)", "Hindi (Native)"],
+    avatar: p.avatar_url || p.avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+    location: p.location || "San Francisco, CA, USA (PST)",
+    skills: Array.isArray(p.skills) ? p.skills : ["Figma", "Design Systems", "SaaS UI"],
+    languages: ["English (Fluent)", "German (Conversational)"],
     experience: Number(p.experience) || 8,
-    hourlyRate: Number(p.hourly_rate) || 3500,
-    startingPrice: Number(p.starting_price) || 7999,
-    completedOrders: Number(p.completed_orders) || 1,
+    hourlyRate: Number(p.hourly_rate) || 95,
+    startingPrice: Number(p.starting_price) || 280,
+    completedOrders: Number(p.completed_orders) || 248,
     jobSuccess: 100,
     onTimeSettlement: 100,
-    hoursLogged: "1.2k+",
-    totalEscrow: "₹7,999",
+    hoursLogged: "1.8k+",
+    totalEscrow: "$142,000",
     avgResponse: "15 mins",
     nextSprint: "Available Now",
     available: true,
@@ -96,18 +96,18 @@ function mapSupabaseOrder(o) {
   return {
     id: String(o.id),
     code: o.code || `#${String(o.id).slice(-7).toUpperCase()}`,
-    gigId: String(o.gig_id || o.gigId || "g7"),
-    clientId: String(o.client_id || o.clientId || "c-raj"),
-    clientName: o.client_name || o.clientName || "Raj P.",
+    gigId: String(o.gig_id || o.gigId || "g1"),
+    clientId: String(o.client_id || o.clientId || "c1"),
+    clientName: o.client_name || o.clientName || "Linus T.",
     clientBadge: "Verified Buyer",
-    freelancerId: String(o.freelancer_id || o.freelancerId || "f2"),
-    freelancerName: o.freelancer_name || o.freelancerName || "Arjun Mehta",
+    freelancerId: String(o.freelancer_id || o.freelancerId || "f-elena"),
+    freelancerName: o.freelancer_name || o.freelancerName || "Elena Rostova",
     freelancerBadge: "Staff Architect",
-    freelancerAvatar: o.freelancer_avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-    title: o.title || "Custom Vehicle Rental & Dynamic Booking System",
-    description: o.description || o.requirements || "Custom vehicle rental booking engine with fleet management.",
-    price: Number(o.price) || 7999,
-    vaultCommitment: `₹${(Number(o.price) || 7999).toLocaleString("en-IN")} INR`,
+    freelancerAvatar: o.freelancer_avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+    title: o.title || "Conversion-driven SaaS Web App and Design System",
+    description: o.description || o.requirements || "Comprehensive SaaS dashboard design system with design tokens.",
+    price: Number(o.price) || 280,
+    vaultCommitment: `$${(Number(o.price) || 280).toLocaleString("en-US")} USD`,
     status: o.status || "completed",
     subStatus: o.sub_status || o.subStatus || "completed",
     statusLabel: (o.status || "completed").toUpperCase(),
@@ -118,10 +118,10 @@ function mapSupabaseOrder(o) {
     createdAt: o.created_at || new Date().toISOString(),
     revisionsUsed: 1,
     revisionsTotal: 3,
-    deliveryDays: 5,
+    deliveryDays: 2,
     milestones: o.milestones || [
-      { step: 1, title: "Booking Engine & Catalog UI", completed: true, tag: "RELEASED (₹3,999)", amount: 3999 },
-      { step: 2, title: "Fleet Management & Escrow Release", completed: true, tag: "RELEASED (₹4,000)", amount: 4000 },
+      { step: 1, title: "Token Architecture & Specs", completed: true, tag: "RELEASED ($140)", amount: 140 },
+      { step: 2, title: "SaaS Views & Figma Export", completed: true, tag: "RELEASED ($140)", amount: 140 },
     ],
     timeline: o.timeline || [
       { label: "Contract Initiated", at: o.created_at || new Date().toISOString() },
@@ -133,22 +133,22 @@ function mapSupabaseOrder(o) {
 function mapSupabaseReview(r) {
   return {
     id: String(r.id),
-    orderId: String(r.order_id || r.orderId || "GC-0899"),
-    gigId: String(r.gig_id || r.gigId || "g7"),
-    gigTitle: r.gig_title || r.gigTitle || "I will develop a custom vehicle rental and booking web application",
-    freelancerId: String(r.freelancer_id || r.freelancerId || "f2"),
-    clientId: String(r.client_id || r.clientId || "c-raj"),
-    clientName: r.client_name || r.clientName || "Raj P.",
-    clientRole: "Operations Lead",
+    orderId: String(r.order_id || r.orderId || "GC-0821"),
+    gigId: String(r.gig_id || r.gigId || "g1"),
+    gigTitle: r.gig_title || r.gigTitle || "I will design a conversion-driven SaaS web app and design syste...",
+    freelancerId: String(r.freelancer_id || r.freelancerId || "f-elena"),
+    clientId: String(r.client_id || r.clientId || "c1"),
+    clientName: r.client_name || r.clientName || "Marcus Vance",
+    clientRole: "VP Infrastructure",
     clientBadge: "VERIFIED BUYER",
     rating: Number(r.rating) || 5,
     verifiedOrder: true,
-    paidEscrow: `₹${(Number(r.paid_escrow) || 7999).toLocaleString("en-IN")}`,
+    paidEscrow: `$${(Number(r.paid_escrow) || 280).toLocaleString("en-US")}`,
     completedDate: "Completed Recently",
-    projectName: r.project_name || "Custom Vehicle Rental & Dynamic Booking System",
-    comment: r.comment || "Good Work personally i feel good experience",
-    reply: r.reply || "Thank you Raj! It was a pleasure building the custom vehicle booking engine with you.",
-    replyAuthor: "ARJUN MEHTA (SELLER)",
+    projectName: r.project_name || "SaaS Dashboard UI & Design System",
+    comment: r.comment || "Elena delivered full responsive Figma frames that matched our tokens 1-to-1!",
+    reply: r.reply || "Thank you Marcus! It was an absolute pleasure collaborating with your team.",
+    replyAuthor: "ELENA ROSTOVA (SELLER)",
     createdAt: r.created_at || r.createdAt || new Date().toISOString(),
   };
 }
@@ -170,22 +170,32 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     setHydrated(true);
     try {
-      const savedGigs = localStorage.getItem("gigcraft_real:gigs");
+      // Actively purge all legacy keys to remove outdated mock data
+      localStorage.removeItem("gigcraft_real:gigs");
+      localStorage.removeItem("gigcraft_real:freelancers");
+      localStorage.removeItem("gigcraft_real:orders");
+      localStorage.removeItem("gigcraft_real:reviews");
+      localStorage.removeItem("gigcraft:gigs");
+      localStorage.removeItem("gigcraft:freelancers");
+      localStorage.removeItem("gigcraft:orders");
+      localStorage.removeItem("gigcraft:reviews");
+
+      const savedGigs = localStorage.getItem("gigcraft_v3:gigs");
       if (savedGigs) {
         const parsed = JSON.parse(savedGigs);
         if (Array.isArray(parsed) && parsed.length > 0) setGigs(parsed);
       }
-      const savedFreelancers = localStorage.getItem("gigcraft_real:freelancers");
+      const savedFreelancers = localStorage.getItem("gigcraft_v3:freelancers");
       if (savedFreelancers) {
         const parsed = JSON.parse(savedFreelancers);
         if (Array.isArray(parsed) && parsed.length > 0) setFreelancers(parsed);
       }
-      const savedOrders = localStorage.getItem("gigcraft_real:orders");
+      const savedOrders = localStorage.getItem("gigcraft_v3:orders");
       if (savedOrders) {
         const parsed = JSON.parse(savedOrders);
         if (Array.isArray(parsed) && parsed.length > 0) setOrders(parsed);
       }
-      const savedReviews = localStorage.getItem("gigcraft_real:reviews");
+      const savedReviews = localStorage.getItem("gigcraft_v3:reviews");
       if (savedReviews) {
         const parsed = JSON.parse(savedReviews);
         if (Array.isArray(parsed) && parsed.length > 0) setReviews(parsed);
@@ -197,7 +207,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_real:gigs", JSON.stringify(gigs));
+        localStorage.setItem("gigcraft_v3:gigs", JSON.stringify(gigs));
       } catch {}
     }
   }, [gigs, hydrated]);
@@ -205,7 +215,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_real:freelancers", JSON.stringify(freelancers));
+        localStorage.setItem("gigcraft_v3:freelancers", JSON.stringify(freelancers));
       } catch {}
     }
   }, [freelancers, hydrated]);
@@ -213,7 +223,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_real:orders", JSON.stringify(orders));
+        localStorage.setItem("gigcraft_v3:orders", JSON.stringify(orders));
       } catch {}
     }
   }, [orders, hydrated]);
@@ -221,7 +231,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_real:reviews", JSON.stringify(reviews));
+        localStorage.setItem("gigcraft_v3:reviews", JSON.stringify(reviews));
       } catch {}
     }
   }, [reviews, hydrated]);
@@ -428,22 +438,22 @@ export function MarketplaceProvider({ children }) {
       freelancerId: targetGig?.freelancerId || "f2",
       freelancerName: targetGig ? getFreelancer(targetGig.freelancerId)?.name : "Arjun Mehta",
       freelancerBadge: "Staff Architect",
-      freelancerAvatar: targetGig ? getFreelancer(targetGig.freelancerId)?.avatar : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-      title: targetGig?.title || "Custom Vehicle Rental & Dynamic Booking System",
+      freelancerAvatar: targetGig ? getFreelancer(targetGig.freelancerId)?.avatar : "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+      title: targetGig?.title || "Conversion-driven SaaS Web App and Design System",
       description: requirements,
-      price: targetGig?.price || 7999,
-      vaultCommitment: `₹${(targetGig?.price || 7999).toLocaleString("en-IN")} INR`,
+      price: targetGig?.price || 280,
+      vaultCommitment: `$${(targetGig?.price || 280).toLocaleString("en-US")} USD`,
       status: "active",
       subStatus: "in-progress",
       statusLabel: "IN PROGRESS",
       milestoneFlight: "MILESTONE 1 OF 2 IN FLIGHT",
       progress: 30,
-      dueText: `Due in ${targetGig?.deliveryDays || 5} days`,
+      dueText: `Due in ${targetGig?.deliveryDays || 2} days`,
       initiatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       revisionsUsed: 0,
       revisionsTotal: targetGig?.revisions || 3,
-      deliveryDays: targetGig?.deliveryDays || 5,
+      deliveryDays: targetGig?.deliveryDays || 2,
       timeline: [
         { status: "active", label: "Contract locked in escrow vault", date: new Date().toISOString() },
       ],
@@ -455,7 +465,7 @@ export function MarketplaceProvider({ children }) {
           date: "IN FLIGHT",
           tag: "CURRENT SPRINT",
           current: true,
-          amount: Math.round((targetGig?.price || 7999) * 0.5),
+          amount: Math.round((targetGig?.price || 280) * 0.5),
         },
         {
           step: 2,
@@ -463,7 +473,7 @@ export function MarketplaceProvider({ children }) {
           desc: "Full code handoff, testing, and verified deployment.",
           date: "PENDING",
           tag: "ESCROW",
-          amount: Math.round((targetGig?.price || 7999) * 0.5),
+          amount: Math.round((targetGig?.price || 280) * 0.5),
         },
       ],
       deliverables: [],
@@ -471,7 +481,7 @@ export function MarketplaceProvider({ children }) {
         {
           id: "m-init",
           isSystem: true,
-          text: `SYSTEM: ESCROW VAULT SECURED (₹${(targetGig?.price || 7999).toLocaleString("en-IN")}). REPO DISBURSEMENT PROTOCOL ACTIVE.`,
+          text: `SYSTEM: ESCROW VAULT SECURED ($${(targetGig?.price || 280).toLocaleString("en-US")}). REPO DISBURSEMENT PROTOCOL ACTIVE.`,
           time: "Just now",
         },
       ],
@@ -667,14 +677,14 @@ export function MarketplaceProvider({ children }) {
       gigTitle: targetOrder?.title || "I will develop a custom vehicle rental and booking web application",
       freelancerId: targetOrder?.freelancerId || "f2",
       clientId: user?.id || "c-raj",
-      clientName: user?.name || "Raj P.",
+      clientName: user?.name || "Marcus Vance",
       clientRole: "Operations Lead",
       clientBadge: "VERIFIED BUYER",
       rating: Number(rating),
       verifiedOrder: true,
-      paidEscrow: targetOrder ? `₹${targetOrder.price?.toLocaleString("en-IN")}` : "₹7,999",
+      paidEscrow: targetOrder ? `$${targetOrder.price?.toLocaleString("en-US")}` : "$280",
       completedDate: "Completed Just now",
-      projectName: targetOrder?.title || "Custom Vehicle Rental & Dynamic Booking System",
+      projectName: targetOrder?.title || "SaaS Dashboard UI & Design System",
       comment,
       reply: null,
       createdAt: new Date().toISOString(),

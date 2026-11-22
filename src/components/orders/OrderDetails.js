@@ -178,7 +178,7 @@ export default function OrderDetails({ initialOrderId }) {
               <span className="text-[11px] uppercase">ESCROW VAULT SECURED</span>
               <span className="text-xs">🛡</span>
             </div>
-            <p className="mt-1 font-serif text-3xl font-bold text-[#047857]">₹1,84,000</p>
+            <p className="mt-1 font-serif text-3xl font-bold text-[#047857]">$280</p>
             <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400">DISPUTE PROTECTION</span>
               <span className="text-slate-800 font-bold">MULTI-SIG LOCK</span>
@@ -274,7 +274,7 @@ export default function OrderDetails({ initialOrderId }) {
                           {ord.statusLabel || ord.status.toUpperCase()}
                         </span>
                       </div>
-                      <span className="font-bold text-slate-950">₹{ord.price?.toLocaleString("en-IN")}</span>
+                      <span className="font-bold text-slate-950">${ord.price?.toLocaleString("en-US")}</span>
                     </div>
 
                     <h4 className="mt-2 font-serif text-sm font-bold text-slate-950 leading-snug">
@@ -550,7 +550,7 @@ export default function OrderDetails({ initialOrderId }) {
                     disabled={isApproving}
                     className="bg-[#047857] px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#065f46] shadow-sm disabled:opacity-50"
                   >
-                    ✓ APPROVE & RELEASE FUNDS (₹5,000)
+                    ✓ APPROVE & RELEASE FUNDS ($100)
                   </button>
                 </div>
 

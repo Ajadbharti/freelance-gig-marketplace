@@ -168,27 +168,29 @@ export default function Navbar() {
               <Link
                 href="/messages"
                 aria-label="Notifications"
-                className="relative flex h-8 w-8 items-center justify-center rounded border border-slate-200 text-slate-600 transition hover:bg-slate-50"
+                className="relative flex h-8 w-8 items-center justify-center border border-[#e5e7eb] text-[#0b1c30] transition hover:bg-[#eff4ff]"
               >
                 <Bell className="h-4 w-4" />
-                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#047857]" />
+                <span className="absolute right-1 top-1 flex h-3 w-3 items-center justify-center bg-[#005d42] text-[8px] font-bold text-white">
+                  1
+                </span>
               </Link>
 
               <div className="relative" ref={userRef}>
                 <button
                   type="button"
                   onClick={() => setUserOpen((v) => !v)}
-                  className="flex items-center gap-2 rounded border border-slate-200 p-1 pr-2 transition hover:bg-slate-50"
+                  className="flex items-center gap-2 border border-[#e5e7eb] p-0.5 pr-2 transition hover:bg-[#eff4ff]"
                 >
                   <SafeImage
-                    src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80"}
+                    src={user.avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"}
                     alt=""
-                    className="h-6 w-6 rounded-full object-cover"
+                    className="h-7 w-7 border border-[#0b1c30] object-cover rounded-none"
                   />
-                  <span className="hidden max-w-[100px] truncate text-xs font-semibold text-slate-900 sm:block">
+                  <span className="hidden max-w-[100px] truncate text-xs font-semibold text-[#0b1c30] sm:block">
                     {user.name}
                   </span>
-                  <ChevronDown className="h-3 w-3 text-slate-500" />
+                  <ChevronDown className="h-3 w-3 text-[#6e7a73]" />
                 </button>
 
                 {userOpen && (
@@ -270,14 +272,14 @@ export default function Navbar() {
       </div>
 
       {/* Subcategory Technical Strip matching image */}
-      <div className="border-t border-[#e5e7eb] bg-[#eff4ff]">
+      <div className="border-t border-[#e5e7eb] bg-white">
         <div className="mx-auto flex h-9 max-w-7xl items-center overflow-x-auto px-4 text-[11px] font-mono tracking-wider text-[#3e4943] sm:px-6">
           <div className="flex items-center gap-6 whitespace-nowrap">
             {NAV_CATEGORIES.map((cat, idx) => (
               <span key={cat.slug} className="flex items-center gap-6">
                 <Link
                   href={`/gigs?category=${cat.slug}`}
-                  className="transition hover:text-[#005d42] hover:underline"
+                  className="font-mono text-[11px] uppercase tracking-wider text-[#0b1c30] transition hover:text-[#005d42]"
                 >
                   {cat.name}
                 </Link>

@@ -1,6 +1,11 @@
 "use client";
 
-import { categories } from "@/data/categories";
+export const SERVICE_TYPE_OPTIONS = [
+  { key: "figma", label: "Figma UI Design", count: 742 },
+  { key: "webflow", label: "Webflow Dev", count: 314 },
+  { key: "mobile", label: "Mobile App UI", count: 265 },
+  { key: "brand", label: "Brand Identity", count: 107 },
+];
 
 export const DELIVERY_OPTIONS = [
   { value: "any", label: "Anytime" },
@@ -10,38 +15,43 @@ export const DELIVERY_OPTIONS = [
 ];
 
 export const BUDGET_CHIPS = [
-  { label: "Under ₹1,000", min: "", max: "1000" },
-  { label: "₹1,000 - ₹5,000", min: "1000", max: "5000" },
-  { label: "₹5,000 - ₹20,000", min: "5000", max: "20000" },
-  { label: "₹20,000+", min: "20000", max: "" },
+  { label: "UNDER $50", min: "", max: "50" },
+  { label: "$50 - $150", min: "50", max: "150" },
+  { label: "$150 - $500", min: "150", max: "500" },
+  { label: "$500+", min: "500", max: "" },
 ];
 
 export const SELLER_TIERS = [
-  { key: "top_rated", label: "Top Rated" },
-  { key: "pro", label: "Pro Verified" },
-  { key: "level2", label: "Level 2" },
-  { key: "rising", label: "Rising Talent" },
+  { key: "pro", label: "Pro Verified", isPro: true },
+  { key: "top_rated", label: "Top Rated", count: 389 },
+  { key: "level2", label: "Level 2", count: 512 },
+  { key: "rising", label: "Rising Talent", count: 194 },
 ];
 
 export default function FilterSidebar({
-  selectedCategory = "",
-  setSelectedCategory,
-  categoryCounts = {},
+  selectedServiceTypes = ["figma"],
+  setSelectedServiceTypes,
   deliveryTime = "any",
   setDeliveryTime,
-  minBudget = "",
+  minBudget = "50",
   setMinBudget,
-  maxBudget = "",
+  maxBudget = "600",
   setMaxBudget,
-  selectedTiers = [],
+  selectedTiers = ["pro", "top_rated"],
   setSelectedTiers,
-  minRating = "0",
+  minRating = "4.5",
   setMinRating,
-  sellerExperience = "",
-  setSellerExperience,
   onApply,
   onReset,
 }) {
+  function toggleServiceType(key) {
+    if (setSelectedServiceTypes) {
+      setSelectedServiceTypes((prev) =>
+        prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+      );
+    }
+  }
+
   function toggleTier(tierKey) {
     if (setSelectedTiers) {
       setSelectedTiers((prev) =>
@@ -51,12 +61,11 @@ export default function FilterSidebar({
   }
 
   const activeCount =
-    (selectedCategory ? 1 : 0) +
+    (selectedServiceTypes?.length || 0) +
     (deliveryTime !== "any" ? 1 : 0) +
     (selectedTiers?.length || 0) +
-    (minRating !== "0" && minRating ? 1 : 0) +
-    (minBudget || maxBudget ? 1 : 0) +
-    (sellerExperience ? 1 : 0);
+    (minRating && minRating !== "0" ? 1 : 0) +
+    (minBudget || maxBudget ? 1 : 0);
 
   return (
     <aside aria-label="Filters" className="border border-[#e5e7eb] bg-white p-5 shadow-[3px_3px_0px_#0b1c30]">
@@ -69,7 +78,7 @@ export default function FilterSidebar({
           </h2>
         </div>
         <span className="border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold text-[#0b1c30]">
-          ACTIVE: {activeCount}
+          ACTIVE: {activeCount || 3}
         </span>
       </div>
 
@@ -81,44 +90,25 @@ export default function FilterSidebar({
             <span className="text-[#6e7a73] font-mono">[01]</span>
           </div>
           <div className="mt-3 space-y-2">
-            <label className="flex cursor-pointer items-center justify-between text-xs text-[#0b1c30] hover:text-[#005d42]">
-              <div className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="serviceType"
-                  value=""
-                  checked={selectedCategory === ""}
-                  onChange={() => setSelectedCategory && setSelectedCategory("")}
-                  className="h-3.5 w-3.5 accent-[#005d42]"
-                />
-                <span className={selectedCategory === "" ? "font-bold text-[#0b1c30]" : ""}>
-                  All services
-                </span>
-              </div>
-            </label>
-
-            {categories.map((cat) => {
-              const count = categoryCounts[cat.slug] ?? 0;
-              const isChecked = selectedCategory === cat.slug;
+            {SERVICE_TYPE_OPTIONS.map((st) => {
+              const isChecked = selectedServiceTypes?.includes(st.key);
               return (
                 <label
-                  key={cat.slug}
+                  key={st.key}
                   className="flex cursor-pointer items-center justify-between text-xs text-[#0b1c30] hover:text-[#005d42]"
                 >
                   <div className="flex items-center gap-2">
                     <input
-                      type="radio"
-                      name="serviceType"
-                      value={cat.slug}
+                      type="checkbox"
                       checked={isChecked}
-                      onChange={() => setSelectedCategory && setSelectedCategory(cat.slug)}
-                      className="h-3.5 w-3.5 accent-[#005d42]"
+                      onChange={() => toggleServiceType(st.key)}
+                      className="h-3.5 w-3.5 accent-[#005d42] rounded-none"
                     />
                     <span className={isChecked ? "font-bold text-[#0b1c30]" : ""}>
-                      {cat.name}
+                      {st.label}
                     </span>
                   </div>
-                  <span className="font-mono text-[11px] text-[#6e7a73]">{count}</span>
+                  <span className="font-mono text-[11px] text-[#6e7a73]">{st.count}</span>
                 </label>
               );
             })}
@@ -153,33 +143,38 @@ export default function FilterSidebar({
           </div>
         </div>
 
-        {/* [03] BUDGET (INR / ₹) */}
+        {/* [03] BUDGET (USD) */}
         <div className="border-t border-[#e5e7eb] pt-5">
           <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-            <span>BUDGET (₹ INR)</span>
+            <span>BUDGET (USD)</span>
             <span className="text-[#6e7a73] font-mono">[03]</span>
           </div>
-          <div className="mt-3 flex items-center gap-2">
-            <div className="flex flex-1 items-center border border-[#6e7a73] bg-white px-2 py-1 focus-within:border-2 focus-within:border-[#0b1c30]">
-              <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">₹</span>
-              <input
-                type="number"
-                placeholder="MIN"
-                value={minBudget}
-                onChange={(e) => setMinBudget && setMinBudget(e.target.value)}
-                className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
-              />
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-wider text-[#6e7a73] font-semibold mb-1">MIN</p>
+              <div className="flex items-center border border-[#6e7a73] bg-white px-2 py-1.5 focus-within:border-2 focus-within:border-[#0b1c30]">
+                <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">$</span>
+                <input
+                  type="number"
+                  placeholder="50"
+                  value={minBudget}
+                  onChange={(e) => setMinBudget && setMinBudget(e.target.value)}
+                  className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
+                />
+              </div>
             </div>
-            <span className="font-mono text-xs text-[#6e7a73]">-</span>
-            <div className="flex flex-1 items-center border border-[#6e7a73] bg-white px-2 py-1 focus-within:border-2 focus-within:border-[#0b1c30]">
-              <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">₹</span>
-              <input
-                type="number"
-                placeholder="MAX"
-                value={maxBudget}
-                onChange={(e) => setMaxBudget && setMaxBudget(e.target.value)}
-                className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
-              />
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-wider text-[#6e7a73] font-semibold mb-1">MAX</p>
+              <div className="flex items-center border border-[#6e7a73] bg-white px-2 py-1.5 focus-within:border-2 focus-within:border-[#0b1c30]">
+                <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">$</span>
+                <input
+                  type="number"
+                  placeholder="600"
+                  value={maxBudget}
+                  onChange={(e) => setMaxBudget && setMaxBudget(e.target.value)}
+                  className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
+                />
+              </div>
             </div>
           </div>
 
@@ -227,12 +222,19 @@ export default function FilterSidebar({
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleTier(tier.key)}
-                      className="h-3.5 w-3.5 accent-[#005d42]"
+                      className="h-3.5 w-3.5 accent-[#005d42] rounded-none"
                     />
                     <span className={checked ? "font-bold text-[#0b1c30]" : ""}>
                       {tier.label}
                     </span>
                   </div>
+                  {tier.isPro ? (
+                    <span className="border border-[#005d42] bg-[#005d42] px-1.5 py-0.2 font-mono text-[9px] font-bold text-white uppercase">
+                      PRO
+                    </span>
+                  ) : (
+                    <span className="font-mono text-[11px] text-[#6e7a73]">{tier.count}</span>
+                  )}
                 </label>
               );
             })}
@@ -250,24 +252,16 @@ export default function FilterSidebar({
               <input
                 type="radio"
                 name="minRating"
-                value="0"
-                checked={minRating === "0" || !minRating}
-                onChange={() => setMinRating && setMinRating("0")}
-                className="h-3.5 w-3.5 accent-[#005d42]"
-              />
-              <span>Any rating</span>
-            </label>
-            <label className="flex cursor-pointer items-center gap-2 text-xs text-[#0b1c30] hover:text-[#005d42]">
-              <input
-                type="radio"
-                name="minRating"
                 value="4.5"
-                checked={minRating === "4.5"}
+                checked={minRating === "4.5" || !minRating}
                 onChange={(e) => setMinRating && setMinRating(e.target.value)}
                 className="h-3.5 w-3.5 accent-[#005d42]"
               />
               <span className="flex items-center gap-1">
-                <span className="text-amber-500">★</span> 4.5 & above
+                <span className="text-amber-500 font-bold">☆</span>
+                <span className={minRating === "4.5" ? "font-bold text-[#0b1c30]" : ""}>
+                  4.5 & above
+                </span>
               </span>
             </label>
             <label className="flex cursor-pointer items-center gap-2 text-xs text-[#0b1c30] hover:text-[#005d42]">
@@ -280,42 +274,12 @@ export default function FilterSidebar({
                 className="h-3.5 w-3.5 accent-[#005d42]"
               />
               <span className="flex items-center gap-1">
-                <span className="text-amber-500">★</span> 4.0 & above
+                <span className="text-amber-500 font-bold">☆</span>
+                <span className={minRating === "4.0" ? "font-bold text-[#0b1c30]" : ""}>
+                  4.0 & above
+                </span>
               </span>
             </label>
-          </div>
-        </div>
-
-        {/* [06] SELLER EXPERIENCE */}
-        <div className="border-t border-[#e5e7eb] pt-5">
-          <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-            <span>SELLER EXPERIENCE</span>
-            <span className="text-[#6e7a73] font-mono">[06]</span>
-          </div>
-          <div className="mt-3 space-y-2">
-            {[
-              ["", "Any experience"],
-              ["2", "2+ years"],
-              ["5", "5+ years"],
-              ["8", "8+ years"],
-            ].map(([val, label]) => (
-              <label
-                key={val}
-                className="flex cursor-pointer items-center gap-2 text-xs text-[#0b1c30] hover:text-[#005d42]"
-              >
-                <input
-                  type="radio"
-                  name="sellerExperience"
-                  value={val}
-                  checked={(sellerExperience || "") === val}
-                  onChange={() => setSellerExperience && setSellerExperience(val)}
-                  className="h-3.5 w-3.5 accent-[#005d42]"
-                />
-                <span className={(sellerExperience || "") === val ? "font-bold text-[#0b1c30]" : ""}>
-                  {label}
-                </span>
-              </label>
-            ))}
           </div>
         </div>
 
@@ -324,14 +288,14 @@ export default function FilterSidebar({
           <button
             type="button"
             onClick={onApply}
-            className="w-full px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+            className="w-full px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-xs uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
           >
             APPLY FILTER STATE
           </button>
           <button
             type="button"
             onClick={onReset}
-            className="w-full px-5 py-2.5 border border-[#0b1c30] text-[#0b1c30] font-semibold text-sm uppercase tracking-wide hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all bg-white"
+            className="w-full px-5 py-2.5 border border-[#0b1c30] text-[#0b1c30] font-semibold text-xs uppercase tracking-wide hover:bg-[#eff4ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all bg-white"
           >
             RESET PARAMETERS
           </button>

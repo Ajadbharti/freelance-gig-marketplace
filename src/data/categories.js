@@ -1,24 +1,17 @@
 export const categories = [
   {
-    slug: "web-development",
-    name: "Web Development",
-    icon: "Code",
-    description: "Full-stack web applications, custom platforms, Next.js, React, and frontend systems",
-    subcategories: ["Custom Web Apps", "React / Next.js", "E-Commerce", "SaaS Systems"],
-  },
-  {
     slug: "graphics-design",
-    name: "Graphics & Design",
+    name: "Design & Creative",
     icon: "Palette",
     description: "Enterprise UI/UX systems, product design, brand identity & Figma architectures",
     subcategories: ["Figma UI Design", "Design Systems", "Mobile App UI", "Brand Identity"],
   },
   {
-    slug: "writing-translation",
-    name: "Writing & Translation",
-    icon: "PenLine",
-    description: "Engineering documentation, whitepapers, developer advocacy & technical copy",
-    subcategories: ["Developer Documentation", "Technical Whitepapers", "API Reference Docs"],
+    slug: "web-development",
+    name: "Development & Tech",
+    icon: "Code",
+    description: "Full-stack web applications, custom platforms, Next.js, React, and frontend systems",
+    subcategories: ["Fullstack Next.js", "Webflow Dev", "React Systems", "API Engineering"],
   },
   {
     slug: "digital-marketing",
@@ -32,11 +25,18 @@ export const categories = [
     name: "Video & Animation",
     icon: "Video",
     description: "3D product renders, interactive motion graphics & executive video editing",
-    subcategories: ["3D Product Animation", "Motion Graphics", "Lottie Animations"],
+    subcategories: ["3D Product Animation", "Motion Graphics", "Blender Visuals"],
+  },
+  {
+    slug: "writing-translation",
+    name: "Writing & Translation",
+    icon: "PenLine",
+    description: "Engineering documentation, whitepapers, developer advocacy & technical copy",
+    subcategories: ["Developer Documentation", "Technical Articles", "API Reference Docs"],
   },
   {
     slug: "data-ai",
-    name: "Data & AI",
+    name: "AI Services",
     icon: "Cpu",
     description: "LLM fine-tuning, RAG pipelines, agentic workflows & machine learning models",
     subcategories: ["LLM Architectures", "RAG Pipelines", "Autonomous Agents"],
@@ -58,12 +58,10 @@ export const categories = [
 ];
 
 export const NAV_CATEGORIES = [
-  { name: "WEB DEVELOPMENT", slug: "web-development" },
-  { name: "GRAPHICS & DESIGN", slug: "graphics-design" },
-  { name: "WRITING & TRANSLATION", slug: "writing-translation" },
+  { name: "DESIGN & CREATIVE", slug: "graphics-design" },
+  { name: "DEVELOPMENT & TECH", slug: "web-development" },
   { name: "DIGITAL MARKETING", slug: "digital-marketing" },
   { name: "VIDEO & ANIMATION", slug: "video-animation" },
-  { name: "DATA & AI", slug: "data-ai" },
-  { name: "PROGRAMMING & TECHNOLOGY", slug: "programming-technology" },
-  { name: "BUSINESS", slug: "business" },
+  { name: "WRITING & TRANSLATION", slug: "writing-translation" },
+  { name: "AI SERVICES", slug: "data-ai" },
 ];

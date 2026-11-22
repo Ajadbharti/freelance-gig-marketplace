@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Clock } from "lucide-react";
+import { Heart, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
@@ -18,7 +18,7 @@ export default function GigCard({ gig }) {
 
   const freelancer = getFreelancer(gig.freelancerId);
   const ratingData = getGigRating(gig.id);
-  const avgRating = ratingData.average || gig.rating || null;
+  const avgRating = ratingData.average || gig.rating || 5.0;
   const reviewCount = ratingData.count || gig.reviewsCount || 0;
   const saved = isSaved(gig.id);
 
@@ -36,15 +36,26 @@ export default function GigCard({ gig }) {
     }
   }
 
-  const tier = gig.tier || freelancer?.tier || "RISING TALENT";
+  const tier = (gig.tier || freelancer?.tier || "TOP RATED").toUpperCase();
+
+  const tierBadgeStyle =
+    tier === "PRO VERIFIED"
+      ? "bg-[#005d42] text-white border-[#005d42]"
+      : tier === "RISING TALENT"
+      ? "bg-[#0047bf] text-white border-[#0047bf]"
+      : "bg-[#0b1c30] text-white border-[#0b1c30]";
+
+  const deliveryText =
+    gig.deliveryBadge ||
+    (gig.deliveryDays === 1 ? "24H EXPRESS" : `${gig.deliveryDays}-DAY DELIVERY`);
 
   return (
     <article className="group flex flex-col border border-[#e5e7eb] bg-white shadow-[3px_3px_0px_#0b1c30] transition hover:border-[#0b1c30]">
       {/* Top Image Box */}
       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 border-b border-[#e5e7eb]">
-        {/* Tier Badge Top Left: White box with crisp black border */}
-        <div className="absolute left-2.5 top-2.5 z-10 border border-[#0b1c30] bg-white px-2 py-0.5">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#0b1c30]">
+        {/* Tier Badge Top Left */}
+        <div className={`absolute left-2.5 top-2.5 z-10 border px-2 py-0.5 ${tierBadgeStyle}`}>
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider">
             {tier}
           </span>
         </div>
@@ -56,7 +67,7 @@ export default function GigCard({ gig }) {
           aria-label={saved ? "Remove from saved" : "Save spec"}
           className="absolute right-2.5 top-2.5 z-10 flex h-7 w-7 items-center justify-center border border-[#0b1c30] bg-white text-[#0b1c30] transition hover:bg-[#eff4ff]"
         >
-          <Heart className={`h-4 w-4 ${saved ? "fill-[#ba1a1a] text-[#ba1a1a]" : ""}`} />
+          <Heart className={`h-4 w-4 ${saved ? "fill-[#ba1a1a] text-[#ba1a1a]" : "text-[#0b1c30]"}`} />
         </button>
 
         {/* Main Image */}
@@ -68,11 +79,11 @@ export default function GigCard({ gig }) {
           />
         </Link>
 
-        {/* Delivery Bar at Bottom Left of Image: White box with border, green clock */}
+        {/* Delivery Bar at Bottom Left of Image */}
         <div className="absolute bottom-2 left-2 flex items-center gap-1.5 border border-[#0b1c30] bg-white px-2 py-0.5">
-          <Clock className="h-3.5 w-3.5 text-[#005d42]" />
+          <Zap className="h-3 w-3 text-[#005d42] fill-[#005d42]" />
           <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#0b1c30]">
-            {gig.deliveryDays}-DAY DELIVERY
+            {deliveryText}
           </span>
         </div>
       </div>
@@ -82,27 +93,37 @@ export default function GigCard({ gig }) {
         {/* Author & Rating Row */}
         <div className="flex items-center justify-between">
           <Link
-            href={`/freelancers/${freelancer?.id || "f-ajju"}`}
+            href={`/freelancers/${freelancer?.id || "f-elena"}`}
             className="flex items-center gap-2 group/author min-w-0"
           >
-            {/* Square Initials Avatar matching screenshot */}
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#e5e7eb] bg-[#eff4ff] font-headline text-[11px] font-bold text-[#0047bf]">
-              {freelancer?.initials || "AK"}
+            {/* Square Avatar matching screenshot */}
+            <div className="h-6 w-6 shrink-0 overflow-hidden border border-[#0b1c30] bg-[#eff4ff]">
+              {freelancer?.avatar ? (
+                <SafeImage
+                  src={freelancer.avatar}
+                  alt={freelancer?.name || "Specialist"}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center font-headline text-[10px] font-bold text-[#0047bf]">
+                  {freelancer?.initials || "SP"}
+                </div>
+              )}
             </div>
-            <span className="truncate text-xs font-bold text-[#0b1c30] group-hover/author:text-[#005d42]">
-              {freelancer?.name || "Ajju Kumar"}
-            </span>
+            <div className="flex items-center gap-1 min-w-0">
+              <span className="truncate text-xs font-bold text-[#0b1c30] group-hover/author:text-[#005d42]">
+                {freelancer?.name || "Elena Rostova"}
+              </span>
+              <span className="material-symbols-outlined text-[13px] text-[#005d42] leading-none shrink-0">
+                check_circle
+              </span>
+            </div>
           </Link>
+
           <div className="flex items-center gap-1 font-mono text-xs font-bold shrink-0">
-            {avgRating && reviewCount > 0 ? (
-              <>
-                <span className="text-amber-500">★</span>
-                <span className="text-[#0b1c30]">{Number(avgRating).toFixed(1)}</span>
-                <span className="font-normal text-[#6e7a73]">({reviewCount})</span>
-              </>
-            ) : (
-              <span className="font-mono text-xs font-bold text-[#565e74] uppercase">NEW</span>
-            )}
+            <span className="text-amber-500">★</span>
+            <span className="text-[#0b1c30]">{Number(avgRating).toFixed(1)}</span>
+            <span className="font-normal text-[#6e7a73]">({reviewCount})</span>
           </div>
         </div>
 
@@ -128,8 +149,12 @@ export default function GigCard({ gig }) {
         {/* Footer: Price + Inspect Spec */}
         <div className="mt-auto flex items-center justify-between border-t border-[#e5e7eb] pt-3.5">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-semibold">STARTING AT</p>
-            <p className="font-headline text-xl font-bold text-[#0b1c30]">₹{gig.price?.toLocaleString("en-IN")}</p>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-semibold">
+              STARTING AT
+            </p>
+            <p className="font-headline text-xl font-bold text-[#0b1c30]">
+              ${Number(gig.price ?? 280).toLocaleString("en-US")}
+            </p>
           </div>
           <Link
             href={`/gigs/${gig.id}`}

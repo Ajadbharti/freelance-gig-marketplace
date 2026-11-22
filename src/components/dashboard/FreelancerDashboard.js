@@ -97,7 +97,7 @@ export default function FreelancerDashboard() {
         <StatCard icon={Briefcase} label="Active Specs" value={myGigs.length} tone="indigo" />
         <StatCard icon={ShoppingBag} label="Sprints In Flight" value={counts.active} tone="amber" />
         <StatCard icon={CheckCircle2} label="Milestones Settled" value={counts.completed} tone="emerald" />
-        <StatCard icon={Wallet} label="Total Escrow Earned" value={`₹${(earned + 1284000).toLocaleString("en-IN")}`} hint="All-time settled" tone="emerald" />
+        <StatCard icon={Wallet} label="Total Escrow Earned" value={`$${(earned + 142000).toLocaleString("en-US")}`} hint="All-time settled" tone="emerald" />
       </div>
 
       {/* Published Technical Specs Section */}

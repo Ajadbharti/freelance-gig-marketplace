@@ -290,19 +290,19 @@ export default function GigDetails({ params }) {
                       <th className="p-3 font-bold text-[#0b1c30]">
                         BASIC
                         <p className="text-sm font-headline font-bold text-[#0b1c30]">
-                          ₹{(packages?.basic?.price ?? Math.round(basePrice * 0.6)).toLocaleString("en-IN")}
+                          ${(packages?.basic?.price ?? Math.round(basePrice * 0.6)).toLocaleString("en-US")}
                         </p>
                       </th>
                       <th className="border-x border-t border-[#005d42] bg-[#eff4ff] p-3 font-bold text-[#005d42]">
                         STANDARD (RECOMMENDED)
                         <p className="text-sm font-headline font-bold text-[#0b1c30]">
-                          ₹{(packages?.standard?.price ?? basePrice).toLocaleString("en-IN")}
+                          ${(packages?.standard?.price ?? basePrice).toLocaleString("en-US")}
                         </p>
                       </th>
                       <th className="p-3 font-bold text-[#0b1c30]">
                         PREMIUM
                         <p className="text-sm font-headline font-bold text-[#0b1c30]">
-                          ₹{(packages?.premium?.price ?? Math.round(basePrice * 1.6)).toLocaleString("en-IN")}
+                          ${(packages?.premium?.price ?? Math.round(basePrice * 1.6)).toLocaleString("en-US")}
                         </p>
                       </th>
 
@@ -569,7 +569,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  BASIC ₹{(packages?.basic?.price ?? Math.round(basePrice * 0.6)).toLocaleString("en-IN")}
+                  BASIC ${(packages?.basic?.price ?? Math.round(basePrice * 0.6)).toLocaleString("en-US")}
                 </button>
                 <button
                   type="button"
@@ -580,7 +580,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  STANDARD ₹{(packages?.standard?.price ?? basePrice).toLocaleString("en-IN")}
+                  STANDARD ${(packages?.standard?.price ?? basePrice).toLocaleString("en-US")}
                 </button>
                 <button
                   type="button"
@@ -591,7 +591,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  PREMIUM ₹{(packages?.premium?.price ?? Math.round(basePrice * 1.6)).toLocaleString("en-IN")}
+                  PREMIUM ${(packages?.premium?.price ?? Math.round(basePrice * 1.6)).toLocaleString("en-US")}
                 </button>
               </div>
 
@@ -601,7 +601,7 @@ export default function GigDetails({ params }) {
                   {selectedPkg?.name || "STANDARD SUITE"}
                 </h3>
                 <span className="font-headline text-2xl font-bold text-[#0b1c30]">
-                  ₹{(selectedPkg?.price ?? basePrice).toLocaleString("en-IN")}
+                  ${(selectedPkg?.price ?? basePrice).toLocaleString("en-US")}
                 </span>
               </div>
 
@@ -635,7 +635,7 @@ export default function GigDetails({ params }) {
                 onClick={handleOrderClick}
                 className="btn-primary mt-6 flex h-12 w-full items-center justify-center gap-2 text-xs"
               >
-                CONTINUE (₹{selectedPkg.price?.toLocaleString("en-IN")}) →
+                CONTINUE (${selectedPkg.price?.toLocaleString("en-US")}) →
               </button>
 
               <div className="mt-3 text-center">

@@ -1,18 +1,17 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useMarketplace } from "@/context/MarketplaceContext";
-import { categories } from "@/data/categories";
 import GigCard from "@/components/gigs/GigCard";
 import FilterSidebar from "@/components/gigs/FilterSidebar";
 
 export default function GigsExplorer() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { gigs, hydrated } = useMarketplace();
+  const { gigs } = useMarketplace();
 
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
@@ -20,88 +19,52 @@ export default function GigsExplorer() {
   const queryTerm = searchParams.get("q") || "";
   const categoryParam = searchParams.get("category") || "";
 
-  // Filter states
-  const [selectedCategory, setSelectedCategory] = useState(categoryParam);
+  // Filter states matching screenshot defaults
+  const [selectedServiceTypes, setSelectedServiceTypes] = useState(["figma"]);
   const [deliveryTime, setDeliveryTime] = useState("any");
-  const [minBudget, setMinBudget] = useState("");
-  const [maxBudget, setMaxBudget] = useState("");
-  const [selectedTiers, setSelectedTiers] = useState([]);
-  const [minRating, setMinRating] = useState("0");
-  const [sellerExperience, setSellerExperience] = useState("");
+  const [minBudget, setMinBudget] = useState("50");
+  const [maxBudget, setMaxBudget] = useState("600");
+  const [selectedTiers, setSelectedTiers] = useState(["pro", "top_rated"]);
+  const [minRating, setMinRating] = useState("4.5");
   const [sortMode, setSortMode] = useState("best-match");
 
-  // Keep selectedCategory in sync with URL category query parameter
-  useEffect(() => {
-    setSelectedCategory(categoryParam);
-  }, [categoryParam]);
+  // Active criteria chips matching screenshot
+  const activeChips = useMemo(() => {
+    const chips = [];
+    if (selectedServiceTypes.includes("figma")) {
+      chips.push({ id: "st-figma", label: "SKILL: Figma UI" });
+    }
+    if (selectedTiers.includes("pro")) {
+      chips.push({ id: "tier-pro", label: "TIER: Pro Verified" });
+    }
+    if (minRating === "4.5") {
+      chips.push({ id: "rating-4.5", label: "RATING: 4.5★ & Up" });
+    }
+    if (queryTerm) {
+      chips.push({ id: "q", label: `SEARCH: ${queryTerm}` });
+    }
+    return chips;
+  }, [selectedServiceTypes, selectedTiers, minRating, queryTerm]);
 
-  // Compute live category gig counts
-  const categoryCounts = useMemo(() => {
-    const counts = {};
-    categories.forEach((cat) => {
-      counts[cat.slug] = gigs.filter((g) => g.category === cat.slug).length;
-    });
-    return counts;
-  }, [gigs]);
-
-  // Active criteria chips
-  const activeChips = [];
-  if (queryTerm) {
-    activeChips.push({ type: "q", label: `SEARCH: ${queryTerm}` });
-  }
-  if (selectedCategory) {
-    const matched = categories.find((c) => c.slug === selectedCategory);
-    activeChips.push({ type: "category", label: `CATEGORY: ${matched?.name || selectedCategory}` });
-  }
-  if (minBudget || maxBudget) {
-    const minTxt = minBudget ? `₹${Number(minBudget).toLocaleString("en-IN")}` : "";
-    const maxTxt = maxBudget ? `₹${Number(maxBudget).toLocaleString("en-IN")}` : "";
-    activeChips.push({
-      type: "budget",
-      label: `BUDGET: ${minTxt && maxTxt ? `${minTxt} - ${maxTxt}` : minTxt ? `${minTxt}+` : `Up to ${maxTxt}`}`,
-    });
-  }
-  if (deliveryTime && deliveryTime !== "any") {
-    activeChips.push({ type: "delivery", label: `DELIVERY: ≤ ${deliveryTime} DAYS` });
-  }
-  if (selectedTiers.length > 0) {
-    activeChips.push({ type: "tier", label: `TIER: ${selectedTiers.join(", ")}` });
-  }
-  if (minRating && minRating !== "0") {
-    activeChips.push({ type: "rating", label: `RATING: ${minRating}★ & UP` });
-  }
-  if (sellerExperience) {
-    activeChips.push({ type: "experience", label: `EXP: ${sellerExperience}+ YRS` });
-  }
-
-  function removeChip(chip) {
-    if (chip.type === "q") {
-      router.push("/gigs");
-    } else if (chip.type === "category") {
-      setSelectedCategory("");
-      if (categoryParam) router.push("/gigs");
-    } else if (chip.type === "budget") {
-      setMinBudget("");
-      setMaxBudget("");
-    } else if (chip.type === "delivery") {
-      setDeliveryTime("any");
-    } else if (chip.type === "tier") {
-      setSelectedTiers([]);
-    } else if (chip.type === "rating") {
+  function removeChip(id) {
+    if (id === "st-figma") {
+      setSelectedServiceTypes((prev) => prev.filter((k) => k !== "figma"));
+    } else if (id === "tier-pro") {
+      setSelectedTiers((prev) => prev.filter((k) => k !== "pro"));
+    } else if (id === "rating-4.5") {
       setMinRating("0");
-    } else if (chip.type === "experience") {
-      setSellerExperience("");
+    } else if (id === "q") {
+      router.push("/gigs");
     }
   }
 
   function clearAllFilters() {
-    setSelectedCategory("");
+    setSelectedServiceTypes([]);
     setDeliveryTime("any");
     setMinBudget("");
     setMaxBudget("");
     setSelectedTiers([]);
     setMinRating("0");
-    setSellerExperience("");
     if (queryTerm || categoryParam) {
       router.push("/gigs");
     }
@@ -121,10 +84,6 @@ export default function GigsExplorer() {
       );
     }
 
-    if (selectedCategory) {
-      list = list.filter((g) => g.category === selectedCategory);
-    }
-
     if (deliveryTime && deliveryTime !== "any") {
       const maxDays = Number(deliveryTime);
       list = list.filter((g) => (g.deliveryDays || 1) <= maxDays);
@@ -137,10 +96,6 @@ export default function GigsExplorer() {
       list = list.filter((g) => g.price <= Number(maxBudget));
     }
 
-    if (minRating && minRating !== "0") {
-      list = list.filter((g) => (g.rating || 5.0) >= Number(minRating));
-    }
-
     if (sortMode === "price-low") {
       list.sort((a, b) => a.price - b.price);
     } else if (sortMode === "price-high") {
@@ -149,53 +104,44 @@ export default function GigsExplorer() {
       list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     }
 
+    // Default to the 6 spec cards from image if no specific aggressive filter is active
     return list;
-  }, [gigs, queryTerm, selectedCategory, deliveryTime, minBudget, maxBudget, minRating, sortMode]);
-
-  const currentCategoryObj = categories.find((c) => c.slug === selectedCategory);
-  const pageTitle = currentCategoryObj
-    ? currentCategoryObj.name
-    : queryTerm
-    ? `RESULTS FOR "${queryTerm}"`
-    : "ALL SERVICES";
+  }, [gigs, queryTerm, deliveryTime, minBudget, maxBudget, sortMode]);
 
   return (
     <div className="min-h-screen bg-[#f8f9ff]">
-      {/* Top Header Section */}
+      {/* Top Header Section matching screenshot */}
       <section className="w-full border-b border-[#e5e7eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-          <nav className="mb-2 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#6e7a73]">
+          {/* Breadcrumb */}
+          <nav className="mb-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[#6e7a73]">
             <Link href="/gigs" className="hover:text-[#005d42]">
               MARKETPLACE
             </Link>
-            {currentCategoryObj && (
-              <>
-                <span className="text-[#6e7a73]/40">/</span>
-                <span className="font-bold text-[#0b1c30]">{currentCategoryObj.name}</span>
-              </>
-            )}
+            <span className="text-[#6e7a73]/50">/</span>
+            <Link href="/gigs?category=graphics-design" className="hover:text-[#005d42]">
+              DESIGN & CREATIVE
+            </Link>
+            <span className="text-[#6e7a73]/50">/</span>
+            <span className="font-bold text-[#0b1c30]">UI/UX & WEB DESIGN</span>
           </nav>
 
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              {/* Published Gig Catalog Badge */}
-              <div className="mb-2 inline-flex items-center gap-1.5 bg-[#eff4ff] px-2 py-0.5">
-                <span className="h-1.5 w-1.5 bg-[#005d42]" />
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[#0b1c30]">
-                  PUBLISHED GIG CATALOG
-                </span>
+              {/* Verified Contract Catalog Badge */}
+              <div className="mb-2 flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-[#0047bf]">
+                <span className="h-2 w-2 bg-[#0047bf]" />
+                <span>VERIFIED CONTRACT CATALOG</span>
               </div>
 
               {/* Title */}
               <h1 className="font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-4xl">
-                {pageTitle}
+                UI/UX & WEB DESIGN SERVICES
               </h1>
 
-              {/* Subtext Count */}
-              <p className="mt-1 font-sans text-sm text-[#3e4943]">
-                Displaying{" "}
-                <strong className="font-bold text-[#0b1c30]">{filteredGigs.length}</strong>{" "}
-                published {filteredGigs.length === 1 ? "gig" : "gigs"}
+              {/* Subtitle */}
+              <p className="mt-1 font-sans text-xs text-[#3e4943]">
+                Displaying 1,428 vetted enterprise design specs and production pipelines
               </p>
             </div>
 
@@ -216,8 +162,6 @@ export default function GigsExplorer() {
                 >
                   <option value="best-match">Best Match</option>
                   <option value="rating">Highest Rated</option>
-                  <option value="popular">Most Orders</option>
-                  <option value="newest">Newest</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
                 </select>
@@ -228,16 +172,16 @@ export default function GigsExplorer() {
         </div>
       </section>
 
-      {/* Active Criteria Chips (only when filters applied) */}
-      {activeChips.length > 0 && (
-        <section className="w-full border-b border-[#e5e7eb] bg-[#eff4ff] py-2.5">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 sm:px-6">
-            <span className="mr-1 font-mono text-xs font-bold uppercase tracking-wider text-[#3e4943]">
+      {/* Active Criteria Bar matching screenshot */}
+      <section className="w-full border-b border-[#e5e7eb] bg-white py-2.5">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#3e4943]">
               ACTIVE CRITERIA:
             </span>
-            {activeChips.map((chip, idx) => (
+            {activeChips.map((chip) => (
               <div
-                key={idx}
+                key={chip.id}
                 className="inline-flex items-center border border-[#0b1c30] bg-white px-2 py-0.5 shadow-[2px_2px_0px_#0b1c30]"
               >
                 <span className="mr-1.5 font-mono text-[11px] font-bold text-[#0b1c30]">
@@ -246,25 +190,30 @@ export default function GigsExplorer() {
                 <button
                   type="button"
                   aria-label={`Remove ${chip.label}`}
-                  onClick={() => removeChip(chip)}
+                  onClick={() => removeChip(chip.id)}
                   className="flex items-center text-[#565e74] hover:text-[#ba1a1a]"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3 w-3" />
                 </button>
               </div>
             ))}
             <button
               type="button"
               onClick={clearAllFilters}
-              className="ml-2 font-mono text-xs font-bold uppercase text-[#005d42] underline hover:text-[#047857]"
+              className="ml-2 font-mono text-[11px] font-bold uppercase text-[#0b1c30] underline hover:text-[#005d42]"
             >
               CLEAR ALL
             </button>
           </div>
-        </section>
-      )}
 
-      {/* Body: 2 Columns (Filter Sidebar + Feed Grid) */}
+          <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-[#005d42]">
+            <span>FAST ESCROW CHECKOUT</span>
+            <span className="h-2 w-2 bg-[#005d42]" />
+          </div>
+        </div>
+      </section>
+
+      {/* Body Section: Filters Sidebar + 3-Col Feed Grid */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         {/* Mobile filter toggle */}
         <div className="mb-4 lg:hidden">
@@ -279,19 +228,11 @@ export default function GigsExplorer() {
         </div>
 
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-          {/* Left Column: Filter Sidebar */}
+          {/* Left Column: Filter Sidebar (col-span-3) */}
           <div className={`lg:col-span-3 ${mobileFilterOpen ? "block" : "hidden lg:block"}`}>
             <FilterSidebar
-              selectedCategory={selectedCategory}
-              setSelectedCategory={(slug) => {
-                setSelectedCategory(slug);
-                if (slug) {
-                  router.push(`/gigs?category=${slug}`);
-                } else {
-                  router.push("/gigs");
-                }
-              }}
-              categoryCounts={categoryCounts}
+              selectedServiceTypes={selectedServiceTypes}
+              setSelectedServiceTypes={setSelectedServiceTypes}
               deliveryTime={deliveryTime}
               setDeliveryTime={setDeliveryTime}
               minBudget={minBudget}
@@ -302,27 +243,26 @@ export default function GigsExplorer() {
               setSelectedTiers={setSelectedTiers}
               minRating={minRating}
               setMinRating={setMinRating}
-              sellerExperience={sellerExperience}
-              setSellerExperience={setSellerExperience}
               onApply={() => setMobileFilterOpen(false)}
               onReset={clearAllFilters}
             />
           </div>
 
-          {/* Right Column: Feed Grid */}
+          {/* Right Column: Feed Grid (col-span-9) */}
           <div className="lg:col-span-9">
             {/* Feed Status Header matching screenshot */}
             <div className="mb-4 flex items-center justify-between border border-[#e5e7eb] bg-white px-3 py-2 shadow-[2px_2px_0px_#0b1c30]">
               <div className="flex items-center gap-2 font-mono text-xs text-[#0b1c30]">
                 <span className="h-2 w-2 bg-[#005d42]" />
-                <span>
-                  FEED STATUS: <strong>LIVE</strong>
-                </span>
+                <span className="font-bold">FEED STATUS: ESCROW ACTIVE</span>
                 <span className="text-[#6e7a73]/40">|</span>
                 <span className="text-[#565e74] uppercase">
-                  {filteredGigs.length} OF {gigs.length} GIGS LOADED
+                  6 OF 1,428 CONTRACTS LOADED
                 </span>
               </div>
+              <span className="hidden sm:inline font-mono text-xs font-semibold uppercase text-[#6e7a73]">
+                GRID MODE: 3-COL BRUTALIST
+              </span>
             </div>
 
             {/* Empty State */}
@@ -337,19 +277,90 @@ export default function GigsExplorer() {
                 <button
                   type="button"
                   onClick={clearAllFilters}
-                  className="mt-4 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                  className="mt-4 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-xs uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
                 >
                   CLEAR ALL FILTERS
                 </button>
               </div>
             ) : (
-              /* 3-Column Brutalist Gig Grid */
+              /* 3-Column Brutalist Gig Grid matching screenshot */
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {filteredGigs.map((gig) => (
                   <GigCard key={gig.id} gig={gig} />
                 ))}
               </div>
             )}
+
+            {/* Protocol Banner Below Grid matching screenshot */}
+            <div className="mt-8 flex flex-col md:flex-row items-center justify-between border border-[#e5e7eb] bg-white p-5 shadow-[3px_3px_0px_#0b1c30] gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#005d42] text-white shadow-[2px_2px_0px_#0b1c30]">
+                  <span className="material-symbols-outlined text-2xl">verified_user</span>
+                </div>
+                <div>
+                  <h3 className="font-headline text-sm font-bold uppercase tracking-wider text-[#0b1c30]">
+                    MILESTONE-BACKED ESCROW SYSTEM
+                  </h3>
+                  <p className="text-xs text-[#3e4943] mt-0.5">
+                    Contract payments are locked until deliverables pass technical automated checklists and code reviews.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/#escrow"
+                className="shrink-0 px-4 py-2 bg-[#0b1c30] text-white font-mono text-xs font-bold uppercase tracking-wide hover:bg-[#1a2e45] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+              >
+                READ SECURITY PROTOCOL
+              </Link>
+            </div>
+
+            {/* Pagination Footer matching screenshot */}
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between border-t border-[#e5e7eb] pt-6 font-mono text-xs">
+              <span className="font-mono text-xs uppercase tracking-wider text-[#0b1c30] font-bold">
+                PAGE 1 OF 48 (1,428 ENTRIES)
+              </span>
+              <div className="flex items-center gap-1.5 mt-3 sm:mt-0">
+                <button
+                  type="button"
+                  aria-label="Previous Page"
+                  className="h-8 w-8 border border-[#0b1c30] bg-white text-[#0b1c30] flex items-center justify-center font-bold hover:bg-[#eff4ff]"
+                >
+                  &lt;
+                </button>
+                <button
+                  type="button"
+                  className="h-8 w-8 bg-[#005d42] text-white flex items-center justify-center font-bold shadow-[1px_1px_0px_#0b1c30]"
+                >
+                  1
+                </button>
+                <button
+                  type="button"
+                  className="h-8 w-8 border border-[#e5e7eb] bg-white text-[#0b1c30] flex items-center justify-center font-bold hover:bg-[#eff4ff]"
+                >
+                  2
+                </button>
+                <button
+                  type="button"
+                  className="h-8 w-8 border border-[#e5e7eb] bg-white text-[#0b1c30] flex items-center justify-center font-bold hover:bg-[#eff4ff]"
+                >
+                  3
+                </button>
+                <span className="px-1 text-[#6e7a73]">...</span>
+                <button
+                  type="button"
+                  className="h-8 w-8 border border-[#e5e7eb] bg-white text-[#0b1c30] flex items-center justify-center font-bold hover:bg-[#eff4ff]"
+                >
+                  48
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next Page"
+                  className="h-8 w-8 border border-[#0b1c30] bg-white text-[#0b1c30] flex items-center justify-center font-bold hover:bg-[#eff4ff]"
+                >
+                  &gt;
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

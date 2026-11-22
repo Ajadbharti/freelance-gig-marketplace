@@ -205,7 +205,7 @@ export default function Landing() {
                 <div className="mt-5 flex items-center justify-between border-t border-[#e5e7eb] pt-3 font-mono text-xs">
                   <div>
                     <span className="text-[10px] text-[#6e7a73]">RATE</span>
-                    <p className="font-bold text-[#0b1c30]">₹{f.hourlyRate || 2000}/hr</p>
+                    <p className="font-bold text-[#0b1c30]">${f.hourlyRate || 95}/hr</p>
                   </div>
                   <Link
                     href={`/freelancers/${f.id}`}
