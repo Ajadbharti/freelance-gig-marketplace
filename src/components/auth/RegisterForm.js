@@ -5,14 +5,15 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
+  CreditCard,
   Eye,
   EyeOff,
-  Lock,
+  Landmark,
+  Package,
   ShieldCheck,
-  UserCheck,
-  Zap,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
 
 function GithubIcon(props) {
@@ -43,6 +44,7 @@ export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { register: registerUser, loginWithProvider } = useAuth();
+  const { gigs, freelancers } = useMarketplace();
   const { showToast } = useToast();
 
   const [archetype, setArchetype] = useState(
@@ -53,13 +55,13 @@ export default function RegisterForm() {
   const [selectedDomain, setSelectedDomain] = useState(DOMAIN_OPTIONS[0]);
   const [selectedTags, setSelectedTags] = useState(["#Next.js & Edge"]);
   const [agreeTerms, setAgreeTerms] = useState(false);
-  const [agreeDigest, setAgreeDigest] = useState(false);
+  const [agreeUpdates, setAgreeUpdates] = useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm({
     defaultValues: {
       firstName: "",
@@ -92,7 +94,7 @@ export default function RegisterForm() {
 
   async function onSubmit(data) {
     if (!agreeTerms) {
-      showToast("Please agree to the Escrow Terms of Service to proceed.", "error");
+      showToast("Please agree to the Terms of Service to proceed.", "error");
       return;
     }
     const fullName = `${(data.firstName || "").trim()} ${(data.lastName || "").trim()}`.trim();
@@ -102,7 +104,7 @@ export default function RegisterForm() {
       return;
     }
     const result = await registerUser({
-      name: fullName || "Engineer",
+      name: fullName || (archetype === "freelancer" ? "Freelancer" : "Client"),
       email: data.email,
       password: finalPassword,
       role: archetype,
@@ -130,14 +132,11 @@ export default function RegisterForm() {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff]">
-      {/* Top Protocol Header matching image */}
+      {/* Top Header matching reference */}
       <header className="border-b border-[#e5e7eb] bg-white py-3.5 px-4 sm:px-8">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="h-3 w-3 bg-[#005d42]" />
-            <span className="font-headline text-lg font-bold tracking-tight text-[#0b1c30] uppercase">
-              GIGCRAFT
-            </span>
+          <Link href="/" className="font-headline text-xl font-bold tracking-tight text-[#005d42] uppercase">
+            GIGCRAFT
           </Link>
           <Link
             href="/gigs"
@@ -152,15 +151,15 @@ export default function RegisterForm() {
         <div className="mx-auto max-w-7xl">
           {/* Protocol Breadcrumb */}
           <div className="mb-6 flex items-center gap-2 font-mono text-xs text-[#3e4943]">
-            <span className="flex h-3.5 w-3.5 items-center justify-center bg-[#005d42] text-[9px] text-white">■</span>
-            <span className="bg-[#eff4ff] px-2 py-0.5 font-bold uppercase tracking-wider text-[#0b1c30]">
+            <span className="flex items-center gap-1.5 border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-bold uppercase tracking-wider text-[#0b1c30]">
+              <span className="h-2 w-2 bg-[#005d42]" />
               JOIN THE TECHNICAL MARKETPLACE
             </span>
-            <span className="text-[#bdc9c1]">/</span>
-            <span className="text-[#3e4943]">PROTOCOL REGISTRATION v2.4</span>
+            <span className="text-[#6e7a73]">/</span>
+            <span className="uppercase text-[#3e4943]">PROTOCOL REGISTRATION v2.4</span>
           </div>
 
-          {/* 2-Column Split: Form (Left) + Telemetry (Right) */}
+          {/* 2-Column Split: Form (Left) + Info & Metrics (Right) */}
           <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
             {/* Left Column: Form Card */}
             <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6 sm:p-10">
@@ -204,14 +203,14 @@ export default function RegisterForm() {
                       </div>
                     </div>
                     <h3 className="mt-3 font-sans text-sm font-bold text-[#0b1c30]">
-                      Client / Engineering Lead
+                      Client
                     </h3>
                     <p className="mt-1 text-xs leading-relaxed text-[#3e4943]">
-                      Post technical gigs, escrow milestone contracts, and hire vetted engineers & architects with automated deliverables verification.
+                      Browse gigs, order a package with your requirements, track the work, and approve the delivery before the payment is released.
                     </p>
                     <div className="mt-4 flex items-center justify-between border-t border-[#e5e7eb] pt-3 font-mono text-[11px] text-[#3e4943]">
-                      <span className="uppercase tracking-wider font-semibold text-[#0b1c30]">BUYER ESCROW MODE</span>
-                      <span className="text-[#005d42]">0% Upfront Post</span>
+                      <span className="uppercase tracking-wider font-semibold text-[#0b1c30]">ESCROW-HELD PAYMENTS</span>
+                      <span className="text-[#3e4943]">No platform fee</span>
                     </div>
                   </div>
 
@@ -242,14 +241,14 @@ export default function RegisterForm() {
                       </div>
                     </div>
                     <h3 className="mt-3 font-sans text-sm font-bold text-[#0b1c30]">
-                      Freelancer / Specialist
+                      Freelancer
                     </h3>
                     <p className="mt-1 text-xs leading-relaxed text-[#3e4943]">
-                      Publish pre-scoped technical services, pass verified code audits, and unlock immediate milestone settlement upon PR approvals.
+                      Publish services with Basic, Standard and Premium packages, deliver your work, and get paid when the client approves.
                     </p>
                     <div className="mt-4 flex items-center justify-between border-t border-[#e5e7eb] pt-3 font-mono text-[11px] text-[#3e4943]">
-                      <span className="uppercase tracking-wider font-semibold text-[#0b1c30]">BUILDER WORKSPACE</span>
-                      <span className="text-[#005d42]">Direct Settlement</span>
+                      <span className="uppercase tracking-wider font-semibold text-[#0b1c30]">SELLER WORKSPACE</span>
+                      <span className="text-[#3e4943]">Paid on approval</span>
                     </div>
                   </div>
                 </div>
@@ -260,7 +259,7 @@ export default function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => handleSocialAuth("github")}
-                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 >
                   <GithubIcon className="h-4 w-4" />
                   Sign up with GitHub
@@ -268,9 +267,9 @@ export default function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => handleSocialAuth("google")}
-                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 >
-                  <span className="font-bold text-blue-600">G</span>
+                  <span className="font-bold text-[#4285f4]">G</span>
                   Sign up with Google
                 </button>
               </div>
@@ -433,21 +432,21 @@ export default function RegisterForm() {
                     />
                     <span>
                       I agree to the{" "}
-                      <strong className="underline text-[#0b1c30]">GigCraft Escrow Terms of Service</strong>,{" "}
-                      <strong className="underline text-[#0b1c30]">Deterministic Dispute Policy</strong>, and{" "}
-                      <strong className="underline text-[#0b1c30]">Code Review Standards</strong>.
+                      <Link href="/terms" className="underline text-[#0b1c30] font-medium">Terms of Service</Link>,{" "}
+                      <Link href="/privacy" className="underline text-[#0b1c30] font-medium">Privacy Policy</Link>, and{" "}
+                      <Link href="/guidelines" className="underline text-[#0b1c30] font-medium">Community Guidelines</Link>.
                     </span>
                   </label>
 
                   <label className="flex items-start gap-2.5 cursor-pointer text-xs leading-relaxed text-[#3e4943]">
                     <input
                       type="checkbox"
-                      checked={agreeDigest}
-                      onChange={(e) => setAgreeDigest(e.target.checked)}
+                      checked={agreeUpdates}
+                      onChange={(e) => setAgreeUpdates(e.target.checked)}
                       className="mt-0.5 h-4 w-4 rounded-none accent-[#005d42]"
                     />
                     <span>
-                      Send me weekly curated technical gig digests, benchmark contract rate indexes, and core engineering telemetry updates.
+                      Allow occasional product update emails (optional).
                     </span>
                   </label>
                 </div>
@@ -458,7 +457,7 @@ export default function RegisterForm() {
                   disabled={isSubmitting || !agreeTerms}
                   className="mt-4 flex h-12 w-full items-center justify-center gap-2 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50"
                 >
-                  CREATE FREE ACCOUNT & START BOOKING →
+                  {archetype === "freelancer" ? "CREATE FREELANCER ACCOUNT →" : "CREATE CLIENT ACCOUNT →"}
                 </button>
 
                 <div className="pt-2 text-center">
@@ -473,165 +472,123 @@ export default function RegisterForm() {
               </form>
             </div>
 
-            {/* Right Column: Telemetry & Protocol Guarantee */}
+            {/* Right Column: HOW IT WORKS & PLATFORM METRICS matching reference */}
             <div className="space-y-6">
-              {/* Box 1: Protocol Guarantee */}
-              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-5">
-                <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
-                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                    PROTOCOL GUARANTEE
-                  </span>
-                  <span className="border border-[#005d42] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold text-[#005d42]">
-                    ACTIVE
-                  </span>
-                </div>
-                <ul className="mt-4 space-y-4 text-xs text-[#3e4943]">
-                  <li className="flex items-start gap-2.5">
-                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#005d42]" />
-                    <div>
-                      <strong className="text-[#0b1c30]">100% Escrow Milestone Vault</strong>
-                      <p className="mt-0.5 text-[#3e4943]">
-                        Contract funds locked in neutral cryptographic escrow before any coding commences.
-                      </p>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Zap className="mt-0.5 h-4 w-4 shrink-0 text-[#005d42]" />
-                    <div>
-                      <strong className="text-[#0b1c30]">Instant GitHub Portfolio Sync</strong>
-                      <p className="mt-0.5 text-[#3e4943]">
-                        Auto-benchmark PR merge rates, commit volume, and test coverage to auto-tier your profile.
-                      </p>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[#005d42]" />
-                    <div>
-                      <strong className="text-[#0b1c30]">Zero Upfront Hiring Fee</strong>
-                      <p className="mt-0.5 text-[#3e4943]">
-                        Browse, interview, and initiate technical tests without retainer requirements or subscription gating.
-                      </p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Box 2: Current Network Telemetry */}
-              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-5">
-                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  CURRENT NETWORK TELEMETRY
+              {/* Card 1: HOW IT WORKS */}
+              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6">
+                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] border-b border-[#e5e7eb] pb-3">
+                  HOW IT WORKS
                 </h3>
-                <div className="mt-4 grid grid-cols-2 gap-3 border-b border-[#e5e7eb] pb-4">
-                  <div className="border border-[#e5e7eb] bg-[#eff4ff] p-3">
-                    <p className="font-mono text-[10px] uppercase text-[#3e4943]">AVG FILL TIME</p>
-                    <p className="mt-1 font-headline text-xl font-bold text-[#0b1c30]">3.8 hrs</p>
-                    <p className="font-mono text-[10px] text-[#005d42] font-semibold">▲ 14% FASTER</p>
-                  </div>
-                  <div className="border border-[#e5e7eb] bg-[#eff4ff] p-3">
-                    <p className="font-mono text-[10px] uppercase text-[#3e4943]">ESCROW VOLUME</p>
-                    <p className="mt-1 font-headline text-xl font-bold text-[#0b1c30]">$24.2M</p>
-                    <p className="font-mono text-[10px] text-[#3e4943]">Q1 VERIFIED</p>
-                  </div>
-                </div>
-
-                {/* Mini Sparkline Chart */}
-                <div className="mt-4">
-                  <div className="flex items-center justify-between font-mono text-xs">
-                    <span className="text-[#3e4943]">Milestone Dispute Rate</span>
-                    <span className="font-bold text-[#005d42]">0.08%</span>
-                  </div>
-                  {/* SVG Sparkline */}
-                  <div className="mt-2 h-10 w-full">
-                    <svg viewBox="0 0 200 40" className="h-full w-full">
-                      <polyline
-                        fill="none"
-                        stroke="#005d42"
-                        strokeWidth="2"
-                        points="10,32 50,30 100,28 150,22 190,12"
-                      />
-                      <circle cx="190" cy="12" r="3" fill="#005d42" />
-                    </svg>
-                  </div>
-                  <div className="flex justify-between font-mono text-[9px] uppercase text-[#6e7a73]">
-                    <span>OCT</span>
-                    <span>NOV</span>
-                    <span>DEC</span>
-                    <span>JAN</span>
-                    <span className="text-[#005d42] font-bold">LIVE</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Box 3: Testimonial */}
-              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center bg-[#0b1c30] font-mono text-xs font-bold text-white">
-                    AK
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs font-bold text-[#0b1c30]">Alex K.</p>
-                      <span className="border border-[#005d42] bg-[#eff4ff] px-1.5 font-mono text-[9px] font-bold text-[#005d42]">
-                        STAFF ARCHITECT
-                      </span>
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center border border-[#005d42]/30 bg-[#eff4ff] text-[#005d42]">
+                      <ShieldCheck className="h-4 w-4" />
                     </div>
-                    <p className="font-mono text-[10px] text-[#3e4943]">Distributed Systems & Rust</p>
+                    <div>
+                      <p className="text-xs font-bold text-[#0b1c30]">Payments held in escrow</p>
+                      <p className="mt-1 text-xs text-[#3e4943] leading-relaxed">
+                        When you order, the amount is held in a demo escrow and released only when you approve the delivery.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center border border-blue-600/30 bg-[#eff4ff] text-blue-600">
+                      <Package className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-[#0b1c30]">Packages you can compare</p>
+                      <p className="mt-1 text-xs text-[#3e4943] leading-relaxed">
+                        Every gig has Basic, Standard and Premium packages with clear delivery times and revisions.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center border border-[#005d42]/30 bg-[#eff4ff] text-[#005d42]">
+                      <CreditCard className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-[#0b1c30]">No platform fee</p>
+                      <p className="mt-1 text-xs text-[#3e4943] leading-relaxed">
+                        This demo doesn't charge any fees, and no real money is ever used.
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <p className="mt-3 text-xs italic leading-relaxed text-[#0b1c30]">
-                  “GigCraft’s escrow code milestone checks removed invoice chasing entirely. First gig landed within 24 hours of GitHub verification.”
-                </p>
-                <div className="mt-3 flex items-center justify-between border-t border-[#e5e7eb] pt-3 font-mono text-[10px] text-[#3e4943]">
-                  <span>38 COMPLETED CONTRACTS</span>
-                  <span className="font-bold text-[#0b1c30]">★ 5.0 RATING</span>
+              </div>
+
+              {/* Card 2: PLATFORM METRICS */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
+                    PLATFORM METRICS
+                  </span>
+                  <span className="bg-[#005d42] px-2 py-0.5 font-mono text-[10px] font-bold text-white uppercase tracking-wider">
+                    LIVE DATA
+                  </span>
+                </div>
+
+                {/* 4-Stat Grid: Published Gigs, Freelancers, Completed Orders, Average Rating */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white border border-[#e5e7eb] p-4 shadow-[2px_2px_0px_#0b1c30]">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-bold">
+                      PUBLISHED GIGS
+                    </p>
+                    <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
+                      {gigs?.length || 7}
+                    </p>
+                  </div>
+
+                  <div className="bg-white border border-[#e5e7eb] p-4 shadow-[2px_2px_0px_#0b1c30]">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-bold">
+                      FREELANCERS
+                    </p>
+                    <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
+                      {freelancers?.length || 4}
+                    </p>
+                  </div>
+
+                  <div className="bg-white border border-[#e5e7eb] p-4 shadow-[2px_2px_0px_#0b1c30]">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-bold">
+                      COMPLETED ORDERS
+                    </p>
+                    <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
+                      1
+                    </p>
+                  </div>
+
+                  <div className="bg-white border border-[#e5e7eb] p-4 shadow-[2px_2px_0px_#0b1c30]">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-bold">
+                      AVERAGE RATING
+                    </p>
+                    <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] flex items-center gap-1">
+                      5.0 <span className="text-[#005d42] text-xl">★</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Simulated Escrow Released Card */}
+                <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-wider text-[#6e7a73] font-bold">
+                        SIMULATED ESCROW RELEASED
+                      </p>
+                      <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] sm:text-4xl">
+                        ₹7,999
+                      </p>
+                    </div>
+                    <div className="flex h-10 w-10 items-center justify-center border border-[#e5e7eb] bg-[#eff4ff] text-[#005d42]">
+                      <Landmark className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-[#3e4943]">
+                    Demo payments only, No real money moves on GigCraft.
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Bottom Security Highlights */}
-          <div className="mt-8 grid gap-4 border border-[#e5e7eb] bg-white p-6 sm:grid-cols-3 shadow-[3px_3px_0px_#0b1c30]">
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
-              <div>
-                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  DETERMINISTIC ESCROW
-                </h4>
-                <p className="mt-1 text-xs text-[#3e4943]">
-                  Zero upfront platform commission until milestone delivery passes static code analysis and buyer verification.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 border-[#e5e7eb] sm:border-l sm:pl-4">
-              <Lock className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
-              <div>
-                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  SOC-2 TYPE II CUSTODY
-                </h4>
-                <p className="mt-1 text-xs text-[#3e4943]">
-                  Enterprise payroll, tax compliance (1099/W8-BEN), and bank disbursements across 140+ countries.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 border-[#e5e7eb] sm:border-l sm:pl-4">
-              <UserCheck className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
-              <div>
-                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  PRE-SCREENED TALENT
-                </h4>
-                <p className="mt-1 text-xs text-[#3e4943]">
-                  Only the top 3% of technical applicants pass algorithmic repo evaluations and live architecture screens.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Mini Footer */}
-          <div className="mt-6 flex items-center justify-between border-t border-[#e5e7eb] pt-4 font-mono text-xs text-[#3e4943]">
-            <span>GIGCRAFT © 2025 GigCraft Marketplace Inc.</span>
-            <span className="uppercase tracking-wider">SECURE ACCESS PORTAL</span>
           </div>
         </div>
       </main>
