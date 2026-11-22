@@ -1,22 +1,16 @@
-"use client";
+import { Suspense } from "react";
+import GigsExplorer from "@/components/gigs/GigsExplorer";
+import { GigGridSkeleton } from "@/components/ui/LoadingSkeleton";
 
-import { useAuth } from "@/context/AuthContext";
-import Landing from "@/components/home/Landing";
-import MarketplaceHome from "@/components/home/MarketplaceHome";
-import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+export const metadata = {
+  title: "Explore Gigs | GigCraft Technical Marketplace",
+  description: "Browse verified engineering, design, and architecture specs contracting under multi-signature deterministic escrow.",
+};
 
 export default function Home() {
-  const { user, hydrated } = useAuth();
-
-  if (!hydrated) {
-    return (
-      <div className="mx-auto max-w-7xl space-y-4 px-4 py-16" role="status" aria-label="Loading">
-        <LoadingSkeleton className="h-10 w-2/3" />
-        <LoadingSkeleton className="h-6 w-1/2" />
-        <LoadingSkeleton className="h-64 w-full" />
-      </div>
-    );
-  }
-
-  return user ? <MarketplaceHome /> : <Landing />;
+  return (
+    <Suspense fallback={<GigGridSkeleton count={6} />}>
+      <GigsExplorer />
+    </Suspense>
+  );
 }

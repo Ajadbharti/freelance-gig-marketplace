@@ -121,7 +121,7 @@ export default function Navbar() {
           <Link
             href="/gigs"
             className={`text-xs font-bold uppercase tracking-wider transition ${
-              pathname.startsWith("/gigs")
+              pathname === "/" || pathname.startsWith("/explore") || pathname.startsWith("/gigs")
                 ? "border-b-2 border-[#005d42] pb-1 text-[#005d42]"
                 : "text-[#3e4943] hover:text-[#005d42]"
             }`}

@@ -58,10 +58,12 @@ export const categories = [
 ];
 
 export const NAV_CATEGORIES = [
-  { name: "DESIGN & CREATIVE", slug: "graphics-design" },
-  { name: "DEVELOPMENT & TECH", slug: "web-development" },
+  { name: "WEB DEVELOPMENT", slug: "web-development" },
+  { name: "GRAPHICS & DESIGN", slug: "graphics-design" },
+  { name: "WRITING & TRANSLATION", slug: "writing-translation" },
   { name: "DIGITAL MARKETING", slug: "digital-marketing" },
   { name: "VIDEO & ANIMATION", slug: "video-animation" },
-  { name: "WRITING & TRANSLATION", slug: "writing-translation" },
-  { name: "AI SERVICES", slug: "data-ai" },
+  { name: "DATA & AI", slug: "data-ai" },
+  { name: "PROGRAMMING & TECHNOLOGY", slug: "programming-technology" },
+  { name: "BUSINESS", slug: "business" },
 ];

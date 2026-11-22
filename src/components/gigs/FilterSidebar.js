@@ -1,10 +1,17 @@
 "use client";
 
-export const SERVICE_TYPE_OPTIONS = [
-  { key: "figma", label: "Figma UI Design", count: 742 },
-  { key: "webflow", label: "Webflow Dev", count: 314 },
-  { key: "mobile", label: "Mobile App UI", count: 265 },
-  { key: "brand", label: "Brand Identity", count: 107 },
+import { SlidersHorizontal } from "lucide-react";
+
+export const SERVICE_TYPE_CATEGORIES = [
+  { slug: "all", label: "All services" },
+  { slug: "web-development", label: "Web Development" },
+  { slug: "graphics-design", label: "Graphics & Design" },
+  { slug: "writing-translation", label: "Writing & Translation" },
+  { slug: "digital-marketing", label: "Digital Marketing" },
+  { slug: "video-animation", label: "Video & Animation" },
+  { slug: "data-ai", label: "Data & AI" },
+  { slug: "programming-technology", label: "Programming & Technology" },
+  { slug: "business", label: "Business" },
 ];
 
 export const DELIVERY_OPTIONS = [
@@ -29,26 +36,26 @@ export const SELLER_TIERS = [
 ];
 
 export default function FilterSidebar({
-  selectedServiceTypes = ["figma"],
-  setSelectedServiceTypes,
+  selectedCategory = "all",
+  setSelectedCategory,
   deliveryTime = "any",
   setDeliveryTime,
-  minBudget = "50",
+  minBudget = "",
   setMinBudget,
-  maxBudget = "600",
+  maxBudget = "",
   setMaxBudget,
-  selectedTiers = ["pro", "top_rated"],
+  selectedTiers = [],
   setSelectedTiers,
-  minRating = "4.5",
+  minRating = "0",
   setMinRating,
+  categoryCounts = {},
+  totalCount = 6,
   onApply,
   onReset,
 }) {
-  function toggleServiceType(key) {
-    if (setSelectedServiceTypes) {
-      setSelectedServiceTypes((prev) =>
-        prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-      );
+  function handleCategoryChange(slug) {
+    if (setSelectedCategory) {
+      setSelectedCategory(slug);
     }
   }
 
@@ -61,7 +68,7 @@ export default function FilterSidebar({
   }
 
   const activeCount =
-    (selectedServiceTypes?.length || 0) +
+    (selectedCategory && selectedCategory !== "all" ? 1 : 0) +
     (deliveryTime !== "any" ? 1 : 0) +
     (selectedTiers?.length || 0) +
     (minRating && minRating !== "0" ? 1 : 0) +
@@ -72,13 +79,13 @@ export default function FilterSidebar({
       {/* Filters Header */}
       <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-base text-[#005d42]">tune</span>
+          <SlidersHorizontal className="h-4 w-4 text-[#005d42]" />
           <h2 className="font-headline text-base font-bold uppercase tracking-wider text-[#0b1c30]">
             FILTERS
           </h2>
         </div>
         <span className="border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold text-[#0b1c30]">
-          ACTIVE: {activeCount || 3}
+          ACTIVE: {activeCount}
         </span>
       </div>
 
@@ -90,25 +97,29 @@ export default function FilterSidebar({
             <span className="text-[#6e7a73] font-mono">[01]</span>
           </div>
           <div className="mt-3 space-y-2">
-            {SERVICE_TYPE_OPTIONS.map((st) => {
-              const isChecked = selectedServiceTypes?.includes(st.key);
+            {SERVICE_TYPE_CATEGORIES.map((st) => {
+              const isSelected = (selectedCategory || "all") === st.slug;
+              const count = st.slug === "all" ? totalCount : categoryCounts[st.slug] || 0;
+
               return (
                 <label
-                  key={st.key}
+                  key={st.slug}
                   className="flex cursor-pointer items-center justify-between text-xs text-[#0b1c30] hover:text-[#005d42]"
                 >
                   <div className="flex items-center gap-2">
                     <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleServiceType(st.key)}
-                      className="h-3.5 w-3.5 accent-[#005d42] rounded-none"
+                      type="radio"
+                      name="serviceTypeRadio"
+                      value={st.slug}
+                      checked={isSelected}
+                      onChange={() => handleCategoryChange(st.slug)}
+                      className="h-3.5 w-3.5 accent-[#005d42]"
                     />
-                    <span className={isChecked ? "font-bold text-[#0b1c30]" : ""}>
+                    <span className={isSelected ? "font-bold text-[#0b1c30]" : ""}>
                       {st.label}
                     </span>
                   </div>
-                  <span className="font-mono text-[11px] text-[#6e7a73]">{st.count}</span>
+                  <span className="font-mono text-[11px] text-[#6e7a73]">{count}</span>
                 </label>
               );
             })}
@@ -253,7 +264,7 @@ export default function FilterSidebar({
                 type="radio"
                 name="minRating"
                 value="4.5"
-                checked={minRating === "4.5" || !minRating}
+                checked={minRating === "4.5"}
                 onChange={(e) => setMinRating && setMinRating(e.target.value)}
                 className="h-3.5 w-3.5 accent-[#005d42]"
               />
@@ -288,14 +299,14 @@ export default function FilterSidebar({
           <button
             type="button"
             onClick={onApply}
-            className="w-full px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-xs uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            className="w-full px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-xs uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all rounded-none"
           >
             APPLY FILTER STATE
           </button>
           <button
             type="button"
             onClick={onReset}
-            className="w-full px-5 py-2.5 border border-[#0b1c30] text-[#0b1c30] font-semibold text-xs uppercase tracking-wide hover:bg-[#eff4ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all bg-white"
+            className="w-full px-5 py-2.5 border border-[#0b1c30] text-[#0b1c30] font-semibold text-xs uppercase tracking-wide hover:bg-[#eff4ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all bg-white rounded-none"
           >
             RESET PARAMETERS
           </button>
