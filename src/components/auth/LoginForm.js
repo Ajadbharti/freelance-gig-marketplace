@@ -36,7 +36,6 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, loginWithProvider } = useAuth();
-  const { platformMetrics } = useMarketplace();
   const { showToast } = useToast();
 
   const [rememberHardware, setRememberHardware] = useState(true);
@@ -47,7 +46,6 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -73,259 +71,351 @@ export default function LoginForm() {
   }
 
   async function handleSocial(provider) {
-    await loginWithProvider(provider);
-    showToast(`Signed in with ${provider.toUpperCase()}`, "success");
-    router.push("/dashboard/client");
+    const result = await loginWithProvider(provider);
+    if (!result.ok) {
+      showToast(
+        result.error ||
+          `${provider.toUpperCase()} OAuth is not configured in Supabase. Please sign in with your work email.`,
+        "error"
+      );
+      return;
+    }
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff] py-8 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        {/* Top Protocol Subheader matching user screenshot */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3 font-mono text-xs text-slate-600">
-          <div className="flex items-center gap-2">
-            <span className="border border-slate-200 bg-slate-50 px-2 py-0.5 font-bold uppercase tracking-wider text-[#047857]">
-              ■ SECURE SIGN-IN
+    <div className="min-h-screen bg-[#f8f9ff]">
+      {/* Top Protocol Header */}
+      <header className="border-b border-[#e5e7eb] bg-white py-3.5 px-4 sm:px-8">
+        <div className="mx-auto max-w-7xl flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="h-3 w-3 bg-[#005d42]" />
+            <span className="font-headline text-lg font-bold tracking-tight text-[#0b1c30] uppercase">
+              GIGCRAFT
             </span>
-            <span className="text-slate-500">HTTPS // HTTPONLY SESSION COOKIE</span>
-          </div>
-          <div className="flex items-center gap-4 text-[11px] text-slate-700">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="h-3.5 w-3.5 text-[#047857]" /> BCRYPT PASSWORDS
-            </span>
-            <span className="text-slate-300">|</span>
-            <span className="flex items-center gap-1">
-              <Lock className="h-3.5 w-3.5 text-[#005d42]" /> DETERMINISTIC ESCROW
-            </span>
-          </div>
+          </Link>
+          <Link
+            href="/gigs"
+            className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] hover:text-[#005d42] transition"
+          >
+            BACK TO MARKETPLACE
+          </Link>
         </div>
+      </header>
 
-        {/* 2-Column Split: Form (Left) + Platform Metrics (Right) */}
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* Left Column: Login Card */}
-          <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6 sm:p-10">
-            <div className="inline-flex items-center gap-1.5 border border-[#e5e7eb] bg-[#eff4ff] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#0b1c30]">
-              <Shield className="h-3 w-3 text-[#005d42]" />
-              SECURE ESCROW AUTHENTICATION
+      <main className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          {/* Subheader Protocol Indicator */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2 border-b border-[#e5e7eb] pb-3 font-mono text-xs text-[#3e4943]">
+            <div className="flex items-center gap-2">
+              <span className="border border-[#e5e7eb] bg-white px-2 py-0.5 font-bold uppercase tracking-wider text-[#005d42]">
+                ■ AUTH-GATEWAY // NODE-04: SECURE
+              </span>
+              <span className="text-[#3e4943]">PROTOCOL: TLS 1.3 / E2EE VERIFIED</span>
             </div>
-
-            <h1 className="mt-4 font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-4xl">
-              Sign in to GigCraft
-            </h1>
-            <p className="mt-2 text-sm text-[#3e4943]">
-              Access your digital contracts, active sprints, and milestone disbursements.
-            </p>
-
-            {/* Social Auth Buttons */}
-            <div className="mt-8 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => handleSocial("github")}
-                className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-              >
-                <GithubIcon className="h-4 w-4" />
-                GitHub Workspace
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSocial("google")}
-                className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-              >
-                <span className="font-bold text-blue-600">G</span>
-                Google Cloud Identity
-              </button>
+            <div className="flex items-center gap-4 text-[11px] text-[#3e4943]">
+              <span className="flex items-center gap-1">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#005d42]" /> SOC-2 TYPE II
+              </span>
+              <span className="text-[#e5e7eb]">|</span>
+              <span className="flex items-center gap-1">
+                <Lock className="h-3.5 w-3.5 text-[#005d42]" /> MULTI-SIG ESCROW ACTIVE
+              </span>
             </div>
+          </div>
 
-            {/* Divider */}
-            <div className="my-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-[#6e7a73]">
-              <span className="h-px flex-1 bg-[#e5e7eb]" />
-              OR WITH WORK EMAIL
-              <span className="h-px flex-1 bg-[#e5e7eb]" />
-            </div>
-
-            {/* Login Form */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div>
-                <div className="flex items-center justify-between">
-                  <label htmlFor="login-email" className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
-                    CORPORATE EMAIL
-                  </label>
-                  <span className="font-mono text-[10px] font-bold text-[#6e7a73]">REQUIRED</span>
-                </div>
-                <div className="relative mt-1.5 flex h-11 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
-                  <span className="px-3 font-mono text-sm text-[#6e7a73]">@</span>
-                  <input
-                    id="login-email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="name@company.com"
-                    className="h-full w-full bg-transparent pr-3 font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
-                    {...register("email", { required: "Email is required" })}
-                  />
-                </div>
-                {errors.email && (
-                  <p role="alert" className="mt-1 font-mono text-xs text-[#ba1a1a]">
-                    {errors.email.message}
-                  </p>
-                )}
+          {/* 2-Column Split: Form (Left) + Platform Metrics (Right) */}
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+            {/* Left Column: Login Card */}
+            <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6 sm:p-10">
+              <div className="inline-flex items-center gap-1.5 border border-[#e5e7eb] bg-[#eff4ff] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#0b1c30]">
+                <Shield className="h-3 w-3 text-[#005d42]" />
+                SECURE ESCROW AUTHENTICATION
               </div>
 
-              <div>
-                <div className="flex items-center justify-between">
-                  <label htmlFor="login-pass" className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
-                    ACCESS KEY / PASSWORD
-                  </label>
-                  <Link href="/register" className="font-mono text-xs font-semibold text-[#005d42] hover:underline">
-                    Forgot password?
-                  </Link>
+              <h1 className="mt-4 font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-4xl">
+                Sign in to GigCraft
+              </h1>
+              <p className="mt-2 text-sm text-[#3e4943]">
+                Access your digital contracts, active sprints, and milestone disbursements.
+              </p>
+
+              {/* Social Auth Buttons */}
+              <div className="mt-8 grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleSocial("github")}
+                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                >
+                  <GithubIcon className="h-4 w-4" />
+                  GitHub Workspace
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSocial("google")}
+                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                >
+                  <span className="font-bold text-blue-600">G</span>
+                  Google Cloud Identity
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="my-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-[#6e7a73]">
+                <span className="h-px flex-1 bg-[#e5e7eb]" />
+                OR WITH WORK EMAIL
+                <span className="h-px flex-1 bg-[#e5e7eb]" />
+              </div>
+
+              {/* Login Form */}
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="login-email" className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
+                      CORPORATE EMAIL
+                    </label>
+                    <span className="font-mono text-[10px] font-bold text-[#6e7a73]">REQUIRED</span>
+                  </div>
+                  <div className="relative mt-1.5 flex h-11 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
+                    <span className="px-3 font-mono text-sm text-[#6e7a73]">@</span>
+                    <input
+                      id="login-email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder="developer@agency.io"
+                      className="h-full w-full bg-transparent pr-3 font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
+                      {...register("email", { required: "Email is required" })}
+                    />
+                  </div>
+                  {errors.email && (
+                    <p role="alert" className="mt-1 font-mono text-xs text-[#ba1a1a]">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
-                <div className="relative mt-1.5 flex h-11 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
-                  <span className="px-3 text-[#6e7a73] shrink-0">
-                    <KeyRound className="h-4 w-4" />
+
+                <div>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="login-pass" className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
+                      ACCESS KEY / PASSWORD
+                    </label>
+                    <Link href="/register" className="font-mono text-xs font-semibold text-[#005d42] hover:underline">
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative mt-1.5 flex h-11 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
+                    <span className="px-3 text-[#6e7a73] shrink-0">
+                      <KeyRound className="h-4 w-4" />
+                    </span>
+                    <input
+                      id="login-pass"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••••••"
+                      className="h-full flex-1 bg-transparent px-1 font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
+                      {...register("password", { required: "Password is required" })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center text-[#6e7a73] hover:text-[#0b1c30] cursor-pointer focus:outline-none"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p role="alert" className="mt-1 font-mono text-xs text-[#ba1a1a]">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer font-mono text-xs text-[#0b1c30]">
+                    <input
+                      type="checkbox"
+                      checked={rememberHardware}
+                      onChange={(e) => setRememberHardware(e.target.checked)}
+                      className="h-4 w-4 rounded-none accent-[#005d42]"
+                    />
+                    <span>Keep me signed in on this hardware</span>
+                  </label>
+                  <span className="flex items-center gap-1 border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] text-[#0b1c30]">
+                    <ShieldCheck className="h-3 w-3 text-[#005d42]" /> Hardware 2FA Prompted
                   </span>
-                  <input
-                    id="login-pass"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    className="h-full flex-1 bg-transparent px-1 font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
-                    {...register("password", { required: "Password is required" })}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center text-[#6e7a73] hover:text-[#0b1c30] cursor-pointer focus:outline-none"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
                 </div>
-                {errors.password && (
-                  <p role="alert" className="mt-1 font-mono text-xs text-[#ba1a1a]">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
 
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex h-12 w-full items-center justify-center gap-2 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-70"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>{isSubmitting ? "Authenticating..." : "→ Sign In to Workspace"}</span>
+                </button>
+
+                {/* Bottom Register Switch */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#e5e7eb] pt-4 font-mono text-xs text-[#3e4943]">
+                  <span>Don&apos;t have an enterprise account?</span>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href="/register?role=client"
+                      className="border border-[#0b1c30] px-2.5 py-1 uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] font-semibold transition"
+                    >
+                      SIGN UP AS CLIENT
+                    </Link>
+                    <Link
+                      href="/register?role=freelancer"
+                      className="border border-[#0b1c30] px-2.5 py-1 uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] font-semibold transition"
+                    >
+                      APPLY AS FREELANCER
+                    </Link>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* Right Column: Platform Ledger & Metrics */}
+            <div className="space-y-5">
+              {/* Header Bar */}
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer font-mono text-xs text-[#0b1c30]">
-                  <input
-                    type="checkbox"
-                    checked={rememberHardware}
-                    onChange={(e) => setRememberHardware(e.target.checked)}
-                    className="h-4 w-4 rounded-none accent-[#005d42]"
-                  />
-                  <span>Keep me signed in on this hardware</span>
-                </label>
-                <span className="flex items-center gap-1 border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] text-[#0b1c30]">
-                  <ShieldCheck className="h-3 w-3 text-[#005d42]" /> HTTPS session
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
+                  PLATFORM LEDGER & METRICS
+                </span>
+                <span className="bg-[#005d42] px-2 py-0.5 font-mono text-[10px] font-bold text-white uppercase tracking-wider">
+                  REAL-TIME
                 </span>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex h-12 w-full items-center justify-center gap-2 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-70"
-              >
-                <LogIn className="h-4 w-4" />
-                <span>{isSubmitting ? "Authenticating..." : "Sign In to Workspace"}</span>
-              </button>
-
-              {/* Bottom Register Switch */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#e5e7eb] pt-4 font-mono text-xs text-[#3e4943]">
-                <span>Don&apos;t have an enterprise account?</span>
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/register?role=client"
-                    className="border border-[#0b1c30] px-2.5 py-1 uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] font-semibold transition"
-                  >
-                    SIGN UP AS CLIENT
-                  </Link>
-                  <Link
-                    href="/register?role=freelancer"
-                    className="border border-[#0b1c30] px-2.5 py-1 uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] font-semibold transition"
-                  >
-                    APPLY AS FREELANCER
-                  </Link>
+              {/* Card 1: Active Escrow Liquidity */}
+              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-wider text-[#6e7a73]">
+                      ACTIVE ESCROW LIQUIDITY
+                    </p>
+                    <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] sm:text-4xl">
+                      $1,842,500.00
+                    </p>
+                  </div>
+                  <div className="flex h-10 w-10 items-center justify-center border border-[#e5e7eb] bg-[#eff4ff] text-[#005d42]">
+                    <Landmark className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-5 border-t border-[#e5e7eb] pt-3">
+                  <div className="flex justify-between font-mono text-xs text-[#3e4943]">
+                    <span>Disbursement Allocation</span>
+                    <span className="font-bold text-[#005d42]">94.8% SLA Clearance</span>
+                  </div>
+                  <div className="mt-2 h-2 w-full bg-[#eff4ff] border border-[#e5e7eb]">
+                    <div className="h-full bg-[#005d42] w-[94.8%]" />
+                  </div>
                 </div>
               </div>
-            </form>
+
+              {/* Card 2: Candidate Acceptance Rate */}
+              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6">
+                <div className="flex items-center justify-between">
+                  <p className="font-mono text-xs uppercase tracking-wider text-[#6e7a73]">
+                    CANDIDATE ACCEPTANCE RATE
+                  </p>
+                  <span className="border border-[#005d42] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold text-[#005d42] uppercase">
+                    ASSESSED
+                  </span>
+                </div>
+                <p className="mt-2 font-headline text-2xl font-bold tracking-tight text-[#0b1c30]">
+                  Top 1.4% Verified
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-[#3e4943]">
+                  Strict algorithmic code assessments, system design interviews, and identity KYC.
+                </p>
+              </div>
+
+              {/* Card 3: Verified Buyer Testimonial */}
+              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6">
+                <div className="flex items-center gap-2 font-mono text-xs font-bold text-[#005d42]">
+                  <span>★★★★★</span>
+                  <span className="border border-[#005d42] bg-[#eff4ff] px-1.5 py-0.2 text-[10px]">
+                    VERIFIED BUYER
+                  </span>
+                </div>
+                <p className="mt-3 text-xs italic leading-relaxed text-[#0b1c30]">
+                  &ldquo;We migrated all 24 external distributed systems contracts to GigCraft. The multi-sig milestone escrow eliminates payment disputes entirely.&rdquo;
+                </p>
+                <div className="mt-4 flex items-center justify-between border-t border-[#e5e7eb] pt-3">
+                  <div>
+                    <p className="font-bold text-xs text-[#0b1c30]">Marcus Vance</p>
+                    <p className="font-mono text-[10px] text-[#6e7a73]">VP Infrastructure @ HyperLayer Corp</p>
+                  </div>
+                  <span className="border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold text-[#005d42]">
+                    $340k+ Transacted
+                  </span>
+                </div>
+              </div>
+
+              {/* Card 4: Protocol Ledger Specs */}
+              <div className="bg-[#eff4ff] border border-[#e5e7eb] p-4 font-mono text-xs space-y-2.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-[#3e4943]">Zero-Knowledge Token Proof</span>
+                  <span className="font-bold text-[#005d42]">ACTIVE</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#3e4943]">Hardware Security Module (HSM)</span>
+                  <span className="font-bold text-[#0b1c30]">FIPS 140-2 LEVEL 3</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#3e4943]">Instant Automated Escrow Release</span>
+                  <span className="font-bold text-[#005d42]">UPON GIT COMMIT VERIFY</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Right Column: Platform Metrics & Telemetry matching user screenshot */}
-          <div className="space-y-5">
-            {/* Header Bar */}
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800">
-                PLATFORM METRICS
-              </span>
-              <span className="bg-[#047857] px-2 py-0.5 font-mono text-[10px] font-bold text-white uppercase tracking-wider">
-                LIVE DATA
-              </span>
-            </div>
-
-            {/* 2x2 Grid of Metrics */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="card-neo p-4">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">PUBLISHED GIGS</p>
-                <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold text-[#0b1c30]">
-                  {platformMetrics.publishedGigs}
-                </p>
-              </div>
-              <div className="card-neo p-4">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">FREELANCERS</p>
-                <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold text-[#0b1c30]">
-                  {platformMetrics.freelancersCount}
-                </p>
-              </div>
-              <div className="card-neo p-4">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">COMPLETED ORDERS</p>
-                <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold text-[#0b1c30]">
-                  {platformMetrics.completedOrders}
-                </p>
-              </div>
-              <div className="card-neo p-4">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">AVERAGE RATING</p>
-                <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold text-[#0b1c30]">
-                  {platformMetrics.averageRating} ★
+          {/* Bottom Security Cards */}
+          <div className="mt-8 grid gap-4 border border-[#e5e7eb] bg-white p-6 sm:grid-cols-3 shadow-[3px_3px_0px_#0b1c30]">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
+              <div>
+                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
+                  SOC-2 Type II Certified
+                </h4>
+                <p className="mt-1 text-xs text-[#3e4943]">
+                  Continuous third-party audits ensure complete financial and credential protection.
                 </p>
               </div>
             </div>
 
-            {/* Total Escrow Released Card */}
-            <div className="card-neo p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">TOTAL ESCROW SECURED</p>
-                  <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                    ₹{platformMetrics.totalEscrowReleased.toLocaleString("en-IN")}
-                  </p>
-                </div>
-                <div className="flex h-10 w-10 items-center justify-center border border-[#0b1c30] bg-[#eff4ff] text-[#005d42]">
-                  <Landmark className="h-5 w-5" />
-                </div>
+            <div className="flex items-start gap-3 border-[#e5e7eb] sm:border-l sm:pl-4">
+              <Lock className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
+              <div>
+                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
+                  Multi-Sig Escrow Vault
+                </h4>
+                <p className="mt-1 text-xs text-[#3e4943]">
+                  Funds are held neutral until acceptance criteria and code deliverable verification meet specs.
+                </p>
               </div>
-              <p className="mt-3 font-mono text-xs text-[#3e4943]">
-                Secured under cryptographic milestone escrow protocols.
-              </p>
             </div>
 
-            {/* Real Verified Review Card */}
-            {platformMetrics.featuredReview && (
-              <div className="card-neo p-5">
-                <div suppressHydrationWarning className="flex items-center gap-1 text-[#047857] text-sm">
-                  {"★".repeat(platformMetrics.featuredReview.rating || 5)}
-                </div>
-                <p suppressHydrationWarning className="mt-2 text-xs italic leading-relaxed text-slate-800">
-                  “{platformMetrics.featuredReview.comment}”
-                </p>
-                <p suppressHydrationWarning className="mt-3 border-t border-slate-100 pt-2 text-[11px] text-slate-600">
-                  <span className="font-semibold text-slate-900">{platformMetrics.featuredReview.clientName}</span> on “{platformMetrics.featuredReview.gigTitle}”
+            <div className="flex items-start gap-3 border-[#e5e7eb] sm:border-l sm:pl-4">
+              <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
+              <div>
+                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
+                  256-Bit Hardware Encryption
+                </h4>
+                <p className="mt-1 text-xs text-[#3e4943]">
+                  Strict hardware token integration with encrypted payload transmission and session pinning.
                 </p>
               </div>
-            )}
+            </div>
+          </div>
+
+          {/* Bottom Mini Footer */}
+          <div className="mt-6 flex items-center justify-between border-t border-[#e5e7eb] pt-4 font-mono text-xs text-[#3e4943]">
+            <span>GIGCRAFT © 2025 GigCraft Marketplace Inc.</span>
+            <span className="uppercase tracking-wider">SECURE ACCESS PORTAL</span>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

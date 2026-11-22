@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 const AuthContext = createContext(null);
 
@@ -65,21 +66,42 @@ export function AuthProvider({ children }) {
   }, []);
 
   const loginWithProvider = useCallback(async (provider) => {
-    const providerName = provider === "github" ? "GitHub Workspace User" : "Google Cloud User";
-    const providerEmail = provider === "github" ? "developer@github.com" : "developer@google.com";
-    const sessionUser = {
-      id: `usr-${provider}-${Date.now().toString(36)}`,
-      name: providerName,
-      email: providerEmail,
-      role: "client",
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${provider}&backgroundColor=047857`,
-      joinedAt: new Date().toISOString(),
-    };
-    setUser(sessionUser);
     try {
-      localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
-    } catch {}
-    return { ok: true, user: sessionUser };
+      const supabase = createClient();
+      const redirectUrl =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/auth/callback`
+          : undefined;
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: redirectUrl,
+        },
+      });
+
+      if (error) {
+        return {
+          ok: false,
+          error: `${provider === "github" ? "GitHub" : "Google"} OAuth is not configured in Supabase. Please sign in or register with your work email below.`,
+        };
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+        return { ok: true, redirecting: true };
+      }
+
+      return {
+        ok: false,
+        error: `${provider === "github" ? "GitHub" : "Google"} authentication provider is not available. Please sign in with your work email.`,
+      };
+    } catch (err) {
+      return {
+        ok: false,
+        error: `${provider === "github" ? "GitHub" : "Google"} login is not enabled in this environment. Please sign in with your corporate email.`,
+      };
+    }
   }, []);
 
   const register = useCallback(async ({ name, email, password, role }) => {
@@ -139,6 +161,10 @@ export function AuthProvider({ children }) {
     setUser(null);
     try {
       localStorage.removeItem("gigcraft_in:user");
+    } catch {}
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
     } catch {}
   }, []);
 

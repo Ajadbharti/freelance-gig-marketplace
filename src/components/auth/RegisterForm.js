@@ -121,9 +121,15 @@ export default function RegisterForm() {
   }
 
   async function handleSocialAuth(provider) {
-    await loginWithProvider(provider);
-    showToast(`Signed in with ${provider.toUpperCase()}`, "success");
-    router.push(archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
+    const result = await loginWithProvider(provider);
+    if (!result.ok) {
+      showToast(
+        result.error ||
+          `${provider.toUpperCase()} OAuth is not configured in Supabase. Please register with your work email below.`,
+        "error"
+      );
+      return;
+    }
   }
 
   return (
