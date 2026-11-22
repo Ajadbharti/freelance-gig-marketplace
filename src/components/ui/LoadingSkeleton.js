@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 export default function LoadingSkeleton({ className }) {
-  return <div aria-hidden="true" className={cn("animate-pulse rounded-lg bg-slate-200", className)} />;
+  return <div aria-hidden="true" className={cn("animate-pulse bg-[#eff4ff]", className)} />;
 }
 
 export function GigCardSkeleton() {
@@ -9,9 +9,9 @@ export function GigCardSkeleton() {
     <div
       role="status"
       aria-label="Loading"
-      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      className="overflow-hidden border border-[#e5e7eb] bg-white shadow-[3px_3px_0px_#0b1c30]"
     >
-      <LoadingSkeleton className="h-44 rounded-none" />
+      <LoadingSkeleton className="h-44 w-full" />
       <div className="space-y-3 p-4">
         <LoadingSkeleton className="h-4 w-1/3" />
         <LoadingSkeleton className="h-4 w-full" />

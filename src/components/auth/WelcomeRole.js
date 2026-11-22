@@ -1,36 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Briefcase, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import AuthCard from "@/components/auth/AuthCard";
 import { cn } from "@/lib/utils";
+import AuthCard from "@/components/auth/AuthCard";
 
 const ROLES = [
-  { value: "client", label: "Client", text: "I want to hire freelancers", icon: ShoppingBag },
-  { value: "freelancer", label: "Freelancer", text: "I want to sell my services", icon: Briefcase },
+  {
+    value: "client",
+    label: "I want to hire talent",
+    text: "Order gigs, collaborate with specialists and manage payments securely in escrow.",
+    icon: ShoppingBag,
+  },
+  {
+    value: "freelancer",
+    label: "I want to offer services",
+    text: "List your specialized services, deliver orders and get paid directly to your balance.",
+    icon: Briefcase,
+  },
 ];
 
 export default function WelcomeRole() {
   const router = useRouter();
-  const { user, hydrated, setRole } = useAuth();
+  const { user, setRole } = useAuth();
   const { showToast } = useToast();
   const [choice, setChoice] = useState("client");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!user) router.replace("/login");
-    else if (!user.needsRole && !saving) {
-      router.replace(user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
-    }
-  }, [hydrated, user, saving, router]);
-
-  if (!hydrated || !user || !user.needsRole) {
-    return <div className="py-24 text-center text-sm text-slate-500">Loading...</div>;
-  }
+  if (!user) return null;
 
   async function handleContinue() {
     setSaving(true);
@@ -47,7 +47,7 @@ export default function WelcomeRole() {
   return (
     <AuthCard
       title={`Welcome, ${user.name.split(" ")[0]}!`}
-      subtitle="How will you use GigNest? You can only choose this once."
+      subtitle="How will you use GigCraft? You can only choose this once."
     >
       <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Account type">
         {ROLES.map((role) => {
@@ -61,13 +61,13 @@ export default function WelcomeRole() {
               aria-checked={active}
               onClick={() => setChoice(role.value)}
               className={cn(
-                "rounded-xl border p-4 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
-                active ? "border-indigo-600 bg-indigo-50" : "border-slate-300 hover:bg-slate-50"
+                "border p-4 text-left transition focus:outline-none",
+                active ? "border-2 border-[#005d42] bg-[#eff4ff] shadow-[2px_2px_0px_#0b1c30]" : "border-[#6e7a73] hover:bg-[#eff4ff]"
               )}
             >
-              <Icon className="h-5 w-5 text-indigo-600" />
-              <p className="mt-2 text-sm font-semibold text-slate-900">{role.label}</p>
-              <p className="mt-1 text-xs text-slate-600">{role.text}</p>
+              <Icon className="h-5 w-5 text-[#005d42]" />
+              <p className="mt-2 font-headline text-sm font-bold uppercase text-[#0b1c30]">{role.label}</p>
+              <p className="mt-1 text-xs text-[#3e4943]">{role.text}</p>
             </button>
           );
         })}
@@ -77,7 +77,7 @@ export default function WelcomeRole() {
         type="button"
         onClick={handleContinue}
         disabled={saving}
-        className="mt-6 w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+        className="btn-primary mt-6 w-full py-3"
       >
         {saving ? "Saving..." : "Continue"}
       </button>

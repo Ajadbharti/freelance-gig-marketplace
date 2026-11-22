@@ -27,11 +27,11 @@ export default function SearchBar({
       onSubmit={handleSubmit}
       role="search"
       className={cn(
-        "flex w-full items-center overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100",
+        "flex w-full items-center border border-[#6e7a73] bg-white transition focus-within:border-2 focus-within:border-[#0b1c30]",
         className
       )}
     >
-      <Search className={cn("ml-3 shrink-0 text-slate-400", large ? "h-5 w-5" : "h-4 w-4")} />
+      <Search className={cn("ml-3 shrink-0 text-[#3e4943]", large ? "h-5 w-5" : "h-4 w-4")} />
       <input
         type="search"
         value={query}
@@ -39,15 +39,15 @@ export default function SearchBar({
         placeholder={placeholder}
         aria-label="Search gigs"
         className={cn(
-          "min-w-0 flex-1 bg-transparent px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none",
-          large ? "py-4 text-base" : "py-2 text-sm"
+          "min-w-0 flex-1 bg-transparent px-3 font-sans text-sm text-[#0b1c30] placeholder:text-slate-400 focus:outline-none",
+          large ? "py-3 text-base" : "py-2"
         )}
       />
       <button
         type="submit"
         className={cn(
-          "m-1 rounded-lg bg-indigo-600 font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
-          large ? "px-6 py-3 text-base" : "px-4 py-1.5 text-sm"
+          "bg-[#005d42] font-mono font-bold uppercase tracking-wider text-white transition hover:bg-[#047857]",
+          large ? "px-6 py-3 text-sm" : "px-4 py-2 text-xs"
         )}
       >
         Search

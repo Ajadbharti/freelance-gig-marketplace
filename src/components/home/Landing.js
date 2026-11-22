@@ -39,11 +39,11 @@ export default function Landing() {
       <section className="border-b border-slate-200 bg-white py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="inline-flex items-center gap-2 border border-slate-200 bg-slate-50 px-3 py-1 font-mono text-xs font-semibold text-slate-800">
-            <span className="h-2 w-2 rounded-full bg-[#047857]" />
+            <span className="h-2 w-2 bg-[#005d42]" />
             <span>PROTOCOL v2.4 ACTIVE // NEXT SPRINT RECONCILIATION LIVE</span>
           </div>
 
-          <h1 className="mt-5 font-serif text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl max-w-4xl">
+          <h1 className="mt-5 font-headline text-4xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-5xl lg:text-6xl max-w-4xl">
             Contract High-Output Engineers & Designers Under Escrow.
           </h1>
 
@@ -96,22 +96,22 @@ export default function Landing() {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 text-center">
             <div className="p-2 border-r border-slate-200 last:border-none">
               <p className="text-[10px] uppercase text-slate-500">ESCROW LIQUIDITY</p>
-              <p className="font-serif text-2xl font-bold text-slate-950">₹24,20,00,000</p>
-              <p className="text-[10px] text-emerald-700">Q1 VERIFIED</p>
+              <p className="font-headline text-2xl font-bold text-[#0b1c30]">$24.2M</p>
+              <p className="text-[10px] text-[#005d42] font-semibold">Q1 VERIFIED</p>
             </div>
             <div className="p-2 border-r border-slate-200 last:border-none">
               <p className="text-[10px] uppercase text-slate-500">AVG CONTRACT FILL TIME</p>
-              <p className="font-serif text-2xl font-bold text-slate-950">3.8 Hours</p>
-              <p className="text-[10px] text-emerald-700">▲ 14% FASTER</p>
+              <p className="font-headline text-2xl font-bold text-[#0b1c30]">3.8 Hours</p>
+              <p className="text-[10px] text-[#005d42] font-semibold">▲ 14% FASTER</p>
             </div>
             <div className="p-2 border-r border-slate-200 last:border-none">
               <p className="text-[10px] uppercase text-slate-500">DISPUTE RATE</p>
-              <p className="font-serif text-2xl font-bold text-[#047857]">0.08%</p>
+              <p className="font-headline text-2xl font-bold text-[#005d42]">0.08%</p>
               <p className="text-[10px] text-slate-500">DETERMINISTIC SLA</p>
             </div>
             <div className="p-2">
               <p className="text-[10px] uppercase text-slate-500">APPLICANT ACCEPTANCE</p>
-              <p className="font-serif text-2xl font-bold text-slate-950">Top 1.4%</p>
+              <p className="font-headline text-2xl font-bold text-[#0b1c30]">Top 1.4%</p>
               <p className="text-[10px] text-slate-500">CODE AUDIT PASS</p>
             </div>
           </div>
@@ -123,10 +123,10 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#047857]">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#005d42]">
                 VERIFIED CONTRACT CATALOG
               </span>
-              <h2 className="mt-1 font-serif text-3xl font-bold text-slate-950">
+              <h2 className="mt-1 font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30]">
                 Featured Engineering & UI/UX Specs
               </h2>
             </div>
@@ -151,18 +151,18 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between border-b border-slate-200 pb-4">
             <div>
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#047857]">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#005d42]">
                 AUDITED CONTRACTORS
               </span>
-              <h2 className="mt-1 font-serif text-3xl font-bold text-slate-950">
+              <h2 className="mt-1 font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30]">
                 Vetted Technical Specialists
               </h2>
             </div>
             <Link
               href="/freelancers/f1"
-              className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800 hover:text-[#047857]"
+              className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] hover:text-[#005d42]"
             >
-              INSPECT SAMPLE ARCHITECT (ELENA) →
+              INSPECT VERIFIED SPECIALIST (ELENA) →
             </Link>
           </div>
 
@@ -175,7 +175,7 @@ export default function Landing() {
                       <SafeImage
                         src={f.avatar}
                         alt={f.name}
-                        className="h-12 w-12 rounded-full object-cover border border-[#e5e7eb]"
+                        className="h-12 w-12 border border-[#0b1c30] object-cover"
                       />
                       <div>
                         <Link

@@ -49,7 +49,7 @@ export default function ImageUploader({
         <div
           className={cn(
             "overflow-hidden border border-slate-200 bg-slate-100",
-            round ? "h-24 w-24 rounded-full" : "aspect-[16/10] w-full max-w-xs rounded-xl"
+            round ? "h-24 w-24 border-2 border-[#0b1c30]" : "aspect-[16/10] w-full max-w-xs border border-[#e5e7eb]"
           )}
         >
           {value ? (
@@ -75,7 +75,7 @@ export default function ImageUploader({
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-secondary px-4 py-2 text-xs"
           >
             {uploading ? "Uploading..." : value ? "Replace image" : "Choose image"}
           </button>

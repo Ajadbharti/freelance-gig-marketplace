@@ -24,11 +24,11 @@ export default function AuthCallback() {
     <div className="mx-auto flex max-w-md flex-col items-center px-4 py-24 text-center">
       {failed ? (
         <>
-          <h1 className="text-2xl font-bold text-slate-900">Sign-in did not complete</h1>
-          <p className="mt-2 text-slate-600">{urlError || "We could not sign you in. Please try again."}</p>
+          <h1 className="font-headline text-2xl font-bold uppercase tracking-tight text-[#0b1c30]">Sign-in did not complete</h1>
+          <p className="mt-2 text-sm text-[#3e4943]">{urlError || "We could not sign you in. Please try again."}</p>
           <Link
             href="/"
-            className="mt-6 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+            className="btn-primary mt-6 inline-block"
           >
             Back to sign in
           </Link>
@@ -36,11 +36,11 @@ export default function AuthCallback() {
       ) : (
         <>
           <div
-            className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600"
+            className="h-10 w-10 animate-spin border-4 border-[#eff4ff] border-t-[#005d42]"
             aria-hidden="true"
           />
-          <h1 className="mt-6 text-xl font-semibold text-slate-900">Signing you in...</h1>
-          <p className="mt-2 text-sm text-slate-600">Please wait a moment.</p>
+          <h1 className="mt-6 font-headline text-xl font-bold uppercase tracking-tight text-[#0b1c30]">Signing you in...</h1>
+          <p className="mt-2 font-mono text-xs text-[#3e4943]">Please wait a moment.</p>
         </>
       )}
     </div>

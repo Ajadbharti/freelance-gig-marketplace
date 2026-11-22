@@ -132,7 +132,7 @@ export default function GigDetails({ params }) {
 
         {/* Gig Title */}
         <div className="mt-6">
-          <h1 className="font-serif text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl md:text-4xl uppercase">
+          <h1 className="font-headline text-2xl font-bold tracking-tight text-[#0b1c30] sm:text-3xl md:text-4xl uppercase">
             {gig?.title}
           </h1>
 
@@ -146,24 +146,24 @@ export default function GigDetails({ params }) {
                 <SafeImage
                   src={freelancer?.avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"}
                   alt=""
-                  className="h-8 w-8 rounded-full object-cover"
+                  className="h-8 w-8 border border-[#0b1c30] object-cover"
                 />
-                <span className="font-sans text-sm font-bold text-slate-950 hover:underline">
-                  {freelancer?.name || "Ananya Sharma"} <span className="text-[#047857]">✓</span>
+                <span className="font-sans text-sm font-bold text-[#0b1c30] hover:underline">
+                  {freelancer?.name || "Ananya Sharma"} <span className="text-[#005d42]">✓</span>
                 </span>
               </Link>
-              <span className="bg-slate-950 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-white">
+              <span className="bg-[#0b1c30] px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-white">
                 {gig?.tier || "TOP RATED"}
               </span>
-              <div className="flex items-center gap-1 font-mono text-xs font-bold text-slate-800">
+              <div className="flex items-center gap-1 font-mono text-xs font-bold text-[#0b1c30]">
                 <span className="text-amber-500">★</span>
                 <span>{Number(ratingData.average || 4.9).toFixed(1)}</span>
-                <span className="font-normal text-slate-500">({ratingData.count || 248} reviews)</span>
+                <span className="font-normal text-[#3e4943]">({ratingData.count || 248} reviews)</span>
               </div>
               <span className="text-slate-300">|</span>
-              <span className="font-mono text-xs text-slate-600">3 Orders in Queue</span>
+              <span className="font-mono text-xs text-[#3e4943]">3 Orders in Queue</span>
               <span className="text-slate-300">|</span>
-              <span className="font-mono text-xs font-semibold text-[#047857]">Escrow Safe</span>
+              <span className="font-mono text-xs font-semibold text-[#005d42]">Escrow Safe</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -173,14 +173,14 @@ export default function GigDetails({ params }) {
                   navigator.clipboard?.writeText(window.location.href);
                   showToast("Contract link copied to clipboard!");
                 }}
-                className="flex items-center gap-1.5 border border-slate-300 bg-white px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-slate-700 hover:bg-slate-50"
+                className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs"
               >
                 <Share2 className="h-3.5 w-3.5" /> SHARE
               </button>
               <button
                 type="button"
                 onClick={handleContactSeller}
-                className="bg-[#047857] px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#065f46]"
+                className="btn-primary px-4 py-1.5 text-xs"
               >
                 CONTACT SELLER
               </button>
@@ -193,7 +193,7 @@ export default function GigDetails({ params }) {
           {/* Left Column: Spec Details */}
           <div className="space-y-10">
             {/* Gallery Preview Box */}
-            <div className="border border-slate-200 bg-white p-3 shadow-sm">
+            <div className="border border-[#e5e7eb] bg-white p-3 shadow-[3px_3px_0px_#0b1c30]">
               <div className="relative aspect-[16/10] overflow-hidden bg-slate-950">
                 <SafeImage
                   src={gig?.image}
@@ -227,20 +227,20 @@ export default function GigDetails({ params }) {
             </div>
 
             {/* About This Gig Section */}
-            <div className="border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="card-neo sm:p-8">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h2 className="font-serif text-2xl font-bold text-slate-950">ABOUT THIS GIG</h2>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                <h2 className="font-headline text-2xl font-bold uppercase tracking-wide text-[#0b1c30]">ABOUT THIS GIG</h2>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">
                   MODULE: SCALED VISUAL SPEC & ASSETS
                 </span>
               </div>
-              <div className="mt-4 whitespace-pre-line text-sm leading-relaxed text-slate-700">
+              <div className="mt-4 whitespace-pre-line text-sm leading-relaxed text-[#0b1c30]">
                 {gig?.description}
               </div>
 
               {/* Feature Checklist Box */}
-              <div className="mt-8 border border-slate-200 bg-[#FAFBFB] p-5">
-                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+              <div className="mt-8 border border-[#e5e7eb] bg-[#eff4ff] p-5">
+                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                   WHAT YOU WILL RECEIVE (PRODUCTION READY)
                 </h3>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -251,8 +251,8 @@ export default function GigDetails({ params }) {
                     "FULL DESIGN SYSTEM/TOKENS",
                     "DEVELOPER HANDOFF BLUEPRINTS",
                   ]).map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2 font-mono text-xs text-slate-800">
-                      <span className="flex h-4 w-4 items-center justify-center bg-[#047857] text-[10px] text-white">
+                    <div key={idx} className="flex items-center gap-2 font-mono text-xs text-[#0b1c30]">
+                      <span className="flex h-4 w-4 items-center justify-center bg-[#005d42] text-[10px] text-white">
                         ✓
                       </span>
                       <span>{item}</span>
@@ -263,21 +263,21 @@ export default function GigDetails({ params }) {
 
               {/* Metrics Row matching image */}
               <div className="mt-8 grid grid-cols-3 gap-4 border-t border-slate-200 pt-6">
-                <div className="border border-slate-100 bg-[#FAFBFB] p-4 text-center">
-                  <p className="font-serif text-2xl font-bold text-slate-950">8+ YRS</p>
-                  <p className="mt-1 font-mono text-[10px] uppercase text-slate-500">
+                <div className="border border-[#e5e7eb] bg-[#eff4ff] p-4 text-center">
+                  <p className="font-headline text-2xl font-bold text-[#0b1c30]">8+ YRS</p>
+                  <p className="mt-1 font-mono text-[10px] uppercase text-[#3e4943]">
                     RETURNING CLIENT EXPERIENCE
                   </p>
                 </div>
-                <div className="border border-slate-100 bg-[#FAFBFB] p-4 text-center">
-                  <p className="font-serif text-2xl font-bold text-[#047857]">100%</p>
-                  <p className="mt-1 font-mono text-[10px] uppercase text-slate-500">
+                <div className="border border-[#e5e7eb] bg-[#eff4ff] p-4 text-center">
+                  <p className="font-headline text-2xl font-bold text-[#005d42]">100%</p>
+                  <p className="mt-1 font-mono text-[10px] uppercase text-[#3e4943]">
                     ON-TIME SETTLEMENT
                   </p>
                 </div>
-                <div className="border border-slate-100 bg-[#FAFBFB] p-4 text-center">
-                  <p className="font-serif text-2xl font-bold text-slate-950">DAILY</p>
-                  <p className="mt-1 font-mono text-[10px] uppercase text-slate-500">
+                <div className="border border-[#e5e7eb] bg-[#eff4ff] p-4 text-center">
+                  <p className="font-headline text-2xl font-bold text-[#0b1c30]">DAILY</p>
+                  <p className="mt-1 font-mono text-[10px] uppercase text-[#3e4943]">
                     ASYNC ASYNCHRONY
                   </p>
                 </div>
@@ -285,30 +285,30 @@ export default function GigDetails({ params }) {
             </div>
 
             {/* Compare Packages Table matching Image 3 */}
-            <div className="border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="card-neo sm:p-8">
               <div className="border-b border-slate-100 pb-3">
-                <h2 className="font-serif text-2xl font-bold text-slate-950">COMPARE PACKAGES</h2>
+                <h2 className="font-headline text-2xl font-bold uppercase tracking-wide text-[#0b1c30]">COMPARE PACKAGES</h2>
               </div>
               <div className="mt-6 overflow-x-auto">
                 <table className="w-full border-collapse font-mono text-xs">
                   <thead>
                     <tr className="border-b border-slate-200 text-left">
                       <th className="p-3 text-slate-500 font-normal">FEATURES / PRODUCTION</th>
-                      <th className="p-3 font-bold text-slate-900">
+                      <th className="p-3 font-bold text-[#0b1c30]">
                         BASIC
-                        <p className="text-sm font-serif font-bold text-slate-950">
+                        <p className="text-sm font-headline font-bold text-[#0b1c30]">
                           ₹{(packages?.basic?.price ?? Math.round(basePrice * 0.6)).toLocaleString("en-IN")}
                         </p>
                       </th>
-                      <th className="border-x border-t border-[#047857] bg-[#eaf6ee] p-3 font-bold text-[#047857]">
+                      <th className="border-x border-t border-[#005d42] bg-[#eff4ff] p-3 font-bold text-[#005d42]">
                         STANDARD (RECOMMENDED)
-                        <p className="text-sm font-serif font-bold text-slate-950">
+                        <p className="text-sm font-headline font-bold text-[#0b1c30]">
                           ₹{(packages?.standard?.price ?? basePrice).toLocaleString("en-IN")}
                         </p>
                       </th>
-                      <th className="p-3 font-bold text-slate-900">
+                      <th className="p-3 font-bold text-[#0b1c30]">
                         PREMIUM
-                        <p className="text-sm font-serif font-bold text-slate-950">
+                        <p className="text-sm font-headline font-bold text-[#0b1c30]">
                           ₹{(packages?.premium?.price ?? Math.round(basePrice * 1.6)).toLocaleString("en-IN")}
                         </p>
                       </th>
@@ -379,19 +379,19 @@ export default function GigDetails({ params }) {
                             setActivePackageTab("basic");
                             handleOrderClick();
                           }}
-                          className="w-full border border-slate-300 py-1.5 font-bold uppercase hover:bg-slate-50"
+                          className="btn-secondary w-full py-1.5 text-xs"
                         >
                           SELECT SPEC
                         </button>
                       </td>
-                      <td className="border-x border-b border-[#047857] bg-[#eaf6ee] p-3">
+                      <td className="border-x border-b border-[#005d42] bg-[#eff4ff] p-3">
                         <button
                           type="button"
                           onClick={() => {
                             setActivePackageTab("standard");
                             handleOrderClick();
                           }}
-                          className="w-full bg-[#047857] py-1.5 font-bold uppercase text-white hover:bg-[#065f46]"
+                          className="btn-primary w-full py-1.5 text-xs"
                         >
                           SELECT PACKAGE
                         </button>
@@ -403,7 +403,7 @@ export default function GigDetails({ params }) {
                             setActivePackageTab("premium");
                             handleOrderClick();
                           }}
-                          className="w-full border border-slate-300 py-1.5 font-bold uppercase hover:bg-slate-50"
+                          className="btn-secondary w-full py-1.5 text-xs"
                         >
                           SELECT SPEC
                         </button>
@@ -415,9 +415,9 @@ export default function GigDetails({ params }) {
             </div>
 
             {/* Client Verification & Reviews matching Image 3 */}
-            <div className="border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="card-neo sm:p-8">
               <div className="border-b border-slate-100 pb-3">
-                <h2 className="font-serif text-2xl font-bold text-slate-950">
+                <h2 className="font-headline text-2xl font-bold uppercase tracking-wide text-[#0b1c30]">
                   CLIENT VERIFICATION & REVIEWS
                 </h2>
               </div>
@@ -425,7 +425,7 @@ export default function GigDetails({ params }) {
               {/* Rating summary & breakdown bars */}
               <div className="mt-6 grid gap-6 sm:grid-cols-[140px_1fr]">
                 <div className="text-center sm:text-left">
-                  <p className="font-serif text-5xl font-bold text-slate-950">4.9</p>
+                  <p className="font-headline text-5xl font-bold text-[#0b1c30]">4.9</p>
                   <div className="mt-1 flex items-center justify-center sm:justify-start gap-1 text-amber-500 text-sm">
                     ★★★★★
                   </div>
@@ -530,9 +530,9 @@ export default function GigDetails({ params }) {
             </div>
 
             {/* Frequently Asked Questions */}
-            <div className="border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="card-neo sm:p-8">
               <div className="border-b border-slate-100 pb-3">
-                <h2 className="font-serif text-2xl font-bold text-slate-950">
+                <h2 className="font-headline text-2xl font-bold uppercase tracking-wide text-[#0b1c30]">
                   FREQUENTLY ASKED QUESTIONS
                 </h2>
               </div>
@@ -544,13 +544,13 @@ export default function GigDetails({ params }) {
                       <button
                         type="button"
                         onClick={() => setExpandedFaq(isOpen ? -1 : idx)}
-                        className="flex w-full items-center justify-between text-left text-sm font-bold text-slate-900"
+                        className="flex w-full items-center justify-between text-left text-sm font-bold text-[#0b1c30]"
                       >
                         <span>{faq.q}</span>
                         <ChevronDown className={`h-4 w-4 transition ${isOpen ? "rotate-180" : ""}`} />
                       </button>
                       {isOpen && (
-                        <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                        <p className="mt-2 text-xs leading-relaxed text-[#3e4943]">
                           {faq.a}
                         </p>
                       )}
@@ -564,16 +564,16 @@ export default function GigDetails({ params }) {
           {/* Right Sticky Column: Package Selector & Seller Card */}
           <div className="space-y-6 lg:sticky lg:top-20 lg:self-start">
             {/* Box 1: Package Selector Card */}
-            <div className="border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="card-neo">
               {/* Package Tabs matching image */}
-              <div className="grid grid-cols-3 border border-slate-200 font-mono text-xs font-bold text-center">
+              <div className="grid grid-cols-3 border border-[#0b1c30] font-mono text-xs font-bold text-center">
                 <button
                   type="button"
                   onClick={() => setActivePackageTab("basic")}
-                  className={`py-2 ${
+                  className={`py-2 transition-colors ${
                     activePackageTab === "basic"
-                      ? "bg-[#047857] text-white"
-                      : "bg-white text-slate-700 hover:bg-slate-50"
+                      ? "bg-[#005d42] text-white"
+                      : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
                   BASIC ₹{(packages?.basic?.price ?? Math.round(basePrice * 0.6)).toLocaleString("en-IN")}
@@ -581,10 +581,10 @@ export default function GigDetails({ params }) {
                 <button
                   type="button"
                   onClick={() => setActivePackageTab("standard")}
-                  className={`py-2 border-x border-slate-200 ${
+                  className={`py-2 border-x border-[#0b1c30] transition-colors ${
                     activePackageTab === "standard"
-                      ? "bg-[#047857] text-white"
-                      : "bg-white text-slate-700 hover:bg-slate-50"
+                      ? "bg-[#005d42] text-white"
+                      : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
                   STANDARD ₹{(packages?.standard?.price ?? basePrice).toLocaleString("en-IN")}
@@ -592,10 +592,10 @@ export default function GigDetails({ params }) {
                 <button
                   type="button"
                   onClick={() => setActivePackageTab("premium")}
-                  className={`py-2 ${
+                  className={`py-2 transition-colors ${
                     activePackageTab === "premium"
-                      ? "bg-[#047857] text-white"
-                      : "bg-white text-slate-700 hover:bg-slate-50"
+                      ? "bg-[#005d42] text-white"
+                      : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
                   PREMIUM ₹{(packages?.premium?.price ?? Math.round(basePrice * 1.6)).toLocaleString("en-IN")}
@@ -604,34 +604,33 @@ export default function GigDetails({ params }) {
 
               {/* Selected Tier Title & Price */}
               <div className="mt-5 flex items-baseline justify-between border-b border-slate-100 pb-3">
-                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
+                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
                   {selectedPkg?.name || "STANDARD SUITE"}
                 </h3>
-                <span className="font-serif text-2xl font-bold text-slate-950">
+                <span className="font-headline text-2xl font-bold text-[#0b1c30]">
                   ₹{(selectedPkg?.price ?? basePrice).toLocaleString("en-IN")}
                 </span>
               </div>
 
-              <p className="mt-3 text-xs leading-relaxed text-slate-600">
+              <p className="mt-3 text-xs leading-relaxed text-[#3e4943]">
                 Complete UI environment for {selectedPkg?.screens || "4 to 8 Screens"} with responsive layout, handoff specs and interactive prototype.
               </p>
 
               {/* Delivery & Revisions row */}
-              <div className="mt-4 flex items-center justify-between border-y border-slate-100 py-2.5 font-mono text-xs text-slate-700">
+              <div className="mt-4 flex items-center justify-between border-y border-slate-100 py-2.5 font-mono text-xs text-[#0b1c30]">
                 <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-[#047857]" /> {selectedPkg?.deliveryDays || 3}-Day Delivery
+                  <Clock className="h-3.5 w-3.5 text-[#005d42]" /> {selectedPkg?.deliveryDays || 3}-Day Delivery
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <RefreshCw className="h-3.5 w-3.5 text-[#047857]" /> {selectedPkg?.revisions || 3} Revisions
+                  <RefreshCw className="h-3.5 w-3.5 text-[#005d42]" /> {selectedPkg?.revisions || 3} Revisions
                 </span>
               </div>
 
-
               {/* Checklist */}
-              <ul className="mt-4 space-y-2 text-xs text-slate-700">
+              <ul className="mt-4 space-y-2 text-xs text-[#0b1c30]">
                 {selectedPkg.features.map((feat, idx) => (
                   <li key={idx} className="flex items-center gap-2">
-                    <Check className="h-3.5 w-3.5 text-[#047857]" />
+                    <Check className="h-3.5 w-3.5 text-[#005d42]" />
                     <span>{feat}</span>
                   </li>
                 ))}
@@ -641,7 +640,7 @@ export default function GigDetails({ params }) {
               <button
                 type="button"
                 onClick={handleOrderClick}
-                className="mt-6 flex h-12 w-full items-center justify-center gap-2 bg-[#047857] font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46]"
+                className="btn-primary mt-6 flex h-12 w-full items-center justify-center gap-2 text-xs"
               >
                 CONTINUE (₹{selectedPkg.price?.toLocaleString("en-IN")}) →
               </button>
@@ -653,80 +652,80 @@ export default function GigDetails({ params }) {
                     const el = document.querySelector("table");
                     el?.scrollIntoView({ behavior: "smooth" });
                   }}
-                  className="font-mono text-xs text-slate-500 underline hover:text-[#047857]"
+                  className="font-mono text-xs text-[#3e4943] underline hover:text-[#005d42]"
                 >
                   COMPARE PACKAGES
                 </button>
               </div>
 
               {/* Escrow Guarantee Box */}
-              <div className="mt-5 border border-emerald-200 bg-[#f7fcf9] p-3 text-center font-mono text-[11px] text-[#047857]">
+              <div className="mt-5 border border-[#005d42]/30 bg-[#eff4ff] p-3 text-center font-mono text-[11px] text-[#005d42]">
                 <ShieldCheck className="mx-auto h-4 w-4 mb-1" />
                 <strong>GIGCRAFT ESCROW PROTECTION</strong>
-                <p className="mt-0.5 text-[10px] text-slate-600">
+                <p className="mt-0.5 text-[10px] text-[#3e4943]">
                   100% Milestone-backed money-back guarantee
                 </p>
               </div>
             </div>
 
             {/* Box 2: Seller Profile Card */}
-            <div className="border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="card-neo">
               <div className="flex items-center gap-3">
                 <SafeImage
                   src={freelancer?.avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"}
                   alt=""
-                  className="h-12 w-12 rounded-full object-cover"
+                  className="h-12 w-12 border border-[#0b1c30] object-cover"
                 />
                 <div>
                   <Link
                     href={`/freelancers/${freelancer?.id || "f1"}`}
-                    className="font-sans text-sm font-bold text-slate-900 hover:underline"
+                    className="font-sans text-sm font-bold text-[#0b1c30] hover:underline"
                   >
                     {freelancer?.name || "Ananya Sharma"}
                   </Link>
-                  <p className="font-mono text-xs text-slate-500">Design Systems Specialist</p>
+                  <p className="font-mono text-xs text-[#3e4943]">Design Systems Specialist</p>
                 </div>
               </div>
 
-              <div className="mt-4 border-t border-slate-100 pt-3 space-y-2 font-mono text-xs text-slate-600">
+              <div className="mt-4 border-t border-slate-100 pt-3 space-y-2 font-mono text-xs text-[#3e4943]">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Location</span>
-                  <span className="text-slate-900">{freelancer?.location || "Bengaluru, India 🇮🇳"}</span>
+                  <span className="text-[#0b1c30]">{freelancer?.location || "Bengaluru, India 🇮🇳"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Member since</span>
-                  <span className="text-slate-900">October 2021</span>
+                  <span className="text-[#0b1c30]">October 2021</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Avg. response time</span>
-                  <span className="text-slate-900">18 mins</span>
+                  <span className="text-[#0b1c30]">18 mins</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Last delivery</span>
-                  <span className="text-slate-900">2 hours ago</span>
+                  <span className="text-[#0b1c30]">2 hours ago</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Languages</span>
-                  <span className="text-slate-900">English, Hindi (Fluent)</span>
+                  <span className="text-[#0b1c30]">English, Hindi (Fluent)</span>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={handleContactSeller}
-                className="mt-5 w-full border border-slate-300 py-2 font-mono text-xs font-bold uppercase tracking-wider text-slate-800 transition hover:bg-slate-50"
+                className="btn-secondary mt-5 w-full py-2.5 text-xs"
               >
                 CONTACT {freelancer?.name?.split(" ")[0]?.toUpperCase() || "ANANYA"}
               </button>
             </div>
 
             {/* Box 3: Escrow Protocol Explanation */}
-            <div className="border border-slate-200 bg-[#FAFBFB] p-5 font-mono text-xs text-slate-600 shadow-sm">
-              <div className="flex items-center gap-2 text-slate-900 font-bold uppercase">
-                <Lock className="h-3.5 w-3.5 text-[#047857]" />
+            <div className="card-neo bg-[#eff4ff] p-5 font-mono text-xs text-[#3e4943]">
+              <div className="flex items-center gap-2 text-[#0b1c30] font-bold uppercase">
+                <Lock className="h-3.5 w-3.5 text-[#005d42]" />
                 <span>GIGCRAFT ESCROW METHOD</span>
               </div>
-              <p className="mt-2 text-[11px] leading-relaxed text-slate-600">
+              <p className="mt-2 text-[11px] leading-relaxed text-[#3e4943]">
                 Contract funds are locked in neutral escrow before work starts. Deliverables pass automated quality checklist verification before release.
               </p>
             </div>

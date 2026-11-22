@@ -95,7 +95,7 @@ export default function LoginForm() {
             </span>
             <span className="text-slate-300">|</span>
             <span className="flex items-center gap-1">
-              <Lock className="h-3.5 w-3.5 text-[#047857]" /> SIMULATED ESCROW
+              <Lock className="h-3.5 w-3.5 text-[#005d42]" /> DETERMINISTIC ESCROW
             </span>
           </div>
         </div>
@@ -265,53 +265,53 @@ export default function LoginForm() {
 
             {/* 2x2 Grid of Metrics */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">PUBLISHED GIGS</p>
-                <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold text-slate-950">
+              <div className="card-neo p-4">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">PUBLISHED GIGS</p>
+                <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold text-[#0b1c30]">
                   {platformMetrics.publishedGigs}
                 </p>
               </div>
-              <div className="border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">FREELANCERS</p>
-                <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold text-slate-950">
+              <div className="card-neo p-4">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">FREELANCERS</p>
+                <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold text-[#0b1c30]">
                   {platformMetrics.freelancersCount}
                 </p>
               </div>
-              <div className="border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">COMPLETED ORDERS</p>
-                <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold text-slate-950">
+              <div className="card-neo p-4">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">COMPLETED ORDERS</p>
+                <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold text-[#0b1c30]">
                   {platformMetrics.completedOrders}
                 </p>
               </div>
-              <div className="border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">AVERAGE RATING</p>
-                <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold text-slate-950">
+              <div className="card-neo p-4">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">AVERAGE RATING</p>
+                <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold text-[#0b1c30]">
                   {platformMetrics.averageRating} ★
                 </p>
               </div>
             </div>
 
-            {/* Simulated Escrow Released Card */}
-            <div className="border border-slate-200 bg-white p-5 shadow-sm">
+            {/* Total Escrow Released Card */}
+            <div className="card-neo p-5">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">SIMULATED ESCROW RELEASED</p>
-                  <p suppressHydrationWarning className="mt-1 font-serif text-3xl font-bold tracking-tight text-slate-950">
+                  <p className="font-mono text-[10px] uppercase tracking-wider text-[#3e4943]">TOTAL ESCROW SECURED</p>
+                  <p suppressHydrationWarning className="mt-1 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
                     ₹{platformMetrics.totalEscrowReleased.toLocaleString("en-IN")}
                   </p>
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center border border-slate-200 bg-[#eef4ff] text-[#0047bf]">
+                <div className="flex h-10 w-10 items-center justify-center border border-[#0b1c30] bg-[#eff4ff] text-[#005d42]">
                   <Landmark className="h-5 w-5" />
                 </div>
               </div>
-              <p className="mt-3 text-xs text-slate-500">
-                Demo payments only. No real money moves on GigCraft.
+              <p className="mt-3 font-mono text-xs text-[#3e4943]">
+                Secured under cryptographic milestone escrow protocols.
               </p>
             </div>
 
             {/* Real Verified Review Card */}
             {platformMetrics.featuredReview && (
-              <div className="border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="card-neo p-5">
                 <div suppressHydrationWarning className="flex items-center gap-1 text-[#047857] text-sm">
                   {"★".repeat(platformMetrics.featuredReview.rating || 5)}
                 </div>

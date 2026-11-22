@@ -84,11 +84,11 @@ export default function NotificationBell() {
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
-        className="relative rounded-full p-2 text-slate-700 transition hover:bg-slate-100"
+        className="relative p-2 text-[#0b1c30] transition hover:bg-[#eff4ff]"
       >
         <Bell className="h-5 w-5" />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center bg-[#ba1a1a] px-1 font-mono text-[10px] font-bold text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -97,25 +97,25 @@ export default function NotificationBell() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-50 mt-2 w-80 max-w-[90vw] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+          className="absolute right-0 z-50 mt-2 w-80 max-w-[90vw] overflow-hidden border border-[#0b1c30] bg-white shadow-[4px_4px_0px_#0b1c30]"
         >
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <p className="text-sm font-semibold text-slate-900">Notifications</p>
+          <div className="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3 bg-[#eff4ff]">
+            <p className="font-headline text-sm font-bold uppercase tracking-wide text-[#0b1c30]">Notifications</p>
             {unread > 0 && (
               <button
                 type="button"
                 onClick={() => markRead(null)}
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                className="font-mono text-xs font-bold uppercase text-[#005d42] hover:text-[#047857]"
               >
-                Mark all as read
+                Mark all read
               </button>
             )}
           </div>
 
           {items.length === 0 ? (
-            <p className="px-4 py-10 text-center text-sm text-slate-500">You have no notifications yet.</p>
+            <p className="px-4 py-10 text-center font-mono text-xs text-[#3e4943]">You have no notifications yet.</p>
           ) : (
-            <ul className="max-h-96 overflow-y-auto">
+            <ul className="max-h-96 overflow-y-auto divide-y divide-[#e5e7eb]">
               {items.map((item) => (
                 <li key={item.id}>
                   <button
@@ -123,16 +123,16 @@ export default function NotificationBell() {
                     role="menuitem"
                     onClick={() => openItem(item)}
                     className={cn(
-                      "block w-full border-b border-slate-100 px-4 py-3 text-left transition hover:bg-slate-50",
-                      !item.is_read && "bg-indigo-50/60"
+                      "block w-full px-4 py-3 text-left transition hover:bg-[#eff4ff]",
+                      !item.is_read && "bg-[#eff4ff]/60"
                     )}
                   >
-                    <p className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                      {!item.is_read && <span className="h-2 w-2 shrink-0 rounded-full bg-indigo-600" aria-hidden="true" />}
+                    <p className="flex items-center gap-2 text-xs font-bold text-[#0b1c30]">
+                      {!item.is_read && <span className="h-2 w-2 shrink-0 bg-[#005d42]" aria-hidden="true" />}
                       <span className="line-clamp-1">{item.title}</span>
                     </p>
-                    {item.body && <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{item.body}</p>}
-                    <p className="mt-1 text-[11px] text-slate-400">{formatDateTime(item.created_at)}</p>
+                    {item.body && <p className="mt-0.5 line-clamp-2 text-xs text-[#3e4943]">{item.body}</p>}
+                    <p className="mt-1 font-mono text-[10px] text-slate-500">{formatDateTime(item.created_at)}</p>
                   </button>
                 </li>
               ))}

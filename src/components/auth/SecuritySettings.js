@@ -33,9 +33,9 @@ function ChangePassword() {
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="space-y-4 card-neo"
     >
-      <h2 className="text-lg font-semibold text-slate-900">Change password</h2>
+      <h2 className="font-headline text-lg font-bold uppercase tracking-wide text-[#0b1c30]">Change password</h2>
 
       <FormField id="new-password" label="New password" error={errors.password?.message} hint="At least 6 characters.">
         <input
@@ -70,7 +70,7 @@ function ChangePassword() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+        className="btn-primary"
       >
         {isSubmitting ? "Updating..." : "Update password"}
       </button>
@@ -109,16 +109,16 @@ function DeleteAccount() {
   }
 
   return (
-    <section className="rounded-2xl border border-red-200 bg-red-50/50 p-6">
-      <h2 className="text-lg font-semibold text-red-800">Delete account</h2>
-      <p className="mt-2 text-sm text-slate-700">
+    <section className="card-neo border border-[#ba1a1a]/30 bg-[#ffdad6]/20">
+      <h2 className="font-headline text-lg font-bold uppercase tracking-wide text-[#ba1a1a]">Delete account</h2>
+      <p className="mt-2 text-sm text-[#3e4943]">
         This permanently deletes your account, gigs, orders and reviews. It cannot be undone. You must finish or
         cancel your open orders first.
       </p>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-4 rounded-xl border border-red-300 bg-white px-5 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-50"
+        className="btn-danger mt-4"
       >
         Delete my account
       </button>
@@ -143,15 +143,15 @@ function DeleteAccount() {
             />
           </div>
           {error && (
-            <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-red-700">
+            <p role="alert" className="border border-[#ba1a1a] bg-[#ffdad6] p-3 text-xs font-bold text-[#ba1a1a]">
               {error}
             </p>
           )}
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={close}
-              className="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-50"
+              className="btn-secondary"
             >
               Cancel
             </button>
@@ -159,7 +159,7 @@ function DeleteAccount() {
               type="button"
               onClick={handleDelete}
               disabled={busy || confirmText !== "DELETE"}
-              className="rounded-lg bg-red-600 px-5 py-2 font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300"
+              className="btn-danger"
             >
               {busy ? "Deleting..." : "Delete account"}
             </button>

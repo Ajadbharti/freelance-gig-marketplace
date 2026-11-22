@@ -41,7 +41,7 @@ export default function RatingStars({
               onClick={() => onChange(value)}
               onMouseEnter={() => setHover(value)}
               onMouseLeave={() => setHover(0)}
-              className="rounded p-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="p-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#005d42]"
             >
               {star}
             </button>

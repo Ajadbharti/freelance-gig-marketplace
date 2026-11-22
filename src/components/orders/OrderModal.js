@@ -57,39 +57,39 @@ function OrderForm({ gig, selectedPackage, onClose }) {
               TIER: {selectedPackage?.name || "STANDARD CORE SUITE"}
             </p>
           </div>
-          <span className="font-serif text-xl font-bold text-slate-950">
+          <span className="font-headline text-xl font-bold text-[#0b1c30]">
             ₹{price.toLocaleString("en-IN")}
           </span>
         </div>
         <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-2.5 text-[11px] text-slate-600">
           <span>⚡ {deliveryDays}-Day SLA Delivery</span>
           <span>↺ {revisions} Iteration Revisions</span>
-          <span className="text-[#047857] font-bold">100% Escrow Protected</span>
+          <span className="text-[#005d42] font-bold">100% Escrow Protected</span>
         </div>
       </div>
 
       <div>
-        <label htmlFor="requirements" className="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-800">
+        <label htmlFor="requirements" className="block font-mono text-xs font-semibold uppercase tracking-wider text-[#0b1c30]">
           Engineering Scope & Deliverable Requirements
         </label>
         <textarea
           id="requirements"
           rows={4}
           placeholder="Specify exact user flows, Figma frames, API endpoints, or repository requirements..."
-          className="mt-1.5 w-full border border-slate-300 p-3 text-xs leading-relaxed text-slate-900 focus:border-slate-800 focus:outline-none"
+          className="mt-1.5 w-full border border-[#6e7a73] p-3 text-xs leading-relaxed text-[#0b1c30] focus:border-2 focus:border-[#0b1c30] focus:outline-none"
           {...register("requirements", {
             required: "Please describe your scope.",
             minLength: { value: 10, message: "Please write at least 10 characters." },
           })}
         />
         {errors.requirements && (
-          <p className="mt-1 font-mono text-xs text-red-600">{errors.requirements.message}</p>
+          <p className="mt-1 font-mono text-xs text-[#ba1a1a]">{errors.requirements.message}</p>
         )}
       </div>
 
-      <div className="border border-emerald-200 bg-[#f7fcf9] p-3 flex items-start gap-2.5 font-mono text-xs text-[#047857]">
+      <div className="border border-[#005d42]/30 bg-[#eff4ff] p-3 flex items-start gap-2.5 font-mono text-xs text-[#005d42]">
         <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5" />
-        <p className="text-[11px] leading-relaxed text-slate-700">
+        <p className="text-[11px] leading-relaxed text-[#3e4943]">
           <strong>Deterministic Escrow Vault:</strong> Funds are locked in a neutral smart-contract vault and disbursed in automated tranches as milestone deliverables pass review.
         </p>
       </div>
@@ -98,14 +98,14 @@ function OrderForm({ gig, selectedPackage, onClose }) {
         <button
           type="button"
           onClick={onClose}
-          className="border border-slate-300 px-4 py-2 font-mono text-xs font-semibold uppercase text-slate-700 hover:bg-slate-50"
+          className="btn-secondary"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-[#047857] px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#065f46] disabled:opacity-50"
+          className="btn-primary"
         >
           {isSubmitting ? "Locking Escrow..." : `LOCK IN ESCROW VAULT (₹${price.toLocaleString("en-IN")}) →`}
         </button>

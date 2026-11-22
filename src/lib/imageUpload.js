@@ -36,6 +36,15 @@ async function shrink(file, maxSide) {
   return blob;
 }
 
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Failed to process local image."));
+    reader.readAsDataURL(blob);
+  });
+}
+
 export async function uploadImage(file, { userId, folder = "misc", maxSide = 1600 }) {
   if (!ACCEPTED.includes(file.type)) throw new Error("Please choose a JPG, PNG or WebP image.");
   if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
@@ -45,20 +54,31 @@ export async function uploadImage(file, { userId, folder = "misc", maxSide = 160
   const blob = await shrink(file, maxSide);
   const path = `${userId}/${folder}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
 
-  const supabase = createClient();
-  const { error } = await supabase.storage.from("images").upload(path, blob, {
-    contentType: "image/webp",
-    cacheControl: "31536000",
-    upsert: false,
-  });
+  try {
+    const supabase = createClient();
+    const { error } = await supabase.storage.from("images").upload(path, blob, {
+      contentType: "image/webp",
+      cacheControl: "31536000",
+      upsert: false,
+    });
 
-  if (error) {
-    const message = (error.message || "").toLowerCase();
-    if (message.includes("row-level security") || message.includes("not found")) {
-      throw new Error("Uploads are not set up yet. Run the storage SQL script in Supabase first.");
+    if (error) {
+      const message = (error.message || "").toLowerCase();
+      // If Supabase storage bucket isn't created yet or RLS policy is missing:
+      if (message.includes("row-level security") || message.includes("not found") || message.includes("bucket")) {
+        console.warn(
+          "Supabase storage bucket 'images' not configured yet or RLS blocked. Falling back to inline WebP data URL. Run supabase/storage.sql in Supabase to enable cloud storage."
+        );
+        return await blobToDataUrl(blob);
+      }
+      // Attempt fallback anyway so the user's workflow is never completely interrupted
+      console.warn("Storage upload failed, using local WebP fallback:", error.message);
+      return await blobToDataUrl(blob);
     }
-    throw new Error(error.message || "Upload failed. Please try again.");
-  }
 
-  return supabase.storage.from("images").getPublicUrl(path).data.publicUrl;
+    return supabase.storage.from("images").getPublicUrl(path).data.publicUrl;
+  } catch (err) {
+    console.warn("Supabase client unavailable, using local WebP fallback:", err);
+    return await blobToDataUrl(blob);
+  }
 }

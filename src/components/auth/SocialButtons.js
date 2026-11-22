@@ -65,7 +65,7 @@ export default function SocialButtons() {
             type="button"
             onClick={() => handleClick(provider.id)}
             disabled={Boolean(busy)}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-secondary flex w-full items-center justify-center gap-3 py-3"
           >
             <Icon />
             {busy === provider.id ? "Redirecting..." : provider.label}
