@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Zap } from "lucide-react";
+import { Clock, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
@@ -43,7 +43,7 @@ export default function GigCard({ gig }) {
     tier === "PRO VERIFIED"
       ? "bg-[#005d42] text-white border-[#005d42]"
       : tier === "RISING TALENT"
-      ? "bg-[#0047bf] text-white border-[#0047bf]"
+      ? "bg-white text-[#0b1c30] border-[#0b1c30]"
       : "bg-[#0b1c30] text-white border-[#0b1c30]";
 
   const deliveryText =
@@ -82,7 +82,7 @@ export default function GigCard({ gig }) {
 
         {/* Delivery Bar at Bottom Left of Image */}
         <div className="absolute bottom-2 left-2 flex items-center gap-1.5 border border-[#0b1c30] bg-white px-2 py-0.5">
-          <Zap className="h-3 w-3 text-[#005d42] fill-[#005d42]" />
+          <Clock className="h-3.5 w-3.5 text-[#005d42]" />
           <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#0b1c30]">
             {deliveryText}
           </span>
@@ -107,17 +107,19 @@ export default function GigCard({ gig }) {
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center font-headline text-[10px] font-bold text-[#0047bf]">
-                  {freelancer?.initials || "SP"}
+                  {freelancer?.initials || "AK"}
                 </div>
               )}
             </div>
             <div className="flex items-center gap-1 min-w-0">
               <span className="truncate text-xs font-bold text-[#0b1c30] group-hover/author:text-[#005d42]">
-                {freelancer?.name || "Elena Rostova"}
+                {freelancer?.name || "Ajju Kumar"}
               </span>
-              <span className="material-symbols-outlined text-[13px] text-[#005d42] leading-none shrink-0">
-                check_circle
-              </span>
+              {freelancer?.verified && tier !== "RISING TALENT" && (
+                <span className="material-symbols-outlined text-[13px] text-[#005d42] leading-none shrink-0">
+                  check_circle
+                </span>
+              )}
             </div>
           </Link>
 

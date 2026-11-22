@@ -5,6 +5,16 @@ import { createClient } from "@/lib/supabase/client";
 
 const AuthContext = createContext(null);
 
+const DEMO_CLIENT = {
+  id: "c-raj",
+  name: "Raj Patel",
+  email: "rajpatel123@gmail.com",
+  role: "client",
+  avatar: "",
+  initials: "RP",
+  joinedAt: "2024-01-01T00:00:00.000Z",
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [hydrated, setHydrated] = useState(false);
@@ -15,10 +25,12 @@ export function AuthProvider({ children }) {
       if (saved) {
         setUser(JSON.parse(saved));
       } else {
-        setUser(null);
+        // Pre-seed demo client Raj Patel if no user is set
+        setUser(DEMO_CLIENT);
+        localStorage.setItem("gigcraft_in:user", JSON.stringify(DEMO_CLIENT));
       }
     } catch {
-      setUser(null);
+      setUser(DEMO_CLIENT);
     }
     setHydrated(true);
   }, []);
@@ -30,6 +42,15 @@ export function AuthProvider({ children }) {
     }
     if (!password) {
       return { ok: false, error: "Please enter your access key / password." };
+    }
+
+    // Direct check for demo client
+    if (cleanEmail === "rajpatel123@gmail.com" || cleanEmail.includes("rajpatel")) {
+      setUser(DEMO_CLIENT);
+      try {
+        localStorage.setItem("gigcraft_in:user", JSON.stringify(DEMO_CLIENT));
+      } catch {}
+      return { ok: true, user: DEMO_CLIENT };
     }
 
     // Check registered accounts in storage
@@ -50,6 +71,7 @@ export function AuthProvider({ children }) {
         email: found.email,
         role: found.role,
         avatar: found.avatar,
+        initials: found.initials || found.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "RP",
         joinedAt: found.joinedAt,
       };
       setUser(sessionUser);
@@ -57,6 +79,24 @@ export function AuthProvider({ children }) {
         localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
       } catch {}
       return { ok: true, user: sessionUser };
+    }
+
+    // Allow quick login with developer@agency.io for testing
+    if (cleanEmail === "developer@agency.io") {
+      const demoFreelancer = {
+        id: "f-elena",
+        name: "Elena Rostova",
+        email: "developer@agency.io",
+        role: "freelancer",
+        avatar: "",
+        initials: "ER",
+        joinedAt: "2024-01-01T00:00:00.000Z",
+      };
+      setUser(demoFreelancer);
+      try {
+        localStorage.setItem("gigcraft_in:user", JSON.stringify(demoFreelancer));
+      } catch {}
+      return { ok: true, user: demoFreelancer };
     }
 
     return {
@@ -96,7 +136,7 @@ export function AuthProvider({ children }) {
         ok: false,
         error: `${provider === "github" ? "GitHub" : "Google"} authentication provider is not available. Please sign in with your work email.`,
       };
-    } catch (err) {
+    } catch {
       return {
         ok: false,
         error: `${provider === "github" ? "GitHub" : "Google"} login is not enabled in this environment. Please sign in with your corporate email.`,
@@ -125,13 +165,21 @@ export function AuthProvider({ children }) {
     }
 
     const trimmedName = (name || cleanEmail.split("@")[0]).trim();
+    const initials = trimmedName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
     const newUser = {
       id: "usr-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: trimmedName,
       email: cleanEmail,
       password: password,
       role: role || "client",
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(trimmedName)}&backgroundColor=047857,0f172a`,
+      avatar: "",
+      initials: initials || (role === "freelancer" ? "FL" : "CL"),
       joinedAt: new Date().toISOString(),
     };
 
@@ -146,6 +194,7 @@ export function AuthProvider({ children }) {
       email: newUser.email,
       role: newUser.role,
       avatar: newUser.avatar,
+      initials: newUser.initials,
       joinedAt: newUser.joinedAt,
     };
 

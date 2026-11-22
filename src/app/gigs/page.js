@@ -3,15 +3,14 @@ import GigsExplorer from "@/components/gigs/GigsExplorer";
 import { GigGridSkeleton } from "@/components/ui/LoadingSkeleton";
 
 export const metadata = {
-  title: "Explore gigs | GigNest",
+  title: "Explore Gigs | GigCraft",
+  description: "Browse verified engineering, design, and architecture specs contracting under multi-signature deterministic escrow.",
 };
 
 export default function GigsPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
-      <Suspense fallback={<GigGridSkeleton count={6} />}>
-        <GigsExplorer />
-      </Suspense>
-    </div>
+    <Suspense fallback={<GigGridSkeleton count={6} />}>
+      <GigsExplorer />
+    </Suspense>
   );
 }

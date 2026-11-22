@@ -119,7 +119,9 @@ export default function FilterSidebar({
                       {st.label}
                     </span>
                   </div>
-                  <span className="font-mono text-[11px] text-[#6e7a73]">{count}</span>
+                  {st.slug !== "all" && (
+                    <span className="font-mono text-[11px] text-[#6e7a73]">{count}</span>
+                  )}
                 </label>
               );
             })}

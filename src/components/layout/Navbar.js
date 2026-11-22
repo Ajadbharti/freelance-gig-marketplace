@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, ChevronDown, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, User, X } from "lucide-react";
+import { Bell, ChevronDown, LayoutDashboard, LogOut, Menu, Search, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/ToastProvider";
 import { NAV_CATEGORIES } from "@/data/categories";
@@ -14,7 +14,7 @@ const emptySubscribe = () => () => {};
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const { showToast } = useToast();
 
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
@@ -50,19 +50,8 @@ export default function Navbar() {
   async function handleLogout() {
     setUserOpen(false);
     await logout();
-    showToast("Signed out from GigCraft node.", "info");
-    router.push("/login");
-  }
-
-  function handleToggleSelling() {
-    if (!user) {
-      router.push("/register?role=freelancer");
-      return;
-    }
-    const nextRole = user?.role === "freelancer" ? "client" : "freelancer";
-    switchRole(nextRole);
-    showToast(`Switched workspace mode to ${nextRole.toUpperCase()}`, "info");
-    router.push(nextRole === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
+    showToast("Signed out successfully.", "info");
+    router.push("/explore");
   }
 
   const dashboardHref =
@@ -73,18 +62,22 @@ export default function Navbar() {
     return null;
   }
 
+  const isExploreActive = pathname === "/" || pathname.startsWith("/explore") || pathname.startsWith("/gigs");
+  const isOrdersActive = pathname.startsWith("/orders");
+  const isMessagesActive = pathname === "/messages";
+
   return (
     <header className="sticky top-0 z-40 border-b border-[#e5e7eb] bg-white">
       {/* Top Main Navigation Bar */}
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6">
         {/* Brand Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <span className="font-headline text-2xl font-bold tracking-tight text-[#005d42] uppercase">GIGCRAFT</span>
         </Link>
 
-        {/* Search Bar matching image */}
+        {/* Search Bar matching screenshot */}
         <div className="hidden max-w-md flex-1 md:block">
-          <form onSubmit={handleSearchSubmit} className="flex h-9 items-center border border-[#6e7a73] bg-white shadow-none focus-within:border-[#0b1c30]">
+          <form onSubmit={handleSearchSubmit} className="flex h-9 items-center border border-[#6e7a73] bg-white focus-within:border-[#0b1c30]">
             <Search className="ml-2.5 h-4 w-4 text-[#6e7a73] shrink-0" />
             <input
               type="text"
@@ -95,7 +88,7 @@ export default function Navbar() {
             />
             <button
               type="submit"
-              className="h-full bg-[#005d42] px-4 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              className="h-full bg-[#005d42] px-4 font-mono text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#047857]"
             >
               SEARCH
             </button>
@@ -105,9 +98,9 @@ export default function Navbar() {
         {/* Center/Right Nav Links */}
         <nav className="ml-auto hidden items-center gap-6 lg:flex" aria-label="Main">
           <Link
-            href="/gigs"
+            href="/explore"
             className={`text-xs font-bold uppercase tracking-wider transition ${
-              pathname === "/" || pathname.startsWith("/explore") || pathname.startsWith("/gigs")
+              isExploreActive
                 ? "border-b-2 border-[#005d42] pb-1 text-[#005d42]"
                 : "text-[#3e4943] hover:text-[#005d42]"
             }`}
@@ -119,8 +112,8 @@ export default function Navbar() {
             <>
               <Link
                 href="/orders"
-                className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
-                  pathname.startsWith("/orders") ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
+                className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#005d42] ${
+                  isOrdersActive ? "border-b-2 border-[#005d42] pb-1 text-[#005d42]" : "text-[#3e4943]"
                 }`}
               >
                 My Orders
@@ -128,20 +121,12 @@ export default function Navbar() {
 
               <Link
                 href="/messages"
-                className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#047857] ${
-                  pathname === "/messages" ? "text-[#047857] underline underline-offset-8" : "text-slate-700"
+                className={`text-xs font-semibold uppercase tracking-wider transition hover:text-[#005d42] ${
+                  isMessagesActive ? "border-b-2 border-[#005d42] pb-1 text-[#005d42]" : "text-[#3e4943]"
                 }`}
               >
                 Messages
               </Link>
-
-              <button
-                type="button"
-                onClick={handleToggleSelling}
-                className="text-xs font-semibold uppercase tracking-wider text-slate-700 transition hover:text-[#047857]"
-              >
-                {user?.role === "freelancer" ? "Switch to Buying" : "Switch to Selling"}
-              </button>
             </>
           )}
         </nav>
@@ -154,76 +139,67 @@ export default function Navbar() {
               <Link
                 href="/messages"
                 aria-label="Notifications"
-                className="relative flex h-8 w-8 items-center justify-center border border-[#e5e7eb] text-[#0b1c30] transition hover:bg-[#eff4ff]"
+                className="flex items-center justify-center p-1 text-[#0b1c30] hover:text-[#005d42] transition"
               >
-                <Bell className="h-4 w-4" />
-                <span className="absolute right-1 top-1 flex h-3 w-3 items-center justify-center bg-[#005d42] text-[8px] font-bold text-white">
-                  1
-                </span>
+                <Bell className="h-5 w-5" />
               </Link>
 
+              {/* User Dropdown */}
               <div className="relative" ref={userRef}>
                 <button
                   type="button"
                   onClick={() => setUserOpen((v) => !v)}
-                  className="flex items-center gap-2 border border-[#e5e7eb] p-0.5 pr-2 transition hover:bg-[#eff4ff]"
+                  className="flex items-center gap-1.5 transition hover:opacity-80 focus:outline-none"
+                  aria-label="User menu"
+                  aria-expanded={userOpen}
                 >
-                  <SafeImage
-                    src={user.avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80"}
-                    alt=""
-                    className="h-7 w-7 border border-[#0b1c30] object-cover rounded-none"
-                  />
-                  <span className="hidden max-w-[100px] truncate text-xs font-semibold text-[#0b1c30] sm:block">
-                    {user.name}
-                  </span>
-                  <ChevronDown className="h-3 w-3 text-[#6e7a73]" />
+                  {user.avatar ? (
+                    <SafeImage
+                      src={user.avatar}
+                      alt=""
+                      className="h-8 w-8 rounded-full border border-[#e5e7eb] object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e2e8f0] font-mono text-xs font-bold text-[#0b1c30]">
+                      {user.initials || "RP"}
+                    </div>
+                  )}
+                  <ChevronDown className="h-3.5 w-3.5 text-[#0b1c30]" />
                 </button>
 
                 {userOpen && (
                   <div
                     role="menu"
-                    className="absolute right-0 mt-2 w-56 rounded border border-slate-200 bg-white p-2 shadow-lg"
+                    className="absolute right-0 mt-2 w-64 border border-[#0b1c30] bg-white p-4 shadow-[3px_3px_0px_#0b1c30] z-50 rounded-none"
                   >
-                    <div className="border-b border-slate-100 px-3 py-2">
-                      <p className="truncate text-xs font-bold uppercase tracking-wider text-slate-900">{user.name}</p>
-                      <p className="font-mono text-[10px] uppercase text-[#047857]">
-                        {user.role === "freelancer" ? "BUILDER WORKSPACE" : "BUYER ESCROW MODE"}
-                      </p>
+                    <div>
+                      <p className="font-sans text-sm font-bold text-[#0b1c30]">{user.name}</p>
+                      <p className="font-sans text-xs text-[#6e7a73] mt-0.5">{user.email}</p>
+                      <span className="mt-2 inline-block border border-[#005d42]/30 bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#005d42]">
+                        {user.role === "freelancer" ? "FREELANCER" : "CLIENT"}
+                      </span>
                     </div>
+
+                    <div className="border-b border-[#e5e7eb] my-3" />
+
                     <Link
                       href={dashboardHref}
                       onClick={() => setUserOpen(false)}
-                      className="mt-1 flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                      className="flex items-center gap-2 font-sans text-xs font-semibold text-[#0b1c30] hover:text-[#005d42] transition"
                     >
-                      <LayoutDashboard className="h-3.5 w-3.5" /> Workspace Dashboard
+                      <LayoutDashboard className="h-4 w-4" />
+                      <span>Dashboard</span>
                     </Link>
-                    <Link
-                      href="/orders"
-                      onClick={() => setUserOpen(false)}
-                      className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      <ShieldCheck className="h-3.5 w-3.5" /> Active Contracts Ledger
-                    </Link>
-                    <Link
-                      href="/gigs"
-                      onClick={() => setUserOpen(false)}
-                      className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      <User className="h-3.5 w-3.5" /> Browse Specialists Catalog
-                    </Link>
-                    <Link
-                      href="/account"
-                      onClick={() => setUserOpen(false)}
-                      className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      <User className="h-3.5 w-3.5" /> Account Settings
-                    </Link>
+
+                    <div className="border-b border-[#e5e7eb] my-3" />
+
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-2 rounded px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                      className="flex w-full items-center gap-2 font-sans text-xs font-semibold text-[#ba1a1a] hover:underline transition"
                     >
-                      <LogOut className="h-3.5 w-3.5" /> Sign Out
+                      <LogOut className="h-4 w-4" />
+                      <span>Log out</span>
                     </button>
                   </div>
                 )}
@@ -264,7 +240,7 @@ export default function Navbar() {
             {NAV_CATEGORIES.map((cat, idx) => (
               <span key={cat.slug} className="flex items-center gap-6">
                 <Link
-                  href={`/gigs?category=${cat.slug}`}
+                  href={`/explore?category=${cat.slug}`}
                   className="font-mono text-[11px] uppercase tracking-wider text-[#0b1c30] transition hover:text-[#005d42]"
                 >
                   {cat.name}
@@ -285,38 +261,38 @@ export default function Navbar() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search services..."
-              className="h-full flex-1 rounded-l border border-slate-300 px-3 text-xs"
+              className="h-full flex-1 border border-[#6e7a73] px-3 text-xs"
             />
-            <button type="submit" className="bg-[#047857] px-3 font-mono text-xs text-white">
+            <button type="submit" className="bg-[#005d42] px-3 font-mono text-xs text-white">
               SEARCH
             </button>
           </form>
           <div className="space-y-2 font-mono text-xs uppercase tracking-wider">
             <Link
-              href="/gigs"
+              href="/explore"
               onClick={() => setMobileOpen(false)}
-              className="block py-1 text-slate-800 hover:text-[#047857]"
+              className="block py-1 text-slate-800 hover:text-[#005d42]"
             >
               Explore Gigs
             </Link>
             <Link
               href="/orders"
               onClick={() => setMobileOpen(false)}
-              className="block py-1 text-slate-800 hover:text-[#047857]"
+              className="block py-1 text-slate-800 hover:text-[#005d42]"
             >
               My Orders
             </Link>
             <Link
               href="/messages"
               onClick={() => setMobileOpen(false)}
-              className="block py-1 text-slate-800 hover:text-[#047857]"
+              className="block py-1 text-slate-800 hover:text-[#005d42]"
             >
               Messages
             </Link>
             <Link
               href="/dashboard/client"
               onClick={() => setMobileOpen(false)}
-              className="block py-1 text-slate-800 hover:text-[#047857]"
+              className="block py-1 text-slate-800 hover:text-[#005d42]"
             >
               Dashboard
             </Link>

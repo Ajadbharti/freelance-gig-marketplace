@@ -326,9 +326,6 @@ export default function GigsExplorer() {
                   {filteredGigs.length} OF {gigs.length} GIGS LOADED
                 </span>
               </div>
-              <span className="hidden sm:inline font-mono text-xs font-semibold uppercase text-[#6e7a73]">
-                GRID MODE: 3-COL BRUTALIST
-              </span>
             </div>
 
             {/* Empty State */}
