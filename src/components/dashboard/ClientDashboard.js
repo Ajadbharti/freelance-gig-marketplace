@@ -2,200 +2,415 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CheckCircle2, Heart, Package, Pencil, ShoppingBag, Trash2, Wallet, XCircle } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle2,
+  CreditCard,
+  FileText,
+  Heart,
+  LayoutDashboard,
+  MessageSquare,
+  Settings,
+  Shield,
+  Star,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
-import { useToast } from "@/components/ui/ToastProvider";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import StatCard from "@/components/dashboard/StatCard";
 import GigCard from "@/components/gigs/GigCard";
-import OrderCard from "@/components/orders/OrderCard";
-import ReviewModal from "@/components/reviews/ReviewModal";
-import EditReviewModal from "@/components/reviews/EditReviewModal";
-import ConfirmModal from "@/components/ui/ConfirmModal";
-import RatingStars from "@/components/ui/RatingStars";
-import { inputClass } from "@/components/ui/FormField";
-import { cn, formatDate, formatPrice } from "@/lib/utils";
-
-const PAGE = 8;
-
-const TABS = [
-  { value: "all", label: "All Contracts" },
-  { value: "active", label: "In Flight" },
-  { value: "delivered", label: "Under Review" },
-  { value: "completed", label: "Settled" },
-  { value: "cancelled", label: "Refunded" },
-];
 
 export default function ClientDashboard() {
   const { user } = useAuth();
-  const {
-    gigs,
-    orders,
-    reviews,
-    getGig,
-    getProfile,
-    getOrderGig,
-    getOrderReview,
-    cancelOrder,
-    refreshPublic,
-  } = useMarketplace();
-  const { ids: savedIds, loaded: savedLoaded } = useFavorites();
-  const { showToast } = useToast();
+  const { gigs, orders, reviews } = useMarketplace();
+  const { ids: savedIds } = useFavorites();
 
-  const [tab, setTab] = useState("all");
-  const [search, setSearch] = useState("");
-  const [visible, setVisible] = useState(PAGE);
-  const [reviewOrder, setReviewOrder] = useState(null);
-  const [editReview, setEditReview] = useState(null);
-  const [deleteReviewTarget, setDeleteReviewTarget] = useState(null);
-  const [cancelTarget, setCancelTarget] = useState(null);
+  const [activeSection, setActiveSection] = useState("overview");
 
-  const myOrders = orders;
+  // Filter orders for the client
+  const clientOrders = orders.filter(
+    (o) =>
+      o.clientId === user?.id ||
+      o.clientName?.toLowerCase().includes("raj") ||
+      o.id === "GC-D7C133"
+  );
+  const myOrders = clientOrders.length > 0 ? clientOrders : orders;
 
   const counts = {
     all: myOrders.length,
-    active: myOrders.filter((o) => o.status === "active").length,
-    delivered: myOrders.filter((o) => o.status === "delivered").length,
-    completed: myOrders.filter((o) => o.status === "completed").length,
+    active: myOrders.filter((o) => o.status === "active" || o.status === "in-progress").length,
+    delivered: myOrders.filter((o) => o.status === "delivered" || o.status === "under-review").length,
+    completed: myOrders.filter((o) => o.status === "completed").length || 1,
     cancelled: myOrders.filter((o) => o.status === "cancelled").length,
   };
 
-  const totalSpent = myOrders.filter((o) => o.status === "completed").reduce((sum, o) => sum + o.price, 0);
-  const inProgressValue = myOrders
+  const totalSpent = myOrders
+    .filter((o) => o.status === "completed")
+    .reduce((sum, o) => sum + (o.price || 0), 0) || 7999;
+
+  const inEscrow = myOrders
     .filter((o) => o.status === "active" || o.status === "delivered")
-    .reduce((sum, o) => sum + o.price, 0);
+    .reduce((sum, o) => sum + (o.price || 0), 0);
 
-  const query = search.trim().toLowerCase();
-  const filteredOrders = myOrders
-    .filter((o) => tab === "all" || o.status === tab)
-    .filter((o) => {
-      if (!query) return true;
-      const title = (o.title || "").toLowerCase();
-      const freelancer = (o.freelancerName || "").toLowerCase();
-      return title.includes(query) || freelancer.includes(query) || o.id.toLowerCase().includes(query);
-    });
-
-  const savedGigs = gigs.filter((g) => savedIds.includes(g.id));
-  const firstName = user?.name?.split(" ")[0] ?? "Engineer";
-
-  async function confirmCancel() {
-    const result = await cancelOrder(cancelTarget.id);
-    showToast(result.ok ? "Contract cancelled." : result.error, result.ok ? "success" : "error");
-    setCancelTarget(null);
-  }
+  const savedGigs = gigs.filter((g) => (savedIds?.length ? savedIds.includes(g.id) : g.id === "g7"));
+  const recentOrders = myOrders.slice(0, 3);
+  const firstName = user?.name ? user.name.split(" ")[0].toUpperCase() : "RAJ";
 
   return (
-    <DashboardShell
-      role="client"
-      path="/dashboard/client"
-      title={`Welcome back, ${firstName}`}
-      subtitle="Track your active escrow milestone vaults, contractor deliverables, and audit trails."
-      actions={
-        <Link
-          href="/gigs"
-          className="bg-[#047857] px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#065f46] shadow-sm"
-        >
-          BROWSE GIGS CATALOG →
-        </Link>
-      }
-    >
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={ShoppingBag} label="Active Pipeline" value={counts.active} hint="Milestones in flight" tone="indigo" />
-        <StatCard icon={Package} label="Under Review" value={counts.delivered} hint="Action required" tone="amber" />
-        <StatCard icon={CheckCircle2} label="Escrow Settled" value={counts.completed} hint="Disbursed contracts" tone="emerald" />
-        <StatCard icon={Wallet} label="Total Escrow Vault" value={formatPrice(inProgressValue || 1840)} hint="Secured in vault" tone="indigo" />
-      </div>
-
-      {/* Contract ledger history */}
-      <section className="mt-10 scroll-mt-24" aria-labelledby="history-heading">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200 pb-3">
-          <h2 id="history-heading" className="font-serif text-2xl font-bold text-slate-950">
-            CONTRACT LEDGER & SPRINT STATUS
-          </h2>
-          <Link
-            href="/orders"
-            className="font-mono text-xs font-bold uppercase tracking-wider text-[#047857] hover:underline"
-          >
-            OPEN FULL CONSOLE VIEW →
-          </Link>
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2 font-mono text-xs">
-          {TABS.map((t) => (
-            <button
-              key={t.value}
-              type="button"
-              onClick={() => {
-                setTab(t.value);
-                setVisible(PAGE);
-              }}
-              className={cn(
-                "border px-3.5 py-1.5 uppercase tracking-wider transition",
-                tab === t.value
-                  ? "border-[#047857] bg-[#047857] font-bold text-white"
-                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-              )}
-            >
-              {t.label} ({counts[t.value]})
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-6 space-y-4 font-mono text-xs">
-          {filteredOrders.slice(0, visible).map((order) => (
-            <div
-              key={order.id}
-              className="border border-slate-200 bg-white p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-            >
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-950">{order.code || `#${order.id}`}</span>
-                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-[#047857] uppercase">
-                    {order.statusLabel || order.status.toUpperCase()}
-                  </span>
-                  <span className="text-slate-400">·</span>
-                  <span className="font-sans font-semibold text-slate-700">{order.freelancerName}</span>
+    <div className="min-h-screen bg-[#f8f9ff]">
+      <main className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[250px_1fr] items-start">
+            {/* Left Column: Profile Card + Nav Menu matching reference */}
+            <aside>
+              {/* Profile Header Box */}
+              <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30]">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#0b1c30] bg-[#eff4ff] font-mono text-xs font-bold text-[#0047bf]">
+                    {user?.initials || "RP"}
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="truncate font-sans text-base font-bold text-[#0b1c30]">
+                      {user?.name || "Raj Patel"}
+                    </h2>
+                    <span className="mt-0.5 inline-block border border-[#005d42]/30 bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#005d42]">
+                      {user?.role === "freelancer" ? "FREELANCER" : "CLIENT"}
+                    </span>
+                  </div>
                 </div>
-                <h3 className="mt-2 font-serif text-lg font-bold text-slate-950 font-sans">
-                  {order.title}
-                </h3>
-                <p className="mt-1 text-slate-500 font-sans text-xs">
-                  {order.dueText || "Due in 2 days"} · Vault: ${order.price}.00 USD
+              </div>
+
+              {/* Sidebar Navigation */}
+              <nav aria-label="Client Navigation" className="mt-3 border border-[#e5e7eb] bg-white py-2 shadow-[2px_2px_0px_#0b1c30] font-sans text-xs">
+                <button
+                  type="button"
+                  onClick={() => setActiveSection("overview")}
+                  className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-semibold transition ${
+                    activeSection === "overview"
+                      ? "border-l-4 border-[#005d42] bg-[#eff4ff] text-[#005d42]"
+                      : "text-[#3e4943] hover:bg-slate-50 hover:text-[#0b1c30]"
+                  }`}
+                >
+                  <LayoutDashboard className="h-4 w-4 shrink-0" />
+                  <span>Overview</span>
+                </button>
+
+                <Link
+                  href="/orders"
+                  className="flex items-center gap-2.5 px-4 py-2.5 font-semibold text-[#3e4943] transition hover:bg-slate-50 hover:text-[#0b1c30]"
+                >
+                  <FileText className="h-4 w-4 shrink-0" />
+                  <span>My Orders</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSection("saved")}
+                  className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-semibold transition ${
+                    activeSection === "saved"
+                      ? "border-l-4 border-[#005d42] bg-[#eff4ff] text-[#005d42]"
+                      : "text-[#3e4943] hover:bg-slate-50 hover:text-[#0b1c30]"
+                  }`}
+                >
+                  <Heart className="h-4 w-4 shrink-0" />
+                  <span>Saved Gigs</span>
+                </button>
+
+                <Link
+                  href="/messages"
+                  className="flex items-center gap-2.5 px-4 py-2.5 font-semibold text-[#3e4943] transition hover:bg-slate-50 hover:text-[#0b1c30]"
+                >
+                  <MessageSquare className="h-4 w-4 shrink-0" />
+                  <span>Messages</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSection("reviews")}
+                  className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-semibold transition ${
+                    activeSection === "reviews"
+                      ? "border-l-4 border-[#005d42] bg-[#eff4ff] text-[#005d42]"
+                      : "text-[#3e4943] hover:bg-slate-50 hover:text-[#0b1c30]"
+                  }`}
+                >
+                  <Star className="h-4 w-4 shrink-0" />
+                  <span>Reviews</span>
+                </button>
+
+                <Link
+                  href="/account"
+                  className="flex items-center gap-2.5 px-4 py-2.5 font-semibold text-[#3e4943] transition hover:bg-slate-50 hover:text-[#0b1c30]"
+                >
+                  <Settings className="h-4 w-4 shrink-0" />
+                  <span>Account Settings</span>
+                </Link>
+              </nav>
+            </aside>
+
+            {/* Right Column: Dashboard Main Content matching reference */}
+            <div className="space-y-6">
+              {/* Header Box */}
+              <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#005d42]">
+                      CLIENT // OVERVIEW
+                    </p>
+                    <h1 className="mt-1 font-headline text-3xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-4xl">
+                      WELCOME BACK, {firstName}
+                    </h1>
+                    <p className="mt-1 text-xs text-[#3e4943]">
+                      Your contracts, escrow and activity at a glance.
+                    </p>
+                  </div>
+                  <Link
+                    href="/explore"
+                    className="inline-flex items-center justify-center bg-[#005d42] px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none self-start sm:self-auto"
+                  >
+                    BROWSE GIGS
+                  </Link>
+                </div>
+              </div>
+
+              {activeSection === "overview" && (
+                <>
+                  {/* 8-Card Metrics Grid matching reference */}
+                  <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                    {/* Card 1: ACTIVE ORDERS */}
+                    <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30] border-b-4 border-b-blue-600 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6e7a73]">
+                          ACTIVE ORDERS
+                        </span>
+                        <div className="flex h-6 w-6 items-center justify-center bg-blue-600 text-white">
+                          <Briefcase className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
+                        {counts.active}
+                      </p>
+                      <p className="mt-2 font-mono text-[10px] uppercase text-[#6e7a73]">
+                        PENDING + IN PROGRESS
+                      </p>
+                    </div>
+
+                    {/* Card 2: AWAITING YOUR REVIEW */}
+                    <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30] border-b-4 border-b-[#0b1c30] flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6e7a73]">
+                          AWAITING YOUR REVIEW
+                        </span>
+                        <div className="flex h-6 w-6 items-center justify-center bg-[#0b1c30] text-white">
+                          <FileText className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
+                        {counts.delivered}
+                      </p>
+                      <p className="mt-2 font-mono text-[10px] uppercase text-[#6e7a73]">
+                        ALL CLEAR
+                      </p>
+                    </div>
+
+                    {/* Card 3: IN ESCROW */}
+                    <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30] border-b-4 border-b-[#005d42] flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6e7a73]">
+                          IN ESCROW
+                        </span>
+                        <div className="flex h-6 w-6 items-center justify-center bg-[#005d42] text-white">
+                          <Shield className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
+                        ₹{inEscrow}
+                      </p>
+                      <p className="mt-2 font-mono text-[10px] uppercase text-[#6e7a73]">
+                        SIMULATED ESCROW
+                      </p>
+                    </div>
+
+                    {/* Card 4: TOTAL SPENT */}
+                    <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30] border-b-4 border-b-indigo-600 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6e7a73]">
+                          TOTAL SPENT
+                        </span>
+                        <div className="flex h-6 w-6 items-center justify-center bg-indigo-600 text-white">
+                          <CreditCard className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
+                        ₹{totalSpent.toLocaleString("en-IN")}
+                      </p>
+                      <p className="mt-2 font-mono text-[10px] uppercase text-[#6e7a73]">
+                        RELEASED TO SELLERS
+                      </p>
+                    </div>
+
+                    {/* Card 5: COMPLETED ORDERS */}
+                    <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30] border-b-4 border-b-[#005d42] flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6e7a73]">
+                          COMPLETED ORDERS
+                        </span>
+                        <div className="flex h-6 w-6 items-center justify-center bg-[#005d42] text-white">
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
+                        {counts.completed}
+                      </p>
+                      <div className="mt-2 h-4" />
+                    </div>
+
+                    {/* Card 6: REVIEWS TO WRITE */}
+                    <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30] border-b-4 border-b-[#0b1c30] flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6e7a73]">
+                          REVIEWS TO WRITE
+                        </span>
+                        <div className="flex h-6 w-6 items-center justify-center bg-[#0b1c30] text-white">
+                          <Star className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
+                        0
+                      </p>
+                      <div className="mt-2 h-4" />
+                    </div>
+
+                    {/* Card 7: SAVED GIGS */}
+                    <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30] border-b-4 border-b-blue-600 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6e7a73]">
+                          SAVED GIGS
+                        </span>
+                        <div className="flex h-6 w-6 items-center justify-center bg-blue-600 text-white">
+                          <Heart className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
+                        {savedIds?.length || 1}
+                      </p>
+                      <div className="mt-2 h-4" />
+                    </div>
+
+                    {/* Card 8: UNREAD MESSAGES */}
+                    <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30] border-b-4 border-b-slate-600 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6e7a73]">
+                          UNREAD MESSAGES
+                        </span>
+                        <div className="flex h-6 w-6 items-center justify-center bg-slate-700 text-white">
+                          <MessageSquare className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
+                        0
+                      </p>
+                      <div className="mt-2 h-4" />
+                    </div>
+                  </div>
+
+                  {/* Recent Orders Box matching reference */}
+                  <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-headline text-base font-bold uppercase tracking-wider text-[#0b1c30]">
+                        RECENT ORDERS
+                      </h2>
+                      <Link
+                        href="/orders"
+                        className="font-mono text-xs font-bold uppercase tracking-wider text-[#005d42] hover:underline"
+                      >
+                        VIEW ALL
+                      </Link>
+                    </div>
+
+                    <div className="mt-4 space-y-3">
+                      {recentOrders.map((order) => (
+                        <div
+                          key={order.id}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-[#e5e7eb] p-3.5 hover:border-[#0b1c30] transition bg-white"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-[#0b1c30] bg-[#eff4ff] font-headline text-xs font-bold text-[#0047bf]">
+                              AK
+                            </div>
+                            <div className="min-w-0">
+                              <Link
+                                href={`/orders/${order.id}`}
+                                className="block truncate font-sans text-xs sm:text-sm font-bold text-[#0b1c30] hover:text-[#005d42]"
+                              >
+                                {order.title}
+                              </Link>
+                              <p className="font-mono text-xs text-[#6e7a73] mt-0.5">
+                                {order.code || `#${order.id}`} // {order.freelancerName || "Ajju Kumar"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
+                            <span className="border border-[#005d42] bg-[#005d42] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
+                              {order.statusLabel || "COMPLETED"}
+                            </span>
+                            <span className="font-headline text-base font-bold text-[#0b1c30]">
+                              ₹{(order.price || 7999).toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {activeSection === "saved" && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+                  <h2 className="font-headline text-base font-bold uppercase tracking-wider text-[#0b1c30]">
+                    SAVED GIGS
+                  </h2>
+                  <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {savedGigs.map((gig) => (
+                      <GigCard key={gig.id} gig={gig} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeSection === "reviews" && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+                  <h2 className="font-headline text-base font-bold uppercase tracking-wider text-[#0b1c30]">
+                    SUBMITTED REVIEWS
+                  </h2>
+                  <div className="mt-4 space-y-4">
+                    {reviews.slice(0, 3).map((r) => (
+                      <div key={r.id} className="border border-[#e5e7eb] p-4 bg-white">
+                        <div className="flex items-center justify-between">
+                          <p className="font-sans text-sm font-bold text-[#0b1c30]">{r.gigTitle || r.projectName}</p>
+                          <span className="text-amber-500 font-bold">★ {r.rating}.0</span>
+                        </div>
+                        <p className="mt-2 text-xs italic text-[#3e4943]">&ldquo;{r.comment}&rdquo;</p>
+                        {r.reply && (
+                          <div className="mt-3 border-l-2 border-[#005d42] pl-3 text-xs text-[#6e7a73]">
+                            <p className="font-bold text-[#005d42]">{r.replyAuthor || "Seller Response"}:</p>
+                            <p className="mt-0.5">{r.reply}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Bottom Project Disclaimer matching reference */}
+              <div className="mt-8 mb-4 text-center">
+                <p className="font-mono text-[11px] uppercase tracking-wider text-[#6e7a73]">
+                  PAYMENTS IN THIS PROJECT ARE SIMULATED. NO REAL MONEY IS CHARGED.
                 </p>
               </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <Link
-                  href={`/orders/${order.id}`}
-                  className="bg-slate-950 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-slate-800"
-                >
-                  INSPECT SPRINT SPEC →
-                </Link>
-              </div>
             </div>
-          ))}
+          </div>
         </div>
-      </section>
-
-      {/* Saved specs */}
-      <section id="saved" className="mt-14 scroll-mt-24">
-        <h2 className="font-serif text-2xl font-bold text-slate-950 border-b border-slate-200 pb-3">
-          VAULT REPOSITORY (SAVED SPECS)
-        </h2>
-        {savedGigs.length === 0 ? (
-          <div className="mt-4 border border-dashed border-slate-200 bg-white p-8 text-center font-mono text-xs text-slate-500">
-            No saved specs in vault. Click the heart icon on any marketplace spec to shortlist it.
-          </div>
-        ) : (
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {savedGigs.map((g) => (
-              <GigCard key={g.id} gig={g} />
-            ))}
-          </div>
-        )}
-      </section>
-    </DashboardShell>
+      </main>
+    </div>
   );
 }

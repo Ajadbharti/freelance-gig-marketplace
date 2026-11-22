@@ -1,12 +1,12 @@
 export const reviews = [
   {
     id: "r0",
-    orderId: "GC-0899",
+    orderId: "GC-D7C133",
     gigId: "g7",
     gigTitle: "I will develop a custom vehicle rental and booking web application",
-    freelancerId: "f2",
+    freelancerId: "f-ajju",
     clientId: "c-raj",
-    clientName: "Raj P.",
+    clientName: "Raj Patel",
     clientRole: "Fleet & Operations Lead",
     clientBadge: "VERIFIED BUYER",
     rating: 5,
@@ -16,7 +16,7 @@ export const reviews = [
     projectName: "Custom Vehicle Rental & Dynamic Booking System",
     comment: "Good Work personally i feel good experience",
     reply: "Thank you Raj! It was a pleasure building the custom vehicle booking engine with you.",
-    replyAuthor: "ARJUN MEHTA (SELLER)",
+    replyAuthor: "AJJU KUMAR (SELLER)",
     createdAt: "2026-11-20T10:00:00.000Z",
   },
   {
