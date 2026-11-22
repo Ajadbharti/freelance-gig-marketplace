@@ -3,7 +3,7 @@ export function cn(...classes) {
 }
 
 export function formatPrice(amount) {
-  return `$${Number(amount ?? 0).toLocaleString("en-US")}`;
+  return `₹${Number(amount ?? 0).toLocaleString("en-IN")}`;
 }
 
 export function formatDate(iso) {

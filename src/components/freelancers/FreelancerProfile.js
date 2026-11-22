@@ -15,6 +15,7 @@ import {
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
 import SafeImage from "@/components/ui/SafeImage";
+import { formatPrice } from "@/lib/utils";
 
 const ELENA_GIGS = [
   {
@@ -203,7 +204,7 @@ export default function FreelancerProfile({ params }) {
                   RATE INDICATOR
                 </p>
                 <p className="font-headline text-2xl font-bold text-[#0b1c30] mt-0.5">
-                  ${freelancer.hourlyRate}.00 <span className="font-sans text-xs font-normal text-[#6e7a73]">/ HOUR</span>
+                  ₹{freelancer.hourlyRate}.00 <span className="font-sans text-xs font-normal text-[#6e7a73]">/ HOUR</span>
                 </p>
               </div>
 
@@ -263,7 +264,7 @@ export default function FreelancerProfile({ params }) {
             <p className="text-[10px] uppercase text-[#6e7a73] font-semibold">HOURS LOGGED</p>
           </div>
           <div className="p-2">
-            <p className="font-headline text-xl font-bold text-[#0b1c30]">$128k+</p>
+            <p className="font-headline text-xl font-bold text-[#0b1c30]">{freelancer.totalEscrow || "₹7,999"}</p>
             <p className="text-[10px] uppercase text-[#6e7a73] font-semibold">TOTAL ESCROW EARNINGS</p>
           </div>
         </div>
@@ -490,7 +491,7 @@ export default function FreelancerProfile({ params }) {
                             STARTING FROM
                           </p>
                           <p className="font-headline text-lg font-bold text-[#0b1c30]">
-                            ${g.price}
+                            {formatPrice(g.price)}
                           </p>
                         </div>
                         <Link

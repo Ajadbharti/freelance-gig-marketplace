@@ -68,23 +68,9 @@ export default function Navbar() {
   const dashboardHref =
     user?.role === "admin" ? "/admin" : user?.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
 
-  // Streamlined Minimal Header for Auth Pages (Matching Screenshot)
+  // Minimal Header for Auth Pages: Return null so LoginForm/RegisterForm render their single header without duplicates
   if (isAuthPage) {
-    return (
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="font-serif text-xl font-bold tracking-tight text-[#047857]">
-            GIGCRAFT
-          </Link>
-          <Link
-            href="/gigs"
-            className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-600 transition hover:text-[#047857]"
-          >
-            BACK TO MARKETPLACE
-          </Link>
-        </div>
-      </header>
-    );
+    return null;
   }
 
   return (

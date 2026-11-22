@@ -179,24 +179,28 @@ export function MarketplaceProvider({ children }) {
       localStorage.removeItem("gigcraft:freelancers");
       localStorage.removeItem("gigcraft:orders");
       localStorage.removeItem("gigcraft:reviews");
+      localStorage.removeItem("gigcraft_v3:gigs");
+      localStorage.removeItem("gigcraft_v3:freelancers");
       localStorage.removeItem("gigcraft_v3:orders");
+      localStorage.removeItem("gigcraft_v3:reviews");
+      localStorage.removeItem("gigcraft_v4:orders");
 
-      const savedGigs = localStorage.getItem("gigcraft_v3:gigs");
+      const savedGigs = localStorage.getItem("gigcraft_v5:gigs");
       if (savedGigs) {
         const parsed = JSON.parse(savedGigs);
         if (Array.isArray(parsed) && parsed.length > 0) setGigs(parsed);
       }
-      const savedFreelancers = localStorage.getItem("gigcraft_v3:freelancers");
+      const savedFreelancers = localStorage.getItem("gigcraft_v5:freelancers");
       if (savedFreelancers) {
         const parsed = JSON.parse(savedFreelancers);
         if (Array.isArray(parsed) && parsed.length > 0) setFreelancers(parsed);
       }
-      const savedOrders = localStorage.getItem("gigcraft_v4:orders");
+      const savedOrders = localStorage.getItem("gigcraft_v5:orders");
       if (savedOrders) {
         const parsed = JSON.parse(savedOrders);
         if (Array.isArray(parsed) && parsed.length > 0) setOrders(parsed);
       }
-      const savedReviews = localStorage.getItem("gigcraft_v3:reviews");
+      const savedReviews = localStorage.getItem("gigcraft_v5:reviews");
       if (savedReviews) {
         const parsed = JSON.parse(savedReviews);
         if (Array.isArray(parsed) && parsed.length > 0) setReviews(parsed);
@@ -208,7 +212,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v3:gigs", JSON.stringify(gigs));
+        localStorage.setItem("gigcraft_v5:gigs", JSON.stringify(gigs));
       } catch {}
     }
   }, [gigs, hydrated]);
@@ -216,7 +220,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v3:freelancers", JSON.stringify(freelancers));
+        localStorage.setItem("gigcraft_v5:freelancers", JSON.stringify(freelancers));
       } catch {}
     }
   }, [freelancers, hydrated]);
@@ -224,7 +228,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v4:orders", JSON.stringify(orders));
+        localStorage.setItem("gigcraft_v5:orders", JSON.stringify(orders));
       } catch {}
     }
   }, [orders, hydrated]);
@@ -232,7 +236,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v3:reviews", JSON.stringify(reviews));
+        localStorage.setItem("gigcraft_v5:reviews", JSON.stringify(reviews));
       } catch {}
     }
   }, [reviews, hydrated]);

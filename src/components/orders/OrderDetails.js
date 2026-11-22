@@ -26,6 +26,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
 import SafeImage from "@/components/ui/SafeImage";
+import { formatPrice } from "@/lib/utils";
 
 export default function OrderDetails({ initialOrderId }) {
   const { user } = useAuth();
@@ -74,7 +75,7 @@ export default function OrderDetails({ initialOrderId }) {
     const result = await completeOrder(activeOrder.id);
     setIsApproving(false);
     if (result.ok) {
-      showToast(`Milestone approved! $${activeOrder.currentMilestoneAmount || 60}.00 disbursed from escrow vault.`, "success");
+      showToast(`Milestone approved! ${formatPrice(activeOrder.currentMilestoneAmount || 5000)} disbursed from escrow vault.`, "success");
     } else {
       showToast(result.error || "Approval failed.", "error");
     }
@@ -244,7 +245,7 @@ export default function OrderDetails({ initialOrderId }) {
                 <ShieldCheck className="h-3.5 w-3.5" />
               </div>
             </div>
-            <p className="mt-2 font-serif text-3xl font-bold text-[#047857]">$1,840.00</p>
+            <p className="mt-2 font-serif text-3xl font-bold text-[#047857]">₹7,999</p>
             <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400 uppercase">DISPUTE PROTECTION</span>
               <span className="text-slate-900 font-bold uppercase">MULTI-SIG LOCK</span>
@@ -304,7 +305,7 @@ export default function OrderDetails({ initialOrderId }) {
                         </span>
                       </div>
                       <span className="font-bold text-slate-950 font-mono">
-                        ${ord.price?.toFixed(2)}
+                        {formatPrice(ord.price)}
                       </span>
                     </div>
 
@@ -391,7 +392,7 @@ export default function OrderDetails({ initialOrderId }) {
                   <div className="sm:border-l sm:border-slate-200 sm:pl-4">
                     <span className="text-slate-400 text-[10px] uppercase font-bold">VAULT COMMITMENT</span>
                     <p className="mt-1 font-bold text-slate-950 font-mono">
-                      {activeOrder.vaultCommitment || `$${activeOrder.price}.00 USD`}
+                      {activeOrder.vaultCommitment || formatPrice(activeOrder.price)}
                     </p>
                     <p className="mt-0.5 text-[10px] text-[#047857] font-bold flex items-center gap-1">
                       <Lock className="h-3 w-3" />
@@ -658,7 +659,7 @@ export default function OrderDetails({ initialOrderId }) {
                     className="bg-[#005d42] px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#047857] shadow-sm rounded-none flex items-center gap-1.5 transition active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50"
                   >
                     <Check className="h-3.5 w-3.5" />
-                    APPROVE &amp; RELEASE FUNDS (${activeOrder.currentMilestoneAmount || 60})
+                    APPROVE &amp; RELEASE FUNDS ({formatPrice(activeOrder.currentMilestoneAmount || 5000)})
                   </button>
                 </div>
 

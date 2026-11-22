@@ -22,6 +22,7 @@ import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
 import SafeImage from "@/components/ui/SafeImage";
 import OrderModal from "@/components/orders/OrderModal";
+import { formatPrice } from "@/lib/utils";
 
 const SHOWCASE_GALLERY = [
   "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
@@ -519,15 +520,15 @@ export default function GigDetails({ params }) {
                       <th className="p-3 text-[#6e7a73] font-normal w-1/4">TECHNICAL SPECIFICATION</th>
                       <th className="p-3 font-bold text-[#0b1c30] border-l border-[#e5e7eb] w-1/4">
                         BASIC TIER
-                        <p className="text-base font-headline font-bold text-[#0b1c30] mt-0.5">$180</p>
+                        <p className="text-base font-headline font-bold text-[#0b1c30] mt-0.5">{formatPrice(pkgData.basic.price)}</p>
                       </th>
                       <th className="p-3 font-bold text-[#005d42] border-x border-[#005d42] bg-[#eff4ff] w-1/4">
                         STANDARD (RECOMMENDED)
-                        <p className="text-base font-headline font-bold text-[#005d42] mt-0.5">$280</p>
+                        <p className="text-base font-headline font-bold text-[#005d42] mt-0.5">{formatPrice(pkgData.standard.price)}</p>
                       </th>
                       <th className="p-3 font-bold text-[#0b1c30] border-r border-[#e5e7eb] w-1/4">
                         PREMIUM SUITE
-                        <p className="text-base font-headline font-bold text-[#0b1c30] mt-0.5">$520</p>
+                        <p className="text-base font-headline font-bold text-[#0b1c30] mt-0.5">{formatPrice(pkgData.premium.price)}</p>
                       </th>
                     </tr>
                   </thead>
@@ -814,7 +815,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  BASIC $180
+                  BASIC {formatPrice(pkgData.basic.price)}
                 </button>
                 <button
                   type="button"
@@ -825,7 +826,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  STANDARD $280
+                  STANDARD {formatPrice(pkgData.standard.price)}
                 </button>
                 <button
                   type="button"
@@ -836,7 +837,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  PREMIUM $520
+                  PREMIUM {formatPrice(pkgData.premium.price)}
                 </button>
               </div>
 
@@ -846,7 +847,7 @@ export default function GigDetails({ params }) {
                   {selectedPkg.name}
                 </h3>
                 <span className="font-headline text-3xl font-bold text-[#0b1c30]">
-                  ${selectedPkg.price}
+                  {formatPrice(selectedPkg.price)}
                 </span>
               </div>
 
@@ -880,7 +881,7 @@ export default function GigDetails({ params }) {
                 onClick={handleOrderClick}
                 className="mt-6 flex h-12 w-full items-center justify-center gap-2 bg-[#005d42] font-mono text-xs font-bold uppercase tracking-wider text-white shadow-[2px_2px_0px_#0b1c30] hover:bg-[#047857] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               >
-                CONTINUE (${selectedPkg.price}) →
+                CONTINUE ({formatPrice(selectedPkg.price)}) →
               </button>
 
               <div className="mt-3 text-center">

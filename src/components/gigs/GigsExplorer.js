@@ -61,7 +61,7 @@ export default function GigsExplorer() {
       chips.push({ id: "del", label: `DELIVERY: Up to ${deliveryTime} Days` });
     }
     if (minBudget || maxBudget) {
-      chips.push({ id: "budget", label: `BUDGET: $${minBudget || "0"} - $${maxBudget || "∞"}` });
+      chips.push({ id: "budget", label: `BUDGET: ₹${minBudget || "0"} - ₹${maxBudget || "∞"}` });
     }
     if (selectedTiers.length > 0) {
       chips.push({ id: "tiers", label: `TIER: ${selectedTiers.join(", ").toUpperCase()}` });

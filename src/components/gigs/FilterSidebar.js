@@ -22,10 +22,10 @@ export const DELIVERY_OPTIONS = [
 ];
 
 export const BUDGET_CHIPS = [
-  { label: "UNDER $50", min: "", max: "50" },
-  { label: "$50 - $150", min: "50", max: "150" },
-  { label: "$150 - $500", min: "150", max: "500" },
-  { label: "$500+", min: "500", max: "" },
+  { label: "UNDER ₹2,000", min: "", max: "2000" },
+  { label: "₹2,000 - ₹5,000", min: "2000", max: "5000" },
+  { label: "₹5,000 - ₹10,000", min: "5000", max: "10000" },
+  { label: "₹10,000+", min: "10000", max: "" },
 ];
 
 export const SELLER_TIERS = [
@@ -154,20 +154,20 @@ export default function FilterSidebar({
           </div>
         </div>
 
-        {/* [03] BUDGET (USD) */}
+        {/* [03] BUDGET (INR) */}
         <div className="border-t border-[#e5e7eb] pt-5">
           <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-            <span>BUDGET (USD)</span>
+            <span>BUDGET (INR)</span>
             <span className="text-[#6e7a73] font-mono">[03]</span>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <div>
               <p className="font-mono text-[9px] uppercase tracking-wider text-[#6e7a73] font-semibold mb-1">MIN</p>
               <div className="flex items-center border border-[#6e7a73] bg-white px-2 py-1.5 focus-within:border-2 focus-within:border-[#0b1c30]">
-                <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">$</span>
+                <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">₹</span>
                 <input
                   type="number"
-                  placeholder="50"
+                  placeholder="2000"
                   value={minBudget}
                   onChange={(e) => setMinBudget && setMinBudget(e.target.value)}
                   className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
@@ -177,10 +177,10 @@ export default function FilterSidebar({
             <div>
               <p className="font-mono text-[9px] uppercase tracking-wider text-[#6e7a73] font-semibold mb-1">MAX</p>
               <div className="flex items-center border border-[#6e7a73] bg-white px-2 py-1.5 focus-within:border-2 focus-within:border-[#0b1c30]">
-                <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">$</span>
+                <span className="font-mono text-xs font-bold text-[#6e7a73] mr-1">₹</span>
                 <input
                   type="number"
-                  placeholder="600"
+                  placeholder="15000"
                   value={maxBudget}
                   onChange={(e) => setMaxBudget && setMaxBudget(e.target.value)}
                   className="w-full font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"

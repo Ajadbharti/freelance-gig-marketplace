@@ -8,6 +8,7 @@ import { useFavorites } from "@/context/FavoritesContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
 import SafeImage from "@/components/ui/SafeImage";
+import { formatPrice } from "@/lib/utils";
 
 export default function GigCard({ gig }) {
   const router = useRouter();
@@ -120,11 +121,17 @@ export default function GigCard({ gig }) {
             </div>
           </Link>
 
-          <div className="flex items-center gap-1 font-mono text-xs font-bold shrink-0">
-            <span className="text-amber-500">★</span>
-            <span className="text-[#0b1c30]">{Number(avgRating).toFixed(1)}</span>
-            <span className="font-normal text-[#6e7a73]">({reviewCount})</span>
-          </div>
+          {reviewCount > 0 ? (
+            <div className="flex items-center gap-1 font-mono text-xs font-bold shrink-0">
+              <span className="text-amber-500">★</span>
+              <span className="text-[#0b1c30]">{Number(avgRating).toFixed(1)}</span>
+              <span className="font-normal text-[#6e7a73]">({reviewCount})</span>
+            </div>
+          ) : (
+            <span className="font-mono text-[11px] font-bold text-[#6e7a73] uppercase shrink-0">
+              NEW
+            </span>
+          )}
         </div>
 
         {/* Title */}
@@ -153,7 +160,7 @@ export default function GigCard({ gig }) {
               STARTING AT
             </p>
             <p className="font-headline text-xl font-bold text-[#0b1c30]">
-              ${Number(gig.price ?? 280).toLocaleString("en-US")}
+              {formatPrice(gig.price)}
             </p>
           </div>
           <Link
