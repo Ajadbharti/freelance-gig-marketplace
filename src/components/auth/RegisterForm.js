@@ -5,13 +5,9 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
-  Check,
-  CheckCircle2,
   Eye,
   EyeOff,
-  Globe,
   Lock,
-  Shield,
   ShieldCheck,
   UserCheck,
   Zap,

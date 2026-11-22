@@ -6,20 +6,13 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Check,
-  CheckCircle2,
   ChevronDown,
   Clock,
-  ExternalLink,
-  Heart,
-  HelpCircle,
   Lock,
-  MessageSquare,
   RefreshCw,
   Search,
   Share2,
   ShieldCheck,
-  Sparkles,
-  Star,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";

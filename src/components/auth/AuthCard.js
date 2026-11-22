@@ -10,9 +10,3 @@ export default function AuthCard({ title, subtitle, children, footer }) {
     </div>
   );
 }
-
-export function DemoNotice({ children }) {
-  return (
-    <div className="border border-[#0b1c30] bg-[#eff4ff] p-4 font-mono text-xs text-[#0b1c30] shadow-[2px_2px_0px_#0b1c30]">{children}</div>
-  );
-}

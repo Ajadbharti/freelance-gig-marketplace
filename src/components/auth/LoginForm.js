@@ -12,12 +12,10 @@ import {
   Landmark,
   Lock,
   LogIn,
-  Mail,
   Shield,
   ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
 
 function GithubIcon(props) {

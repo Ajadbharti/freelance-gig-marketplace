@@ -4,23 +4,17 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight,
-  CheckCircle2,
   Lock,
   Search,
   ShieldCheck,
-  TrendingUp,
   Zap,
 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import GigCard from "@/components/gigs/GigCard";
-import { NAV_CATEGORIES } from "@/data/categories";
 import SafeImage from "@/components/ui/SafeImage";
 
 export default function Landing() {
   const router = useRouter();
-  const { user } = useAuth();
   const { gigs, freelancers } = useMarketplace();
   const [query, setQuery] = useState("");
 
