@@ -266,6 +266,12 @@ export function AuthProvider({ children }) {
     setUser(sessionUser);
     try {
       localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
+      const raw = localStorage.getItem("gigcraft_in:registered_users");
+      const list = raw ? JSON.parse(raw) : [];
+      if (!list.some((u) => u.email === cleanEmail)) {
+        list.push(sessionUser);
+        localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(list));
+      }
     } catch {}
 
     return { ok: true, user: sessionUser };
@@ -295,6 +301,12 @@ export function AuthProvider({ children }) {
     setUser(sessionUser);
     try {
       localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
+      const raw = localStorage.getItem("gigcraft_in:registered_users");
+      const list = raw ? JSON.parse(raw) : [];
+      if (!list.some((u) => u.email === cleanEmail)) {
+        list.push(sessionUser);
+        localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(list));
+      }
     } catch {}
 
     return { ok: true, user: sessionUser };
@@ -357,6 +369,12 @@ export function AuthProvider({ children }) {
     setUser(sessionUser);
     try {
       localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
+      const raw = localStorage.getItem("gigcraft_in:registered_users");
+      const list = raw ? JSON.parse(raw) : [];
+      if (!list.some((u) => u.email === cleanEmail)) {
+        list.push(sessionUser);
+        localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(list));
+      }
     } catch {}
 
     return { ok: true, user: sessionUser };
