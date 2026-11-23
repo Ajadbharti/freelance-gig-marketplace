@@ -118,53 +118,61 @@ export default function GigDetails({ params }) {
   const [reviewSearch, setReviewSearch] = useState("");
   const [reviewTagFilter, setReviewTagFilter] = useState("all");
 
-  const defaultPackages = {
+  const basePrice = Number(gig?.price) || 3999;
+  const rawPackages = gig?.packages && typeof gig.packages === "object" ? gig.packages : {};
+
+  const pkgData = {
     basic: {
-      name: "BASIC SPEC",
-      price: gig?.price ? Math.round(gig.price * 0.6) : 2499,
-      deliveryDays: 2,
-      revisions: 2,
-      screens: "Up to 3 Screens",
-      features: [
-        "Core user flow layout",
-        "Responsive breakpoint stacking",
-        "Source files & assets",
-        "2 Business Days delivery",
-        "2 Revisions included",
-      ],
+      name: rawPackages?.basic?.name || "BASIC SPEC",
+      price: Number(rawPackages?.basic?.price) || Math.round(basePrice * 0.6),
+      deliveryDays: Number(rawPackages?.basic?.deliveryDays) || 2,
+      revisions: Number(rawPackages?.basic?.revisions) || 2,
+      screens: rawPackages?.basic?.screens || "Up to 3 Screens",
+      features: Array.isArray(rawPackages?.basic?.features) && rawPackages.basic.features.length > 0
+        ? rawPackages.basic.features
+        : [
+            "Core user flow layout",
+            "Responsive breakpoint stacking",
+            "Source files & assets",
+            "2 Business Days delivery",
+            "2 Revisions included",
+          ],
     },
     standard: {
-      name: "STANDARD CORE SUITE",
-      price: gig?.price || 3999,
-      deliveryDays: gig?.deliveryDays || 3,
-      revisions: gig?.revisions || 4,
-      screens: "4 to 8 Screens",
+      name: rawPackages?.standard?.name || "STANDARD CORE SUITE",
+      price: Number(rawPackages?.standard?.price) || basePrice,
+      deliveryDays: Number(rawPackages?.standard?.deliveryDays) || Number(gig?.deliveryDays) || 3,
+      revisions: Number(rawPackages?.standard?.revisions) || Number(gig?.revisions) || 4,
+      screens: rawPackages?.standard?.screens || "4 to 8 Screens",
       recommended: true,
-      features: [
-        "Full Platform Implementation",
-        "Responsive Breakpoints (Desktop + Mobile)",
-        "Verified Milestone Escrow Deployment",
-        "Full Documentation & Source Code",
-        "Priority Code Auditing Support",
-      ],
+      features: Array.isArray(rawPackages?.standard?.features) && rawPackages.standard.features.length > 0
+        ? rawPackages.standard.features
+        : [
+            "Full Platform Implementation",
+            "Responsive Breakpoints (Desktop + Mobile)",
+            "Verified Milestone Escrow Deployment",
+            "Full Documentation & Source Code",
+            "Priority Code Auditing Support",
+          ],
     },
     premium: {
-      name: "PREMIUM SUITE",
-      price: gig?.price ? Math.round(gig.price * 1.8) : 7999,
-      deliveryDays: (gig?.deliveryDays || 3) + 2,
-      revisions: 999,
-      screens: "10+ Complete Views",
-      features: [
-        "Full Enterprise Platform Suite",
-        "Custom Architecture & High-Scale Optimization",
-        "Automated CI/CD Test Pipeline Setup",
-        "Full Responsive Breakpoints (Web + Native)",
-        "Unlimited revisions during contract sprint",
-      ],
+      name: rawPackages?.premium?.name || "PREMIUM SUITE",
+      price: Number(rawPackages?.premium?.price) || Math.round(basePrice * 1.8),
+      deliveryDays: Number(rawPackages?.premium?.deliveryDays) || (Number(gig?.deliveryDays) || 3) + 2,
+      revisions: Number(rawPackages?.premium?.revisions) || 999,
+      screens: rawPackages?.premium?.screens || "10+ Complete Views",
+      features: Array.isArray(rawPackages?.premium?.features) && rawPackages.premium.features.length > 0
+        ? rawPackages.premium.features
+        : [
+            "Full Enterprise Platform Suite",
+            "Custom Architecture & High-Scale Optimization",
+            "Automated CI/CD Test Pipeline Setup",
+            "Full Responsive Breakpoints (Web + Native)",
+            "Unlimited revisions during contract sprint",
+          ],
     },
   };
 
-  const pkgData = gig?.packages || defaultPackages;
   const packages = pkgData;
   const selectedPkg = pkgData[activePackageTab] || pkgData.standard || pkgData.basic;
 
@@ -522,15 +530,15 @@ export default function GigDetails({ params }) {
                       <th className="p-3 text-[#6e7a73] font-normal w-1/4">TECHNICAL SPECIFICATION</th>
                       <th className="p-3 font-bold text-[#0b1c30] border-l border-[#e5e7eb] w-1/4">
                         BASIC TIER
-                        <p className="text-base font-headline font-bold text-[#0b1c30] mt-0.5">{formatPrice(pkgData.basic.price)}</p>
+                        <p className="text-base font-headline font-bold text-[#0b1c30] mt-0.5">{formatPrice(pkgData?.basic?.price || 2499)}</p>
                       </th>
                       <th className="p-3 font-bold text-[#005d42] border-x border-[#005d42] bg-[#eff4ff] w-1/4">
                         STANDARD (RECOMMENDED)
-                        <p className="text-base font-headline font-bold text-[#005d42] mt-0.5">{formatPrice(pkgData.standard.price)}</p>
+                        <p className="text-base font-headline font-bold text-[#005d42] mt-0.5">{formatPrice(pkgData?.standard?.price || 3999)}</p>
                       </th>
                       <th className="p-3 font-bold text-[#0b1c30] border-r border-[#e5e7eb] w-1/4">
                         PREMIUM SUITE
-                        <p className="text-base font-headline font-bold text-[#0b1c30] mt-0.5">{formatPrice(pkgData.premium.price)}</p>
+                        <p className="text-base font-headline font-bold text-[#0b1c30] mt-0.5">{formatPrice(pkgData?.premium?.price || 7999)}</p>
                       </th>
                     </tr>
                   </thead>
@@ -817,7 +825,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  BASIC {formatPrice(pkgData.basic.price)}
+                  BASIC {formatPrice(pkgData?.basic?.price || 2499)}
                 </button>
                 <button
                   type="button"
@@ -828,7 +836,7 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  STANDARD {formatPrice(pkgData.standard.price)}
+                  STANDARD {formatPrice(pkgData?.standard?.price || 3999)}
                 </button>
                 <button
                   type="button"
@@ -839,17 +847,17 @@ export default function GigDetails({ params }) {
                       : "bg-white text-[#0b1c30] hover:bg-[#eff4ff]"
                   }`}
                 >
-                  PREMIUM {formatPrice(pkgData.premium.price)}
+                  PREMIUM {formatPrice(pkgData?.premium?.price || 7999)}
                 </button>
               </div>
 
               {/* Selected Tier Title & Price */}
               <div className="mt-5 flex items-baseline justify-between border-b border-[#e5e7eb] pb-3">
                 <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  {selectedPkg.name}
+                  {selectedPkg?.name || "STANDARD CORE SUITE"}
                 </h3>
                 <span className="font-headline text-3xl font-bold text-[#0b1c30]">
-                  {formatPrice(selectedPkg.price)}
+                  {formatPrice(selectedPkg?.price || 3999)}
                 </span>
               </div>
 
@@ -883,7 +891,7 @@ export default function GigDetails({ params }) {
                 onClick={handleOrderClick}
                 className="mt-6 flex h-12 w-full items-center justify-center gap-2 bg-[#005d42] font-mono text-xs font-bold uppercase tracking-wider text-white shadow-[2px_2px_0px_#0b1c30] hover:bg-[#047857] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               >
-                CONTINUE ({formatPrice(selectedPkg.price)}) →
+                CONTINUE ({formatPrice(selectedPkg?.price || basePrice)}) →
               </button>
 
               <div className="mt-3 text-center">
