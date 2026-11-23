@@ -124,29 +124,9 @@ export default function RegisterForm() {
     if (typeof window !== "undefined") {
       localStorage.setItem("gigcraft_in:selected_role", archetype);
     }
-    if (provider === "google") {
-      setGoogleModalOpen(true);
-      return;
-    }
-    if (provider === "github") {
-      const result = await loginWithGithubDemo({
-        name: archetype === "freelancer" ? "Elena Rostova" : "Apex Cloud Labs",
-        email: archetype === "freelancer" ? "developer@agency.io" : "contact@apexcloud.io",
-        role: archetype,
-      });
-      if (result.ok) {
-        showToast(`Signed up with GitHub as ${archetype.toUpperCase()}!`, "success");
-        window.location.href = archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
-      }
-      return;
-    }
     const result = await loginWithProvider(provider, archetype);
     if (!result.ok) {
-      showToast(
-        result.error ||
-          `${provider.toUpperCase()} OAuth is not configured in Supabase. Please register with your work email below.`,
-        "error"
-      );
+      showToast(result.error || `${provider.toUpperCase()} sign-in failed.`, "error");
     }
   }
 

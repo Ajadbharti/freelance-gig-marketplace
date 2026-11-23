@@ -217,16 +217,8 @@ export function AuthProvider({ children }) {
       }
 
       if (data?.url) {
-        if (forceRedirect) {
-          window.location.href = data.url;
-          return { ok: true, redirecting: true };
-        }
-        return {
-          ok: false,
-          error: "Unsupported provider: provider is not enabled in Supabase.",
-          url: data.url,
-          isConfigError: true,
-        };
+        window.location.href = data.url;
+        return { ok: true, redirecting: true };
       }
 
       return {

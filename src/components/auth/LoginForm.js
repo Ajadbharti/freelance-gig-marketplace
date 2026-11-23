@@ -64,30 +64,12 @@ export default function LoginForm() {
   }
 
   async function handleOAuth(provider) {
-    if (provider === "google") {
-      setGoogleModalOpen(true);
-      return;
-    }
-    if (provider === "github") {
-      setOauthLoading("github");
-      const result = await loginWithGithubDemo({
-        name: "Linus Torvalds",
-        email: "developer@agency.io",
-        role: "client",
-      });
-      setOauthLoading(null);
-      if (result.ok) {
-        showToast("Signed in with GitHub Workspace!", "success");
-        window.location.href = nextUrl || "/dashboard/client";
-      }
-      return;
-    }
     setOauthLoading(provider);
     try {
-      const result = await loginWithProvider(provider);
+      const result = await loginWithProvider(provider, "client");
       if (!result.ok) {
         showToast(
-          result.error || `${provider.toUpperCase()} authentication is not configured in this environment.`,
+          result.error || `${provider.toUpperCase()} authentication failed.`,
           "error"
         );
       }
