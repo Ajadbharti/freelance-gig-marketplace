@@ -33,24 +33,13 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextUrl = searchParams.get("next") || "/dashboard/client";
-  const { login, loginWithProvider, loginWithGithubDemo } = useAuth();
+  const { login, loginWithProvider, loginWithGithubDemo, loginWithFirebaseGoogle } = useAuth();
   const { gigs, freelancers } = useMarketplace();
   const { showToast } = useToast();
 
   const [showPassword, setShowPassword] = useState(false);
   const [rememberHardware, setRememberHardware] = useState(true);
   const [oauthLoading, setOauthLoading] = useState(null);
-
-  useEffect(() => {
-    function handleMessage(event) {
-      if (event.data?.type === "GIGCRAFT_GOOGLE_AUTH_SUCCESS" && event.data?.user) {
-        showToast(`Welcome, ${event.data.user.name}! Signed in with Google.`, "success");
-        window.location.href = nextUrl || "/dashboard/client";
-      }
-    }
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [showToast, nextUrl]);
 
   const {
     register,
@@ -75,17 +64,12 @@ export default function LoginForm() {
 
   async function handleOAuth(provider) {
     if (provider === "google") {
-      const width = 500;
-      const height = 620;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2.5;
-      const popup = window.open(
-        `/auth/google?role=client&next=${encodeURIComponent(nextUrl)}`,
-        "GoogleSignInPopup",
-        `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=0`
-      );
-      if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        window.location.href = `/auth/google?role=client&next=${encodeURIComponent(nextUrl)}`;
+      const result = await loginWithFirebaseGoogle("client");
+      if (result.ok && result.user) {
+        showToast(`Welcome, ${result.user.name}! Signed in with Google.`, "success");
+        window.location.href = nextUrl || "/dashboard/client";
+      } else if (result.error) {
+        showToast(result.error, "error");
       }
       return;
     }

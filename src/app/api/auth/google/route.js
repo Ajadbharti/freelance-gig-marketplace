@@ -7,12 +7,21 @@ import { signSession, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 export async function POST(request) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { credential, code, redirectUri, googleUser, role = "client" } = body;
+    const { credential, code, redirectUri, googleUser, firebaseUser, role = "client" } = body;
 
     let googleProfile = null;
 
-    // 1. If an ID Token is provided (Google Identity Services / One Tap / Client token)
-    if (credential) {
+    // 1. Firebase Auth user object from client popup
+    if (firebaseUser && firebaseUser.email) {
+      googleProfile = {
+        googleId: firebaseUser.uid || "fb-" + Date.now().toString(36),
+        name: firebaseUser.name || firebaseUser.email.split("@")[0],
+        email: firebaseUser.email,
+        picture: firebaseUser.picture || firebaseUser.photoURL || "",
+      };
+    }
+    // 2. If an ID Token is provided (Google Identity Services / One Tap / Client token)
+    else if (credential) {
       const verification = await verifyGoogleToken(credential);
       if (!verification.ok) {
         return NextResponse.json(

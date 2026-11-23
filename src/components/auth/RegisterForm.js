@@ -44,7 +44,7 @@ const QUICK_TAGS = [
 export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { register: registerUser, loginWithProvider, loginWithGithubDemo } = useAuth();
+  const { register: registerUser, loginWithProvider, loginWithGithubDemo, loginWithFirebaseGoogle } = useAuth();
   const { gigs, freelancers } = useMarketplace();
   const { showToast } = useToast();
 
@@ -57,19 +57,6 @@ export default function RegisterForm() {
   const [selectedTags, setSelectedTags] = useState(["#Next.js & Edge"]);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreeUpdates, setAgreeUpdates] = useState(false);
-
-  useEffect(() => {
-    function handleMessage(event) {
-      if (event.data?.type === "GIGCRAFT_GOOGLE_AUTH_SUCCESS" && event.data?.user) {
-        showToast(`Welcome, ${event.data.user.name}! Signed in with Google.`, "success");
-        const targetUrl =
-          event.data.user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
-        window.location.href = targetUrl;
-      }
-    }
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [showToast]);
 
   const {
     register,
@@ -137,17 +124,12 @@ export default function RegisterForm() {
       localStorage.setItem("gigcraft_in:selected_role", archetype);
     }
     if (provider === "google") {
-      const width = 500;
-      const height = 620;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2.5;
-      const popup = window.open(
-        `/auth/google?role=${archetype}`,
-        "GoogleSignInPopup",
-        `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=0`
-      );
-      if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        window.location.href = `/auth/google?role=${archetype}`;
+      const result = await loginWithFirebaseGoogle(archetype);
+      if (result.ok && result.user) {
+        showToast(`Welcome, ${result.user.name}! Signed up with Google.`, "success");
+        window.location.href = archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
+      } else if (result.error) {
+        showToast(result.error, "error");
       }
       return;
     }

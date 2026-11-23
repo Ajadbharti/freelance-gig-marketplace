@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { signInWithGooglePopup, signOutFromFirebase } from "@/lib/firebase/auth";
 
 const AuthContext = createContext(null);
 
@@ -416,6 +417,10 @@ export function AuthProvider({ children }) {
     []
   );
 
+  const loginWithFirebaseGoogle = useCallback(async (role = "client") => {
+    return signInWithGooglePopup(role);
+  }, []);
+
   const logout = useCallback(async () => {
     setUser(null);
     try {
@@ -427,6 +432,9 @@ export function AuthProvider({ children }) {
     try {
       const supabase = createClient();
       await supabase.auth.signOut();
+    } catch {}
+    try {
+      await signOutFromFirebase();
     } catch {}
   }, []);
 
@@ -448,6 +456,7 @@ export function AuthProvider({ children }) {
       login,
       loginWithProvider,
       loginWithBackendGoogle,
+      loginWithFirebaseGoogle,
       loginWithGoogleDemo,
       loginWithGithubDemo,
       register,
@@ -461,6 +470,7 @@ export function AuthProvider({ children }) {
       login,
       loginWithProvider,
       loginWithBackendGoogle,
+      loginWithFirebaseGoogle,
       loginWithGoogleDemo,
       loginWithGithubDemo,
       register,
