@@ -169,7 +169,7 @@ export default function LoginForm() {
                   <span>{oauthLoading === "github" ? "Connecting..." : "GitHub Workspace"}</span>
                 </button>
 
-                <GoogleLoginButton role="client" text="Continue with Google" />
+                <GoogleLoginButton askRole={true} text="Continue with Google" />
               </div>
 
               {/* Divider */}

@@ -285,7 +285,10 @@ export default function RegisterForm() {
                   <GithubIcon className="h-4 w-4" />
                   Sign up with GitHub
                 </button>
-                <GoogleLoginButton role={archetype} text="Sign up with Google" />
+                <GoogleLoginButton
+                  role={archetype}
+                  text={`Sign up as ${archetype === "freelancer" ? "Freelancer" : "Client"} with Google`}
+                />
               </div>
 
               {/* Divider */}

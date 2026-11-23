@@ -81,6 +81,7 @@ export function createOrUpdateGoogleUser({ googleId, name, email, picture, role 
       name: existing.name || cleanName,
       avatar: picture || existing.avatar,
       initials: existing.initials || initials,
+      role: role || existing.role || "client",
       lastLoginAt: new Date().toISOString(),
       authProvider: "google",
     };
