@@ -67,16 +67,28 @@ export async function signInWithGooglePopup(role = "client") {
       isNew: data.isNew,
     };
   } catch (err) {
+    if (err.code === "auth/api-key-not-valid" || err.message?.includes("api-key-not-valid")) {
+      return {
+        ok: false,
+        error: "Firebase Web API key is invalid or Identity Toolkit is not enabled. Please check Project Settings in Firebase Console.",
+      };
+    }
     if (err.code === "auth/popup-closed-by-user") {
       return { ok: false, error: "Google sign-in popup was closed before completing." };
     }
     if (err.code === "auth/cancelled-popup-request") {
       return { ok: false, error: "Only one popup request allowed at a time." };
     }
+    if (err.code === "auth/operation-not-allowed") {
+      return {
+        ok: false,
+        error: "Google provider is not enabled in Firebase. Please enable Google in Firebase Console > Authentication > Sign-in method.",
+      };
+    }
     if (err.code === "auth/unauthorized-domain") {
       return {
         ok: false,
-        error: "This domain is not authorized in Firebase Console (Authentication > Settings > Authorized Domains).",
+        error: "This domain (localhost) is not authorized in Firebase Console (Authentication > Settings > Authorized Domains).",
       };
     }
     return {
