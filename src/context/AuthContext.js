@@ -15,24 +15,105 @@ const DEMO_CLIENT = {
   joinedAt: "2024-01-01T00:00:00.000Z",
 };
 
+function mapSupabaseUser(sbUser, defaultRole = "client") {
+  const meta = sbUser?.user_metadata || {};
+  const fullName =
+    meta.full_name || meta.name || meta.user_name || sbUser?.email?.split("@")[0] || "Google User";
+  const initials = fullName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "GU";
+
+  let role = defaultRole;
+  if (typeof window !== "undefined") {
+    const savedRole = localStorage.getItem("gigcraft_in:selected_role");
+    if (savedRole) {
+      role = savedRole;
+    }
+  }
+
+  return {
+    id: sbUser.id,
+    name: fullName,
+    email: sbUser.email,
+    role: meta.role || role || "client",
+    avatar: meta.avatar_url || meta.picture || "",
+    initials: initials,
+    joinedAt: sbUser.created_at || new Date().toISOString(),
+    isGoogleUser: true,
+  };
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("gigcraft_in:user");
-      if (saved) {
-        setUser(JSON.parse(saved));
-      } else {
-        // Pre-seed demo client Raj Patel if no user is set
-        setUser(DEMO_CLIENT);
-        localStorage.setItem("gigcraft_in:user", JSON.stringify(DEMO_CLIENT));
+    let subscription = null;
+
+    async function initAuth() {
+      // 1. Check for active Supabase session
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const mapped = mapSupabaseUser(session.user);
+          setUser(mapped);
+          localStorage.setItem("gigcraft_in:user", JSON.stringify(mapped));
+          setHydrated(true);
+          return;
+        }
+      } catch (e) {
+        console.error("Supabase getSession error:", e);
       }
-    } catch {
-      setUser(DEMO_CLIENT);
+
+      // 2. Fallback to localStorage
+      try {
+        const saved = localStorage.getItem("gigcraft_in:user");
+        if (saved) {
+          setUser(JSON.parse(saved));
+        } else {
+          setUser(DEMO_CLIENT);
+          localStorage.setItem("gigcraft_in:user", JSON.stringify(DEMO_CLIENT));
+        }
+      } catch {
+        setUser(DEMO_CLIENT);
+      }
+      setHydrated(true);
+
+      // 3. Listen to Supabase auth events (e.g. Google OAuth sign-in)
+      try {
+        const supabase = createClient();
+        const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user) {
+            const mapped = mapSupabaseUser(session.user);
+            setUser(mapped);
+            localStorage.setItem("gigcraft_in:user", JSON.stringify(mapped));
+          } else if (event === "SIGNED_OUT") {
+            setUser(null);
+            localStorage.removeItem("gigcraft_in:user");
+          }
+        });
+        subscription = data?.subscription;
+      } catch (err) {
+        console.error("Supabase onAuthStateChange error:", err);
+      }
     }
-    setHydrated(true);
+
+    initAuth();
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  const setSessionUser = useCallback((newUser) => {
+    setUser(newUser);
+    if (typeof window !== "undefined" && newUser) {
+      localStorage.setItem("gigcraft_in:user", JSON.stringify(newUser));
+    }
   }, []);
 
   const login = useCallback(async (email, password) => {
@@ -105,8 +186,11 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const loginWithProvider = useCallback(async (provider) => {
+  const loginWithProvider = useCallback(async (provider, preferredRole = "client") => {
     try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("gigcraft_in:selected_role", preferredRole);
+      }
       const supabase = createClient();
       const redirectUrl =
         typeof window !== "undefined"
@@ -117,13 +201,18 @@ export function AuthProvider({ children }) {
         provider: provider,
         options: {
           redirectTo: redirectUrl,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
         },
       });
 
       if (error) {
         return {
           ok: false,
-          error: `${provider === "github" ? "GitHub" : "Google"} OAuth is not configured in Supabase. Please sign in or register with your work email below.`,
+          error: error.message || `${provider === "github" ? "GitHub" : "Google"} OAuth is not configured in Supabase.`,
+          isConfigError: true,
         };
       }
 
@@ -136,10 +225,11 @@ export function AuthProvider({ children }) {
         ok: false,
         error: `${provider === "github" ? "GitHub" : "Google"} authentication provider is not available. Please sign in with your work email.`,
       };
-    } catch {
+    } catch (err) {
       return {
         ok: false,
-        error: `${provider === "github" ? "GitHub" : "Google"} login is not enabled in this environment. Please sign in with your corporate email.`,
+        error: err.message || `${provider === "github" ? "GitHub" : "Google"} login is not enabled in this environment.`,
+        isConfigError: true,
       };
     }
   }, []);
@@ -229,8 +319,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, hydrated, login, loginWithProvider, register, logout, switchRole }),
-    [user, hydrated, login, loginWithProvider, register, logout, switchRole]
+    () => ({ user, hydrated, login, loginWithProvider, register, logout, switchRole, setSessionUser }),
+    [user, hydrated, login, loginWithProvider, register, logout, switchRole, setSessionUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

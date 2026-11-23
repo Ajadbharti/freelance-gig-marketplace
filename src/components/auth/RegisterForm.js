@@ -119,7 +119,10 @@ export default function RegisterForm() {
   }
 
   async function handleSocialAuth(provider) {
-    const result = await loginWithProvider(provider);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gigcraft_in:selected_role", archetype);
+    }
+    const result = await loginWithProvider(provider, archetype);
     if (!result.ok) {
       showToast(
         result.error ||
