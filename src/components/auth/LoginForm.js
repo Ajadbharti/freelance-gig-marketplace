@@ -60,7 +60,7 @@ export default function LoginForm() {
       return;
     }
     showToast("Signed in successfully. Routing to workspace...", "success");
-    router.push(nextUrl);
+    window.location.href = nextUrl || "/dashboard/client";
   }
 
   async function handleOAuth(provider) {
@@ -78,7 +78,7 @@ export default function LoginForm() {
       setOauthLoading(null);
       if (result.ok) {
         showToast("Signed in with GitHub Workspace!", "success");
-        router.push(nextUrl);
+        window.location.href = nextUrl || "/dashboard/client";
       }
       return;
     }

@@ -84,24 +84,26 @@ export default function GoogleAuthModal({
         ? activeRole
         : account.defaultRole || activeRole;
 
-    setTimeout(async () => {
-      try {
-        const result = await loginWithGoogleDemo({
-          name: account.name,
-          email: account.email,
-          role: targetRole,
-        });
+    try {
+      const result = await loginWithGoogleDemo({
+        name: account.name,
+        email: account.email,
+        role: targetRole,
+      });
 
-        if (result.ok) {
-          showToast(`Welcome, ${account.name}! Signed in with Google.`, "success");
-          onClose();
-          router.push(targetRole === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
-        }
-      } catch {
+      if (result.ok) {
+        showToast(`Welcome, ${account.name}! Signed in with Google.`, "success");
+        const targetUrl =
+          targetRole === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
+        window.location.href = targetUrl;
+      } else {
         showToast("Google authentication failed. Please try again.", "error");
         setIsAuthenticating(false);
       }
-    }, 600);
+    } catch {
+      showToast("Google authentication failed. Please try again.", "error");
+      setIsAuthenticating(false);
+    }
   }
 
   async function handleCustomSubmit(e) {
@@ -111,24 +113,26 @@ export default function GoogleAuthModal({
     setSelectedEmail(customEmail);
     setIsAuthenticating(true);
 
-    setTimeout(async () => {
-      try {
-        const result = await loginWithGoogleDemo({
-          name: customName.trim(),
-          email: customEmail.trim().toLowerCase(),
-          role: activeRole,
-        });
+    try {
+      const result = await loginWithGoogleDemo({
+        name: customName.trim(),
+        email: customEmail.trim().toLowerCase(),
+        role: activeRole,
+      });
 
-        if (result.ok) {
-          showToast(`Welcome, ${customName}! Signed in with Google.`, "success");
-          onClose();
-          router.push(activeRole === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
-        }
-      } catch {
+      if (result.ok) {
+        showToast(`Welcome, ${customName}! Signed in with Google.`, "success");
+        const targetUrl =
+          activeRole === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
+        window.location.href = targetUrl;
+      } else {
         showToast("Google authentication failed.", "error");
         setIsAuthenticating(false);
       }
-    }, 600);
+    } catch {
+      showToast("Google authentication failed.", "error");
+      setIsAuthenticating(false);
+    }
   }
 
   return (

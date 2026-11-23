@@ -114,7 +114,7 @@ export default function RegisterForm() {
 
     if (result.ok) {
       showToast(`Account created as ${archetype.toUpperCase()}. Welcome to GigCraft!`, "success");
-      router.push(archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
+      window.location.href = archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
     } else {
       showToast(result.error || "Registration failed.", "error");
     }
@@ -136,7 +136,7 @@ export default function RegisterForm() {
       });
       if (result.ok) {
         showToast(`Signed up with GitHub as ${archetype.toUpperCase()}!`, "success");
-        router.push(archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
+        window.location.href = archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
       }
       return;
     }
