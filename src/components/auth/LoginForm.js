@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -19,7 +19,6 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import GoogleAuthModal from "@/components/auth/GoogleAuthModal";
 
 function GithubIcon(props) {
   return (
@@ -40,7 +39,17 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberHardware, setRememberHardware] = useState(true);
   const [oauthLoading, setOauthLoading] = useState(null);
-  const [googleModalOpen, setGoogleModalOpen] = useState(false);
+
+  useEffect(() => {
+    function handleMessage(event) {
+      if (event.data?.type === "GIGCRAFT_GOOGLE_AUTH_SUCCESS" && event.data?.user) {
+        showToast(`Welcome, ${event.data.user.name}! Signed in with Google.`, "success");
+        window.location.href = nextUrl || "/dashboard/client";
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [showToast, nextUrl]);
 
   const {
     register,
@@ -64,6 +73,35 @@ export default function LoginForm() {
   }
 
   async function handleOAuth(provider) {
+    if (provider === "google") {
+      const width = 500;
+      const height = 620;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2.5;
+      const popup = window.open(
+        `/auth/google?role=client&next=${encodeURIComponent(nextUrl)}`,
+        "GoogleSignInPopup",
+        `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=0`
+      );
+      if (!popup || popup.closed || typeof popup.closed === "undefined") {
+        window.location.href = `/auth/google?role=client&next=${encodeURIComponent(nextUrl)}`;
+      }
+      return;
+    }
+    if (provider === "github") {
+      setOauthLoading("github");
+      const result = await loginWithGithubDemo({
+        name: "Linus Torvalds",
+        email: "developer@agency.io",
+        role: "client",
+      });
+      setOauthLoading(null);
+      if (result.ok) {
+        showToast("Signed in with GitHub Workspace!", "success");
+        window.location.href = nextUrl || "/dashboard/client";
+      }
+      return;
+    }
     setOauthLoading(provider);
     try {
       const result = await loginWithProvider(provider, "client");
@@ -413,13 +451,6 @@ export default function LoginForm() {
           </div>
         </div>
       </main>
-
-      <GoogleAuthModal
-        isOpen={googleModalOpen}
-        onClose={() => setGoogleModalOpen(false)}
-        role="client"
-        mode="login"
-      />
     </div>
   );
 }

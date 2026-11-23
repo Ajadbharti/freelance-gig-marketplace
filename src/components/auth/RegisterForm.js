@@ -15,7 +15,6 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import GoogleAuthModal from "@/components/auth/GoogleAuthModal";
 
 function GithubIcon(props) {
   return (
@@ -57,7 +56,19 @@ export default function RegisterForm() {
   const [selectedTags, setSelectedTags] = useState(["#Next.js & Edge"]);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreeUpdates, setAgreeUpdates] = useState(false);
-  const [googleModalOpen, setGoogleModalOpen] = useState(false);
+
+  useEffect(() => {
+    function handleMessage(event) {
+      if (event.data?.type === "GIGCRAFT_GOOGLE_AUTH_SUCCESS" && event.data?.user) {
+        showToast(`Welcome, ${event.data.user.name}! Signed in with Google.`, "success");
+        const targetUrl =
+          event.data.user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
+        window.location.href = targetUrl;
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [showToast]);
 
   const {
     register,
@@ -123,6 +134,33 @@ export default function RegisterForm() {
   async function handleSocialAuth(provider) {
     if (typeof window !== "undefined") {
       localStorage.setItem("gigcraft_in:selected_role", archetype);
+    }
+    if (provider === "google") {
+      const width = 500;
+      const height = 620;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2.5;
+      const popup = window.open(
+        `/auth/google?role=${archetype}`,
+        "GoogleSignInPopup",
+        `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=0`
+      );
+      if (!popup || popup.closed || typeof popup.closed === "undefined") {
+        window.location.href = `/auth/google?role=${archetype}`;
+      }
+      return;
+    }
+    if (provider === "github") {
+      const result = await loginWithGithubDemo({
+        name: archetype === "freelancer" ? "Elena Rostova" : "Apex Cloud Labs",
+        email: archetype === "freelancer" ? "developer@agency.io" : "contact@apexcloud.io",
+        role: archetype,
+      });
+      if (result.ok) {
+        showToast(`Signed up with GitHub as ${archetype.toUpperCase()}!`, "success");
+        window.location.href = archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client";
+      }
+      return;
     }
     const result = await loginWithProvider(provider, archetype);
     if (!result.ok) {
@@ -592,13 +630,6 @@ export default function RegisterForm() {
           </div>
         </div>
       </main>
-
-      <GoogleAuthModal
-        isOpen={googleModalOpen}
-        onClose={() => setGoogleModalOpen(false)}
-        role={archetype}
-        mode="register"
-      />
     </div>
   );
 }

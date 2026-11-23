@@ -23,7 +23,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const userRef = useRef(null);
 
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname.startsWith("/auth");
 
   useEffect(() => {
     function handleClick(e) {
