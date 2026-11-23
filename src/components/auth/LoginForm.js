@@ -19,6 +19,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
+import GoogleAuthModal from "@/components/auth/GoogleAuthModal";
 
 function GithubIcon(props) {
   return (
@@ -39,6 +40,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberHardware, setRememberHardware] = useState(true);
   const [oauthLoading, setOauthLoading] = useState(null);
+  const [googleModalOpen, setGoogleModalOpen] = useState(false);
 
   const {
     register,
@@ -66,13 +68,21 @@ export default function LoginForm() {
     try {
       const result = await loginWithProvider(provider);
       if (!result.ok) {
+        if (provider === "google") {
+          setGoogleModalOpen(true);
+          return;
+        }
         showToast(
           result.error || `${provider.toUpperCase()} authentication is not configured in this environment.`,
           "error"
         );
       }
     } catch {
-      showToast(`${provider.toUpperCase()} provider sign-in failed.`, "error");
+      if (provider === "google") {
+        setGoogleModalOpen(true);
+      } else {
+        showToast(`${provider.toUpperCase()} provider sign-in failed.`, "error");
+      }
     } finally {
       setOauthLoading(null);
     }
@@ -411,6 +421,12 @@ export default function LoginForm() {
           </div>
         </div>
       </main>
+
+      <GoogleAuthModal
+        isOpen={googleModalOpen}
+        onClose={() => setGoogleModalOpen(false)}
+        role="client"
+      />
     </div>
   );
 }

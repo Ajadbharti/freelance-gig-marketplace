@@ -234,6 +234,35 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const loginWithGoogleDemo = useCallback(async ({ name, email, role = "client" }) => {
+    const cleanEmail = (email || "").trim().toLowerCase();
+    const cleanName = (name || cleanEmail.split("@")[0] || "Google User").trim();
+    const initials = cleanName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "GU";
+
+    const sessionUser = {
+      id: "usr-google-" + Date.now().toString(36),
+      name: cleanName,
+      email: cleanEmail || "google.user@gmail.com",
+      role: role || "client",
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=047857,0f172a`,
+      initials: initials,
+      joinedAt: new Date().toISOString(),
+      isGoogleUser: true,
+    };
+
+    setUser(sessionUser);
+    try {
+      localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
+    } catch {}
+
+    return { ok: true, user: sessionUser };
+  }, []);
+
   const register = useCallback(async ({ name, email, password, role }) => {
     const cleanEmail = (email || "").trim().toLowerCase();
     if (!cleanEmail) {
@@ -319,8 +348,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, hydrated, login, loginWithProvider, register, logout, switchRole, setSessionUser }),
-    [user, hydrated, login, loginWithProvider, register, logout, switchRole, setSessionUser]
+    () => ({ user, hydrated, login, loginWithProvider, loginWithGoogleDemo, register, logout, switchRole, setSessionUser }),
+    [user, hydrated, login, loginWithProvider, loginWithGoogleDemo, register, logout, switchRole, setSessionUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

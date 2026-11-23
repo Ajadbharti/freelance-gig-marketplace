@@ -15,6 +15,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
+import GoogleAuthModal from "@/components/auth/GoogleAuthModal";
 
 function GithubIcon(props) {
   return (
@@ -56,6 +57,7 @@ export default function RegisterForm() {
   const [selectedTags, setSelectedTags] = useState(["#Next.js & Edge"]);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreeUpdates, setAgreeUpdates] = useState(false);
+  const [googleModalOpen, setGoogleModalOpen] = useState(false);
 
   const {
     register,
@@ -124,6 +126,10 @@ export default function RegisterForm() {
     }
     const result = await loginWithProvider(provider, archetype);
     if (!result.ok) {
+      if (provider === "google") {
+        setGoogleModalOpen(true);
+        return;
+      }
       showToast(
         result.error ||
           `${provider.toUpperCase()} OAuth is not configured in Supabase. Please register with your work email below.`,
@@ -595,6 +601,12 @@ export default function RegisterForm() {
           </div>
         </div>
       </main>
+
+      <GoogleAuthModal
+        isOpen={googleModalOpen}
+        onClose={() => setGoogleModalOpen(false)}
+        role={archetype}
+      />
     </div>
   );
 }
