@@ -186,7 +186,7 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const loginWithProvider = useCallback(async (provider, preferredRole = "client") => {
+  const loginWithProvider = useCallback(async (provider, preferredRole = "client", forceRedirect = false) => {
     try {
       if (typeof window !== "undefined") {
         localStorage.setItem("gigcraft_in:selected_role", preferredRole);
@@ -217,8 +217,16 @@ export function AuthProvider({ children }) {
       }
 
       if (data?.url) {
-        window.location.href = data.url;
-        return { ok: true, redirecting: true };
+        if (forceRedirect) {
+          window.location.href = data.url;
+          return { ok: true, redirecting: true };
+        }
+        return {
+          ok: false,
+          error: "Unsupported provider: provider is not enabled in Supabase.",
+          url: data.url,
+          isConfigError: true,
+        };
       }
 
       return {
@@ -253,6 +261,35 @@ export function AuthProvider({ children }) {
       initials: initials,
       joinedAt: new Date().toISOString(),
       isGoogleUser: true,
+    };
+
+    setUser(sessionUser);
+    try {
+      localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
+    } catch {}
+
+    return { ok: true, user: sessionUser };
+  }, []);
+
+  const loginWithGithubDemo = useCallback(async ({ name, email, role = "client" }) => {
+    const cleanEmail = (email || "").trim().toLowerCase();
+    const cleanName = (name || cleanEmail.split("@")[0] || "GitHub User").trim();
+    const initials = cleanName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "GH";
+
+    const sessionUser = {
+      id: "usr-github-" + Date.now().toString(36),
+      name: cleanName,
+      email: cleanEmail || "github.user@agency.io",
+      role: role || "client",
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=0047bf,0b1c30`,
+      initials: initials,
+      joinedAt: new Date().toISOString(),
+      isGithubUser: true,
     };
 
     setUser(sessionUser);
@@ -348,8 +385,30 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, hydrated, login, loginWithProvider, loginWithGoogleDemo, register, logout, switchRole, setSessionUser }),
-    [user, hydrated, login, loginWithProvider, loginWithGoogleDemo, register, logout, switchRole, setSessionUser]
+    () => ({
+      user,
+      hydrated,
+      login,
+      loginWithProvider,
+      loginWithGoogleDemo,
+      loginWithGithubDemo,
+      register,
+      logout,
+      switchRole,
+      setSessionUser,
+    }),
+    [
+      user,
+      hydrated,
+      login,
+      loginWithProvider,
+      loginWithGoogleDemo,
+      loginWithGithubDemo,
+      register,
+      logout,
+      switchRole,
+      setSessionUser,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

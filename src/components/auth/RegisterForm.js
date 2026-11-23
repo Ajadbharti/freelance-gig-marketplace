@@ -44,7 +44,7 @@ const QUICK_TAGS = [
 export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { register: registerUser, loginWithProvider } = useAuth();
+  const { register: registerUser, loginWithProvider, loginWithGithubDemo } = useAuth();
   const { gigs, freelancers } = useMarketplace();
   const { showToast } = useToast();
 
@@ -124,18 +124,29 @@ export default function RegisterForm() {
     if (typeof window !== "undefined") {
       localStorage.setItem("gigcraft_in:selected_role", archetype);
     }
+    if (provider === "google") {
+      setGoogleModalOpen(true);
+      return;
+    }
+    if (provider === "github") {
+      const result = await loginWithGithubDemo({
+        name: archetype === "freelancer" ? "Elena Rostova" : "Apex Cloud Labs",
+        email: archetype === "freelancer" ? "developer@agency.io" : "contact@apexcloud.io",
+        role: archetype,
+      });
+      if (result.ok) {
+        showToast(`Signed up with GitHub as ${archetype.toUpperCase()}!`, "success");
+        router.push(archetype === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client");
+      }
+      return;
+    }
     const result = await loginWithProvider(provider, archetype);
     if (!result.ok) {
-      if (provider === "google") {
-        setGoogleModalOpen(true);
-        return;
-      }
       showToast(
         result.error ||
           `${provider.toUpperCase()} OAuth is not configured in Supabase. Please register with your work email below.`,
         "error"
       );
-      return;
     }
   }
 
@@ -606,6 +617,7 @@ export default function RegisterForm() {
         isOpen={googleModalOpen}
         onClose={() => setGoogleModalOpen(false)}
         role={archetype}
+        mode="register"
       />
     </div>
   );

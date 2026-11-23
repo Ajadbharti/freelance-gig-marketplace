@@ -33,7 +33,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextUrl = searchParams.get("next") || "/dashboard/client";
-  const { login, loginWithProvider } = useAuth();
+  const { login, loginWithProvider, loginWithGithubDemo } = useAuth();
   const { gigs, freelancers } = useMarketplace();
   const { showToast } = useToast();
 
@@ -64,25 +64,35 @@ export default function LoginForm() {
   }
 
   async function handleOAuth(provider) {
+    if (provider === "google") {
+      setGoogleModalOpen(true);
+      return;
+    }
+    if (provider === "github") {
+      setOauthLoading("github");
+      const result = await loginWithGithubDemo({
+        name: "Linus Torvalds",
+        email: "developer@agency.io",
+        role: "client",
+      });
+      setOauthLoading(null);
+      if (result.ok) {
+        showToast("Signed in with GitHub Workspace!", "success");
+        router.push(nextUrl);
+      }
+      return;
+    }
     setOauthLoading(provider);
     try {
       const result = await loginWithProvider(provider);
       if (!result.ok) {
-        if (provider === "google") {
-          setGoogleModalOpen(true);
-          return;
-        }
         showToast(
           result.error || `${provider.toUpperCase()} authentication is not configured in this environment.`,
           "error"
         );
       }
     } catch {
-      if (provider === "google") {
-        setGoogleModalOpen(true);
-      } else {
-        showToast(`${provider.toUpperCase()} provider sign-in failed.`, "error");
-      }
+      showToast(`${provider.toUpperCase()} provider sign-in failed.`, "error");
     } finally {
       setOauthLoading(null);
     }
@@ -426,6 +436,7 @@ export default function LoginForm() {
         isOpen={googleModalOpen}
         onClose={() => setGoogleModalOpen(false)}
         role="client"
+        mode="login"
       />
     </div>
   );
