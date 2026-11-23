@@ -19,6 +19,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
+import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 
 function GithubIcon(props) {
   return (
@@ -178,21 +179,13 @@ export default function LoginForm() {
                   type="button"
                   onClick={() => handleOAuth("github")}
                   disabled={Boolean(oauthLoading)}
-                  className="flex items-center justify-center gap-2 border border-[#0b1c30] bg-white py-2.5 px-3 font-mono text-xs font-semibold text-[#0b1c30] shadow-[2px_2px_0px_#0b1c30] hover:bg-[#eff4ff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-50"
+                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white py-2.5 px-3 font-mono text-xs font-semibold text-[#0b1c30] shadow-[2px_2px_0px_#0b1c30] hover:bg-[#eff4ff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-50"
                 >
                   <GithubIcon className="h-4 w-4" />
                   <span>{oauthLoading === "github" ? "Connecting..." : "GitHub Workspace"}</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleOAuth("google")}
-                  disabled={Boolean(oauthLoading)}
-                  className="flex items-center justify-center gap-2 border border-[#0b1c30] bg-white py-2.5 px-3 font-mono text-xs font-semibold text-[#0b1c30] shadow-[2px_2px_0px_#0b1c30] hover:bg-[#eff4ff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-50"
-                >
-                  <span className="font-bold text-[#4285f4]">G</span>
-                  <span>{oauthLoading === "google" ? "Connecting..." : "Google Cloud Identity"}</span>
-                </button>
+                <GoogleLoginButton role="client" text="Continue with Google" />
               </div>
 
               {/* Divider */}

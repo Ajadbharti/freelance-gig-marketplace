@@ -60,7 +60,7 @@ function GooglePopupContent() {
   const [customName, setCustomName] = useState("");
   const [customEmail, setCustomEmail] = useState("");
 
-  function completeAuth(name, email) {
+  async function completeAuth(name, email) {
     const cleanEmail = (email || "").trim().toLowerCase();
     const cleanName = (name || cleanEmail.split("@")[0] || "Google User").trim();
     const initials =
@@ -71,7 +71,7 @@ function GooglePopupContent() {
         .slice(0, 2)
         .toUpperCase() || "GU";
 
-    const sessionUser = {
+    let sessionUser = {
       id: "usr-google-" + Date.now().toString(36),
       name: cleanName,
       email: cleanEmail,
@@ -81,6 +81,31 @@ function GooglePopupContent() {
       joinedAt: new Date().toISOString(),
       isGoogleUser: true,
     };
+
+    // 1. Backend database & secure session cookie integration
+    try {
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleUser: {
+            googleId: "g-" + Math.abs(cleanEmail.split("").reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0)),
+            name: cleanName,
+            email: cleanEmail,
+            picture: sessionUser.avatar,
+          },
+          role: role,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.user) {
+          sessionUser = data.user;
+        }
+      }
+    } catch (err) {
+      console.warn("Backend auth call warning:", err);
+    }
 
     try {
       localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
@@ -92,7 +117,7 @@ function GooglePopupContent() {
       }
     } catch {}
 
-    // 1. Notify opener if opened as popup
+    // 2. Notify opener if opened as popup
     if (typeof window !== "undefined" && window.opener && !window.opener.closed) {
       try {
         window.opener.postMessage(
@@ -106,7 +131,7 @@ function GooglePopupContent() {
       return;
     }
 
-    // 2. Direct navigation if opened in full tab
+    // 3. Direct navigation if opened in full tab
     setTimeout(() => {
       window.location.href = nextUrl;
     }, 400);

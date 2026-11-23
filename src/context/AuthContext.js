@@ -54,7 +54,21 @@ export function AuthProvider({ children }) {
     let subscription = null;
 
     async function initAuth() {
-      // 1. Check for active Supabase session
+      // 1. Check for backend HTTP-only session cookie
+      try {
+        const meRes = await fetch("/api/auth/me");
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          if (meData?.ok && meData?.user) {
+            setUser(meData.user);
+            localStorage.setItem("gigcraft_in:user", JSON.stringify(meData.user));
+            setHydrated(true);
+            return;
+          }
+        }
+      } catch {}
+
+      // 2. Check for active Supabase session
       try {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
@@ -372,10 +386,43 @@ export function AuthProvider({ children }) {
     return { ok: true, user: sessionUser };
   }, []);
 
+  const loginWithBackendGoogle = useCallback(
+    async ({ credential, code, redirectUri, role = "client" }) => {
+      try {
+        const res = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ credential, code, redirectUri, role }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          return { ok: false, error: data.error || "Google authentication failed on backend." };
+        }
+        setUser(data.user);
+        try {
+          localStorage.setItem("gigcraft_in:user", JSON.stringify(data.user));
+          const raw = localStorage.getItem("gigcraft_in:registered_users");
+          const list = raw ? JSON.parse(raw) : [];
+          if (!list.some((u) => u.email === data.user.email)) {
+            list.push(data.user);
+            localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(list));
+          }
+        } catch {}
+        return { ok: true, user: data.user, isNew: data.isNew };
+      } catch (err) {
+        return { ok: false, error: err.message || "Failed to reach authentication backend." };
+      }
+    },
+    []
+  );
+
   const logout = useCallback(async () => {
     setUser(null);
     try {
       localStorage.removeItem("gigcraft_in:user");
+    } catch {}
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
     } catch {}
     try {
       const supabase = createClient();
@@ -400,6 +447,7 @@ export function AuthProvider({ children }) {
       hydrated,
       login,
       loginWithProvider,
+      loginWithBackendGoogle,
       loginWithGoogleDemo,
       loginWithGithubDemo,
       register,
@@ -412,6 +460,7 @@ export function AuthProvider({ children }) {
       hydrated,
       login,
       loginWithProvider,
+      loginWithBackendGoogle,
       loginWithGoogleDemo,
       loginWithGithubDemo,
       register,

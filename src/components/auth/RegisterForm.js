@@ -15,6 +15,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
+import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 
 function GithubIcon(props) {
   return (
@@ -302,14 +303,7 @@ export default function RegisterForm() {
                   <GithubIcon className="h-4 w-4" />
                   Sign up with GitHub
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleSocialAuth("google")}
-                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white font-mono text-xs font-semibold text-[#0b1c30] hover:bg-[#dce9ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                >
-                  <span className="font-bold text-[#4285f4]">G</span>
-                  Sign up with Google
-                </button>
+                <GoogleLoginButton role={archetype} text="Sign up with Google" />
               </div>
 
               {/* Divider */}
