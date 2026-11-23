@@ -118,53 +118,55 @@ export default function GigDetails({ params }) {
   const [reviewSearch, setReviewSearch] = useState("");
   const [reviewTagFilter, setReviewTagFilter] = useState("all");
 
-  const packages = {
+  const defaultPackages = {
     basic: {
       name: "BASIC SPEC",
-      price: 180,
+      price: gig?.price ? Math.round(gig.price * 0.6) : 2499,
       deliveryDays: 2,
       revisions: 2,
       screens: "Up to 3 Screens",
       features: [
         "Core user flow layout",
         "Responsive breakpoint stacking",
-        "Source Figma file (.fig)",
+        "Source files & assets",
         "2 Business Days delivery",
         "2 Revisions included",
       ],
     },
     standard: {
       name: "STANDARD CORE SUITE",
-      price: 280,
-      deliveryDays: 3,
-      revisions: 4,
+      price: gig?.price || 3999,
+      deliveryDays: gig?.deliveryDays || 3,
+      revisions: gig?.revisions || 4,
       screens: "4 to 8 Screens",
       recommended: true,
       features: [
-        "Custom SaaS Dashboard Screens",
-        "Full Responsive Breakpoints (Web + Tablet)",
-        "Figma Deliverable Full Data Embedding",
-        "Interactive Clickable Prototype",
-        "Source File + Export Assets Kit",
+        "Full Platform Implementation",
+        "Responsive Breakpoints (Desktop + Mobile)",
+        "Verified Milestone Escrow Deployment",
+        "Full Documentation & Source Code",
+        "Priority Code Auditing Support",
       ],
     },
     premium: {
       name: "PREMIUM SUITE",
-      price: 520,
-      deliveryDays: 5,
+      price: gig?.price ? Math.round(gig.price * 1.8) : 7999,
+      deliveryDays: (gig?.deliveryDays || 3) + 2,
       revisions: 999,
       screens: "10+ Complete Views",
       features: [
-        "Full platform spec (10+ views)",
-        "Design System Tokens (JSON theme schema)",
-        "Interactive micro-prototype",
-        "Full Responsive Breakpoints (Desktop + Mobile)",
-        "Unlimited revisions during sprint",
+        "Full Enterprise Platform Suite",
+        "Custom Architecture & High-Scale Optimization",
+        "Automated CI/CD Test Pipeline Setup",
+        "Full Responsive Breakpoints (Web + Native)",
+        "Unlimited revisions during contract sprint",
       ],
     },
   };
 
-  const selectedPkg = packages[activePackageTab] || packages.standard;
+  const pkgData = gig?.packages || defaultPackages;
+  const packages = pkgData;
+  const selectedPkg = pkgData[activePackageTab] || pkgData.standard || pkgData.basic;
 
   async function handleSave() {
     if (!user) {
@@ -852,22 +854,22 @@ export default function GigDetails({ params }) {
               </div>
 
               <p className="mt-3 text-xs leading-relaxed text-[#3e4943]">
-                Complete UI environment for {selectedPkg.screens} with responsive layout, handoff specs and interactive prototype.
+                Complete technical environment for {selectedPkg.screens || "deliverable scope"} with responsive layout, handoff specs and escrow milestones.
               </p>
 
               {/* Delivery & Revisions row matching screenshot */}
               <div className="mt-4 flex items-center justify-between border-y border-[#e5e7eb] py-2.5 font-mono text-xs text-[#0b1c30]">
                 <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-[#005d42]" /> {selectedPkg.deliveryDays} Business Days
+                  <Clock className="h-3.5 w-3.5 text-[#005d42]" /> {selectedPkg.deliveryDays || 3} Business Days
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <RefreshCw className="h-3.5 w-3.5 text-[#005d42]" /> {selectedPkg.revisions} Iteration Rounds
+                  <RefreshCw className="h-3.5 w-3.5 text-[#005d42]" /> {selectedPkg.revisions === 999 ? "Unlimited" : selectedPkg.revisions || 2} Iteration Rounds
                 </span>
               </div>
 
               {/* Checklist */}
               <ul className="mt-4 space-y-2 text-xs text-[#0b1c30]">
-                {selectedPkg.features.map((feat, idx) => (
+                {(selectedPkg.features || []).map((feat, idx) => (
                   <li key={idx} className="flex items-center gap-2">
                     <Check className="h-3.5 w-3.5 text-[#005d42]" />
                     <span>{feat}</span>
