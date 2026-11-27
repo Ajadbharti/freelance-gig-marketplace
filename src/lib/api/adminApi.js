@@ -4,6 +4,8 @@ const API_BASE =
   process.env.NEXT_PUBLIC_SERVER_API_URL ||
   (typeof window !== "undefined" ? "/api/admin" : "http://localhost:5000/api/admin");
 
+const SUPER_ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "azadbharati802223@gmail.com").toLowerCase();
+
 // Helper to safely read from localStorage
 function getLocalItem(key, fallback = []) {
   if (typeof window === "undefined") return fallback;
@@ -50,11 +52,11 @@ function getClientFallback(endpoint, options = {}) {
   let auditLogs = getLocalItem("gigcraft_admin:audit_logs", [
     {
       id: "log-sys-init",
-      adminEmail: "admin@gigcraft.io",
+      adminEmail: SUPER_ADMIN_EMAIL,
       action: "PLATFORM_INITIALIZATION",
       targetResource: "SYSTEM_GOVERNANCE",
       targetResourceId: "gigcraft-core",
-      reason: "Governance telemetry active and synchronized",
+      reason: "Governance telemetry active and synchronized for Super Admin",
       ipAddress: "127.0.0.1",
       createdAt: new Date().toISOString(),
     },
@@ -73,17 +75,17 @@ function getClientFallback(endpoint, options = {}) {
     },
   ]);
 
-  // Ensure root admin is always present in users list
+  // Ensure single Super Admin is always first in users list
   const users = [
     {
-      id: "admin-root",
-      name: "Platform Administrator",
-      email: "admin@gigcraft.io",
+      id: "super-admin-azad",
+      name: "Azad Bharti (Platform Owner)",
+      email: SUPER_ADMIN_EMAIL,
       role: "admin",
       status: "active",
       createdAt: "2026-01-01T00:00:00.000Z",
     },
-    ...rawUsers.filter((u) => u.email !== "admin@gigcraft.io"),
+    ...rawUsers.filter((u) => u.email?.toLowerCase() !== SUPER_ADMIN_EMAIL),
   ];
 
   // 1. Dashboard
@@ -119,12 +121,14 @@ function getClientFallback(endpoint, options = {}) {
     const action = parts[3];
 
     if (action === "status" && method === "PATCH") {
-      const updated = rawUsers.map((u) => (u.id === userId ? { ...u, status: body.status, suspensionReason: body.reason } : u));
+      const updated = rawUsers.map((u) =>
+        u.id === userId ? { ...u, status: body.status, suspensionReason: body.reason } : u
+      );
       setLocalItem("gigcraft_in:registered_users", updated);
 
       auditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "UPDATE_USER_STATUS",
         targetResource: "User",
         targetResourceId: userId,
@@ -135,13 +139,44 @@ function getClientFallback(endpoint, options = {}) {
       return { ok: true, message: `Status updated to ${body.status}` };
     }
 
+    if (action === "profile" && method === "PATCH") {
+      const updated = rawUsers.map((u) => {
+        if (u.id === userId) {
+          return {
+            ...u,
+            name: body.name ? body.name.trim() : u.name,
+            title: body.title !== undefined ? body.title : u.title,
+            bio: body.bio !== undefined ? body.bio : u.bio,
+            skills: Array.isArray(body.skills) ? body.skills : u.skills,
+            hourlyRate: body.hourlyRate !== undefined ? Number(body.hourlyRate) : u.hourlyRate,
+            isVerified: body.isVerified !== undefined ? Boolean(body.isVerified) : u.isVerified,
+            status: body.status || u.status,
+          };
+        }
+        return u;
+      });
+      setLocalItem("gigcraft_in:registered_users", updated);
+
+      auditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: SUPER_ADMIN_EMAIL,
+        action: "UPDATE_USER_PROFILE",
+        targetResource: "User",
+        targetResourceId: userId,
+        reason: body.reason || "Profile updated by Super Administrator",
+        createdAt: new Date().toISOString(),
+      });
+      setLocalItem("gigcraft_admin:audit_logs", auditLogs);
+      return { ok: true, message: "User profile updated successfully" };
+    }
+
     if (method === "DELETE") {
       const updated = rawUsers.filter((u) => u.id !== userId);
       setLocalItem("gigcraft_in:registered_users", updated);
 
       auditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "DELETE_USER",
         targetResource: "User",
         targetResourceId: userId,
@@ -160,8 +195,91 @@ function getClientFallback(endpoint, options = {}) {
   if (cleanEndpoint === "/freelancers") {
     return { freelancers: users.filter((u) => u.role === "freelancer") };
   }
+
+  if (cleanEndpoint.startsWith("/freelancers/") && cleanEndpoint.endsWith("/dashboard")) {
+    const freelancerId = cleanEndpoint.split("/")[2];
+    const targetFreelancer = users.find((u) => u.id === freelancerId) || {
+      id: freelancerId,
+      name: "Specialist",
+      email: "freelancer@gigcraft.io",
+      role: "freelancer",
+      status: "active",
+      title: "Technical Specialist",
+      bio: "Independent Specialist contracting on GigCraft.",
+    };
+
+    const freelancerGigs = gigs.filter((g) => g.freelancerId === freelancerId);
+    const freelancerOrders = orders.filter((o) => o.freelancerId === freelancerId);
+    const freelancerReviews = reviews.filter((r) => r.freelancerId === freelancerId);
+    const completed = freelancerOrders.filter((o) => o.status === "completed");
+    const active = freelancerOrders.filter((o) => o.status === "active" || o.status === "in-progress");
+    const totalEarned = completed.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+    const avgRating =
+      freelancerReviews.length > 0
+        ? (freelancerReviews.reduce((s, r) => s + (r.rating || 5), 0) / freelancerReviews.length).toFixed(1)
+        : "5.0";
+
+    return {
+      success: true,
+      freelancer: targetFreelancer,
+      dashboard: {
+        stats: {
+          totalGigs: freelancerGigs.length,
+          publishedGigs: freelancerGigs.filter((g) => g.status === "published" || !g.status).length,
+          pendingGigs: freelancerGigs.filter((g) => g.status === "pending").length,
+          totalOrders: freelancerOrders.length,
+          activeOrders: active.length,
+          completedOrders: completed.length,
+          totalEarned,
+          avgRating: Number(avgRating),
+          reviewsCount: freelancerReviews.length,
+        },
+        gigs: freelancerGigs,
+        orders: freelancerOrders,
+        reviews: freelancerReviews,
+      },
+    };
+  }
+
   if (cleanEndpoint === "/clients") {
     return { clients: users.filter((u) => u.role === "client") };
+  }
+
+  if (cleanEndpoint.startsWith("/clients/") && cleanEndpoint.endsWith("/dashboard")) {
+    const clientId = cleanEndpoint.split("/")[2];
+    const targetClient = users.find((u) => u.id === clientId) || {
+      id: clientId,
+      name: "Enterprise Client",
+      email: "client@agency.io",
+      role: "client",
+      status: "active",
+    };
+
+    const clientOrders = orders.filter((o) => o.clientId === clientId);
+    const clientReviews = reviews.filter((r) => r.clientId === clientId);
+    const completed = clientOrders.filter((o) => o.status === "completed");
+    const active = clientOrders.filter((o) => o.status === "active" || o.status === "in-progress");
+    const delivered = clientOrders.filter((o) => o.status === "delivered");
+    const totalSpent = completed.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+    const inEscrow = active.concat(delivered).reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+
+    return {
+      success: true,
+      client: targetClient,
+      dashboard: {
+        stats: {
+          totalOrders: clientOrders.length,
+          activeOrders: active.length,
+          deliveredOrders: delivered.length,
+          completedOrders: completed.length,
+          cancelledOrders: clientOrders.filter((o) => o.status === "cancelled").length,
+          totalSpent,
+          inEscrow,
+        },
+        orders: clientOrders,
+        reviews: clientReviews,
+      },
+    };
   }
 
   // 4. Gigs
@@ -180,7 +298,7 @@ function getClientFallback(endpoint, options = {}) {
 
       auditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "APPROVE_GIG",
         targetResource: "Gig",
         targetResourceId: gigId,
@@ -192,12 +310,14 @@ function getClientFallback(endpoint, options = {}) {
     }
 
     if (action === "reject" && method === "PATCH") {
-      const updated = gigs.map((g) => (g.id === gigId ? { ...g, status: "rejected", rejectionReason: body.reason } : g));
+      const updated = gigs.map((g) =>
+        g.id === gigId ? { ...g, status: "rejected", rejectionReason: body.reason } : g
+      );
       setLocalItem("gigcraft_clean:gigs", updated);
 
       auditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "REJECT_GIG",
         targetResource: "Gig",
         targetResourceId: gigId,
@@ -209,12 +329,14 @@ function getClientFallback(endpoint, options = {}) {
     }
 
     if (action === "suspend" && method === "PATCH") {
-      const updated = gigs.map((g) => (g.id === gigId ? { ...g, status: "suspended", suspensionReason: body.reason } : g));
+      const updated = gigs.map((g) =>
+        g.id === gigId ? { ...g, status: "suspended", suspensionReason: body.reason } : g
+      );
       setLocalItem("gigcraft_clean:gigs", updated);
 
       auditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "SUSPEND_GIG",
         targetResource: "Gig",
         targetResourceId: gigId,
@@ -242,7 +364,7 @@ function getClientFallback(endpoint, options = {}) {
 
       auditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "CREATE_CATEGORY",
         targetResource: "Category",
         targetResourceId: newCat.id,
@@ -361,6 +483,11 @@ export const adminApi = {
       method: "PATCH",
       body: JSON.stringify({ status, reason }),
     }),
+  updateUserProfile: (id, data) =>
+    request(`/users/${id}/profile`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
   deleteUser: (id, { reason }) =>
     request(`/users/${id}`, {
       method: "DELETE",
@@ -372,6 +499,7 @@ export const adminApi = {
     const query = new URLSearchParams(params).toString();
     return request(`/freelancers?${query}`);
   },
+  getFreelancerDashboard: (id) => request(`/freelancers/${id}/dashboard`),
   verifyFreelancer: (id, { verified, reason }) =>
     request(`/freelancers/${id}/verify`, {
       method: "PATCH",
@@ -381,6 +509,7 @@ export const adminApi = {
     const query = new URLSearchParams(params).toString();
     return request(`/clients?${query}`);
   },
+  getClientDashboard: (id) => request(`/clients/${id}/dashboard`),
 
   // 4. Gigs
   getGigs: (params = {}) => {

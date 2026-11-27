@@ -27,6 +27,9 @@ const {
   getReports,
   updateReportStatus,
   getAuditLogs,
+  getClientDashboard,
+  getFreelancerDashboard,
+  updateUserProfile,
 } = require("../controllers/adminController");
 
 // All admin routes require protect AND adminOnly
@@ -39,12 +42,15 @@ router.get("/dashboard", getDashboardStats);
 router.get("/users", getAllUsers);
 router.get("/users/:id", getUserById);
 router.patch("/users/:id/status", updateUserStatus);
+router.patch("/users/:id/profile", updateUserProfile);
 router.delete("/users/:id", deleteUser);
 
-// Freelancers & Clients
+// Freelancers & Clients Management & Inspection
 router.get("/freelancers", getFreelancers);
+router.get("/freelancers/:id/dashboard", getFreelancerDashboard);
 router.patch("/freelancers/:id/verify", verifyFreelancer);
 router.get("/clients", getClients);
+router.get("/clients/:id/dashboard", getClientDashboard);
 
 // Gigs
 router.get("/gigs", getGigs);

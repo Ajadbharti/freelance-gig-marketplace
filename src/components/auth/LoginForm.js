@@ -196,25 +196,25 @@ export default function LoginForm() {
                   <button
                     type="button"
                     onClick={async () => {
-                      setValue("email", "admin@gigcraft.io");
-                      setValue("password", "AdminSecurePass2026!");
-                      const res = await login("admin@gigcraft.io", "AdminSecurePass2026!");
+                      setValue("email", "azadbharati802223@gmail.com");
+                      setValue("password", "AdminSecureAuth");
+                      const res = await login("azadbharati802223@gmail.com", "AdminSecureAuth");
                       if (res.ok) {
-                        showToast("Admin session authenticated! Loading console...", "success");
+                        showToast("Super Admin authenticated! Loading Governance Console...", "success");
                         window.location.href = "/admin";
                       } else {
-                        showToast(res.error || "Admin authentication failed", "error");
+                        showToast(res.error || "Super Admin authentication failed", "error");
                       }
                     }}
                     className="flex items-center justify-center gap-1.5 border border-[#005d42] bg-[#005d42] py-2 px-2.5 font-mono text-[11px] font-bold uppercase text-white hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] transition"
                   >
                     <ShieldCheck className="h-3.5 w-3.5 text-[#9ffdd3]" />
-                    <span>⚡ Admin (Instant)</span>
+                    <span>⚡ Super Admin</span>
                   </button>
                 </div>
                 <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1 border-t border-[#0b1c30]/10 pt-1.5 font-mono text-[10px] text-[#6e7a73]">
-                  <span>Admin ID: <strong className="text-[#0b1c30]">admin@gigcraft.io</strong></span>
-                  <span>Pass: <strong className="text-[#0b1c30]">AdminSecurePass2026!</strong></span>
+                  <span>Super Admin: <strong className="text-[#0b1c30]">azadbharati802223@gmail.com</strong></span>
+                  <span className="text-[#005d42] font-bold">Platform Owner</span>
                 </div>
               </div>
 
@@ -332,24 +332,24 @@ export default function LoginForm() {
                   <span>{isSubmitting ? "Authenticating..." : "→ Sign In to Workspace"}</span>
                 </button>
 
-                {/* 1-Click Admin Access Button */}
+                {/* 1-Click Super Admin Access Button */}
                 <button
                   type="button"
                   onClick={async () => {
-                    setValue("email", "admin@gigcraft.io");
-                    setValue("password", "AdminSecurePass2026!");
-                    const res = await login("admin@gigcraft.io", "AdminSecurePass2026!");
+                    setValue("email", "azadbharati802223@gmail.com");
+                    setValue("password", "AdminSecureAuth");
+                    const res = await login("azadbharati802223@gmail.com", "AdminSecureAuth");
                     if (res.ok) {
-                      showToast("Authenticated as Platform Administrator! Loading Governance Console...", "success");
+                      showToast("Authenticated as Super Administrator! Loading Governance Console...", "success");
                       window.location.href = "/admin";
                     } else {
-                      showToast(res.error || "Admin authentication failed", "error");
+                      showToast(res.error || "Super Admin authentication failed", "error");
                     }
                   }}
                   className="flex h-11 w-full items-center justify-center gap-2 border border-[#0b1c30] bg-[#0b1c30] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-slate-800 shadow-[2px_2px_0px_#005d42] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition"
                 >
                   <ShieldCheck className="h-4 w-4 text-[#9ffdd3]" />
-                  <span>⚡ 1-CLICK SIGN IN AS ADMINISTRATOR</span>
+                  <span>⚡ 1-CLICK SUPER ADMIN (AZAD BHARATI)</span>
                 </button>
 
                 {/* Bottom Register Switch */}

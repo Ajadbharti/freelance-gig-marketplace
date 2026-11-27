@@ -880,3 +880,151 @@ exports.getAuditLogs = async (req, res) => {
     res.status(500).json({ error: error.message || "Failed to fetch audit logs." });
   }
 };
+
+// ==========================================
+// 11. INSPECTION VIEWS (MANAGE AS CLIENT / FREELANCER)
+// ==========================================
+exports.getClientDashboard = async (req, res) => {
+  try {
+    const client = await User.findById(req.params.id).select("-password");
+    if (!client) {
+      return res.status(404).json({ error: "Client account not found." });
+    }
+
+    const [orders, reviews] = await Promise.all([
+      Order.find({ clientId: client._id }).sort({ createdAt: -1 }),
+      Review.find({ clientId: client._id }).sort({ createdAt: -1 }),
+    ]);
+
+    const completedOrders = orders.filter((o) => o.status === "completed");
+    const activeOrders = orders.filter((o) => o.status === "active" || o.status === "in-progress");
+    const deliveredOrders = orders.filter((o) => o.status === "delivered");
+    const cancelledOrders = orders.filter((o) => o.status === "cancelled");
+
+    const totalSpent = completedOrders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+    const inEscrow = activeOrders.concat(deliveredOrders).reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+
+    res.status(200).json({
+      success: true,
+      client,
+      dashboard: {
+        stats: {
+          totalOrders: orders.length,
+          activeOrders: activeOrders.length,
+          deliveredOrders: deliveredOrders.length,
+          completedOrders: completedOrders.length,
+          cancelledOrders: cancelledOrders.length,
+          totalSpent,
+          inEscrow,
+        },
+        orders,
+        reviews,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Failed to fetch client dashboard." });
+  }
+};
+
+exports.getFreelancerDashboard = async (req, res) => {
+  try {
+    const freelancer = await User.findById(req.params.id).select("-password");
+    if (!freelancer) {
+      return res.status(404).json({ error: "Freelancer account not found." });
+    }
+
+    const [gigs, orders, reviews] = await Promise.all([
+      Gig.find({ freelancerId: freelancer._id }).sort({ createdAt: -1 }),
+      Order.find({ freelancerId: freelancer._id }).sort({ createdAt: -1 }),
+      Review.find({ freelancerId: freelancer._id }).sort({ createdAt: -1 }),
+    ]);
+
+    const completedOrders = orders.filter((o) => o.status === "completed");
+    const activeOrders = orders.filter((o) => o.status === "active" || o.status === "in-progress");
+    const totalEarned = completedOrders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+    const avgRating =
+      reviews.length > 0 ? (reviews.reduce((s, r) => s + (r.rating || 5), 0) / reviews.length).toFixed(1) : 5.0;
+
+    res.status(200).json({
+      success: true,
+      freelancer,
+      dashboard: {
+        stats: {
+          totalGigs: gigs.length,
+          publishedGigs: gigs.filter((g) => g.status === "published" || g.status === "approved").length,
+          pendingGigs: gigs.filter((g) => g.status === "pending").length,
+          totalOrders: orders.length,
+          activeOrders: activeOrders.length,
+          completedOrders: completedOrders.length,
+          totalEarned,
+          avgRating: Number(avgRating),
+          reviewsCount: reviews.length,
+        },
+        gigs,
+        orders,
+        reviews,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Failed to fetch freelancer dashboard." });
+  }
+};
+
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const targetUser = await User.findById(req.params.id);
+    if (!targetUser) return res.status(404).json({ error: "User not found." });
+
+    const SUPER_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "azadbharati802223@gmail.com").toLowerCase();
+
+    // Prevent any change of role to admin or from admin
+    if (req.body.role === "admin" && targetUser.email.toLowerCase() !== SUPER_ADMIN_EMAIL) {
+      return res.status(400).json({ error: "Forbidden: Super Admin role cannot be granted." });
+    }
+
+    const { name, title, bio, skills, hourlyRate, isVerified, status } = req.body;
+    const previous = {
+      name: targetUser.name,
+      title: targetUser.title,
+      bio: targetUser.bio,
+      isVerified: targetUser.isVerified,
+      status: targetUser.status,
+    };
+
+    if (name) targetUser.name = name.trim();
+    if (title !== undefined) targetUser.title = title;
+    if (bio !== undefined) targetUser.bio = bio;
+    if (Array.isArray(skills)) targetUser.skills = skills;
+    if (hourlyRate !== undefined) targetUser.hourlyRate = Number(hourlyRate);
+    if (isVerified !== undefined) targetUser.isVerified = Boolean(isVerified);
+    if (status && ["active", "suspended", "blocked"].includes(status)) {
+      targetUser.status = status;
+    }
+
+    await targetUser.save();
+
+    await logAdminAction({
+      admin: req.user,
+      action: "UPDATE_USER_PROFILE",
+      targetResource: "User",
+      targetResourceId: targetUser._id,
+      previousValue: previous,
+      newValue: {
+        name: targetUser.name,
+        title: targetUser.title,
+        isVerified: targetUser.isVerified,
+        status: targetUser.status,
+      },
+      reason: req.body?.reason || "Profile updated by Super Administrator",
+      req,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User profile updated successfully.",
+      user: targetUser,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Failed to update user profile." });
+  }
+};

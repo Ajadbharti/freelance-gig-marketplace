@@ -34,6 +34,9 @@ import AdminHeader from "./AdminHeader";
 import AdminStatsCard from "./AdminStatsCard";
 import UserDetailsModal from "./UserDetailsModal";
 import GigDetailsModal from "./GigDetailsModal";
+import AdminClientInspectionView from "./AdminClientInspectionView";
+import AdminFreelancerInspectionView from "./AdminFreelancerInspectionView";
+import EditUserProfileModal from "./EditUserProfileModal";
 import { adminApi } from "@/lib/api/adminApi";
 import { formatPrice } from "@/lib/utils";
 
@@ -74,6 +77,9 @@ export default function AdminPanel() {
   // Modals & Inspect Targets
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedGig, setSelectedGig] = useState(null);
+  const [inspectingClient, setInspectingClient] = useState(null);
+  const [inspectingFreelancer, setInspectingFreelancer] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
   const [categoryModal, setCategoryModal] = useState(false);
   const [newCatName, setNewCatName] = useState("");
   const [newCatSlug, setNewCatSlug] = useState("");
@@ -167,6 +173,17 @@ export default function AdminPanel() {
       setSelectedUser(null);
     } catch (err) {
       showToast(err.message, "error");
+    }
+  }
+
+  async function handleUpdateUserProfile(userId, data) {
+    try {
+      await adminApi.updateUserProfile(userId, data);
+      showToast("User profile updated successfully in governance ledger.", "success");
+      loadData();
+      setEditingUser(null);
+    } catch (err) {
+      showToast(err.message || "Failed to update profile", "error");
     }
   }
 
@@ -290,28 +307,31 @@ export default function AdminPanel() {
     return matchSearch && matchStatus;
   });
 
-  // Auth Guards for Platform Administration
-  if (!loading && user && user.role !== "admin") {
+  // Auth Guards for Platform Administration - Strictly Single Super Admin
+  const SUPER_ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "azadbharati802223@gmail.com").toLowerCase();
+  const isAuthorizedSuperAdmin = user && user.role === "admin" && user.email?.toLowerCase() === SUPER_ADMIN_EMAIL;
+
+  if (!loading && user && !isAuthorizedSuperAdmin) {
     return (
       <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center p-4">
         <div className="w-full max-w-md border border-[#0b1c30] bg-white p-8 shadow-[4px_4px_0px_#0b1c30]">
           <div className="flex items-center gap-2 border border-[#ba1a1a]/30 bg-[#fff0f0] px-2.5 py-1 font-mono text-xs font-bold text-[#ba1a1a] uppercase w-fit">
-            <ShieldAlert className="h-4 w-4" /> Restricted Access
+            <ShieldAlert className="h-4 w-4" /> Single Super Admin Required
           </div>
           <h2 className="mt-4 font-headline text-2xl font-bold uppercase text-[#0b1c30]">
-            Admin Session Required
+            Super Admin Access Required
           </h2>
           <p className="mt-2 font-mono text-xs text-[#3e4943] leading-relaxed">
-            You are currently signed in as <strong>{user.email}</strong> ({user.role?.toUpperCase()}). Platform governance requires Administrator clearance.
+            You are currently signed in as <strong>{user.email}</strong> ({user.role?.toUpperCase()}). Platform governance is strictly restricted to the platform owner: <strong>{SUPER_ADMIN_EMAIL}</strong>.
           </p>
 
           <div className="mt-6 space-y-3">
             <button
               type="button"
               onClick={async () => {
-                const res = await login("admin@gigcraft.io", "AdminSecurePass2026!");
+                const res = await login(SUPER_ADMIN_EMAIL, "AdminSecureAuth");
                 if (res.ok) {
-                  showToast("Switched to Administrator session!", "success");
+                  showToast("Switched to Super Administrator session!", "success");
                   loadData();
                 } else {
                   showToast(res.error || "Authentication failed", "error");
@@ -320,7 +340,7 @@ export default function AdminPanel() {
               className="flex h-12 w-full items-center justify-center gap-2 border border-[#005d42] bg-[#005d42] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition"
             >
               <ShieldCheck className="h-4 w-4 text-[#9ffdd3]" />
-              <span>⚡ Switch to Administrator Account</span>
+              <span>⚡ Switch to Super Admin Account (Azad Bharti)</span>
             </button>
 
             <Link
@@ -343,19 +363,19 @@ export default function AdminPanel() {
             <ShieldCheck className="h-4 w-4" /> Governance Access
           </div>
           <h2 className="mt-4 font-headline text-2xl font-bold uppercase text-[#0b1c30]">
-            Sign In As Administrator
+            Sign In As Super Admin
           </h2>
           <p className="mt-2 font-mono text-xs text-[#3e4943] leading-relaxed">
-            Access to platform governance, order escrows, user suspensions, and gig approval requests requires root administrator authentication.
+            Access to platform governance, user management, and client/freelancer dashboards is reserved strictly for <strong>{SUPER_ADMIN_EMAIL}</strong>.
           </p>
 
           <div className="mt-6 space-y-3">
             <button
               type="button"
               onClick={async () => {
-                const res = await login("admin@gigcraft.io", "AdminSecurePass2026!");
+                const res = await login(SUPER_ADMIN_EMAIL, "AdminSecureAuth");
                 if (res.ok) {
-                  showToast("Authenticated as Platform Administrator!", "success");
+                  showToast("Authenticated as Super Administrator!", "success");
                   loadData();
                 } else {
                   showToast(res.error || "Authentication failed", "error");
@@ -364,7 +384,7 @@ export default function AdminPanel() {
               className="flex h-12 w-full items-center justify-center gap-2 border border-[#005d42] bg-[#005d42] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition"
             >
               <ShieldCheck className="h-4 w-4 text-[#9ffdd3]" />
-              <span>⚡ 1-Click Authenticate as Administrator</span>
+              <span>⚡ 1-Click Authenticate as Super Admin (Azad Bharti)</span>
             </button>
 
             <Link
@@ -376,7 +396,7 @@ export default function AdminPanel() {
           </div>
 
           <div className="mt-4 border-t border-[#e5e7eb] pt-3 font-mono text-[11px] text-[#6e7a73]">
-            Default Credentials: <strong className="text-[#0b1c30]">admin@gigcraft.io</strong> / <strong className="text-[#0b1c30]">AdminSecurePass2026!</strong>
+            Designated Super Admin: <strong className="text-[#0b1c30]">{SUPER_ADMIN_EMAIL}</strong>
           </div>
         </div>
       </div>
@@ -399,12 +419,85 @@ export default function AdminPanel() {
 
             {/* Main Admin Content Body */}
             <div className="space-y-6 min-w-0">
-              <AdminHeader
-                title={activeSection.replace(/-/g, " ")}
-                subtitle="Deterministic Governance & Escrow Controls"
-                onRefresh={loadData}
-                isRefreshing={refreshing}
-              />
+              {/* Top 3-Way Mode Switcher: Admin Dashboard / Client Management / Freelancer Management */}
+              <div className="flex flex-wrap items-center gap-2 border border-[#0b1c30] bg-white p-2.5 shadow-[3px_3px_0px_#0b1c30] font-mono text-xs">
+                <span className="px-2 font-bold uppercase text-[#6e7a73] text-[10px]">MANAGEMENT CONSOLE:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInspectingClient(null);
+                    setInspectingFreelancer(null);
+                    setActiveSection("overview");
+                  }}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 font-bold uppercase transition shadow-[1px_1px_0px_#0b1c30] ${
+                    activeSection !== "clients" && activeSection !== "freelancers" && !inspectingClient && !inspectingFreelancer
+                      ? "bg-[#0b1c30] text-white"
+                      : "bg-[#eff4ff] text-[#0b1c30] hover:bg-slate-200"
+                  }`}
+                >
+                  <span>🛡️ Admin Dashboard</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInspectingClient(null);
+                    setInspectingFreelancer(null);
+                    setActiveSection("clients");
+                  }}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 font-bold uppercase transition shadow-[1px_1px_0px_#0b1c30] ${
+                    activeSection === "clients" || inspectingClient
+                      ? "bg-[#005d42] text-white"
+                      : "bg-[#eff4ff] text-[#0b1c30] hover:bg-slate-200"
+                  }`}
+                >
+                  <span>👤 Client Management</span>
+                  <span className="bg-white/20 px-1.5 py-0.2 text-[10px] rounded">{stats.totalClients}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInspectingClient(null);
+                    setInspectingFreelancer(null);
+                    setActiveSection("freelancers");
+                  }}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 font-bold uppercase transition shadow-[1px_1px_0px_#0b1c30] ${
+                    activeSection === "freelancers" || inspectingFreelancer
+                      ? "bg-[#005d42] text-white"
+                      : "bg-[#eff4ff] text-[#0b1c30] hover:bg-slate-200"
+                  }`}
+                >
+                  <span>💼 Freelancer Management</span>
+                  <span className="bg-white/20 px-1.5 py-0.2 text-[10px] rounded">{stats.totalFreelancers}</span>
+                </button>
+              </div>
+
+              {inspectingClient ? (
+                <AdminClientInspectionView
+                  client={inspectingClient}
+                  onBack={() => setInspectingClient(null)}
+                  onEditProfile={(target) => setEditingUser(target)}
+                  onUpdateStatus={handleUpdateUserStatus}
+                  onDeleteClient={handleDeleteUser}
+                />
+              ) : inspectingFreelancer ? (
+                <AdminFreelancerInspectionView
+                  freelancer={inspectingFreelancer}
+                  onBack={() => setInspectingFreelancer(null)}
+                  onEditProfile={(target) => setEditingUser(target)}
+                  onApproveGig={handleApproveGig}
+                  onRejectGig={handleRejectGig}
+                  onSuspendGig={handleSuspendGig}
+                  onUpdateStatus={handleUpdateUserStatus}
+                  onDeleteFreelancer={handleDeleteUser}
+                />
+              ) : (
+                <>
+                  <AdminHeader
+                    title={activeSection.replace(/-/g, " ")}
+                    subtitle="Deterministic Governance & Escrow Controls"
+                    onRefresh={loadData}
+                    isRefreshing={refreshing}
+                  />
 
               {/* 1. OVERVIEW SECTION */}
               {activeSection === "overview" && (
@@ -605,13 +698,40 @@ export default function AdminPanel() {
                                 {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}
                               </td>
                               <td className="p-3 text-right">
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedUser(u)}
-                                  className="border border-[#0b1c30] bg-white px-2.5 py-1 font-bold uppercase text-[#0b1c30] hover:bg-[#eff4ff] shadow-[1px_1px_0px_#0b1c30]"
-                                >
-                                  MODERATE
-                                </button>
+                                <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                                  {u.role === "client" && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setInspectingClient(u)}
+                                      className="border border-[#005d42] bg-[#eff4ff] px-2.5 py-1 text-[11px] font-bold uppercase text-[#005d42] hover:bg-[#005d42] hover:text-white shadow-[1px_1px_0px_#0b1c30] transition"
+                                    >
+                                      👤 Manage as Client
+                                    </button>
+                                  )}
+                                  {u.role === "freelancer" && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setInspectingFreelancer(u)}
+                                      className="border border-[#005d42] bg-[#eff4ff] px-2.5 py-1 text-[11px] font-bold uppercase text-[#005d42] hover:bg-[#005d42] hover:text-white shadow-[1px_1px_0px_#0b1c30] transition"
+                                    >
+                                      💼 Manage as Freelancer
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingUser(u)}
+                                    className="border border-[#0b1c30] bg-white px-2 py-1 text-[11px] font-bold uppercase text-[#0b1c30] hover:bg-slate-100 shadow-[1px_1px_0px_#0b1c30] transition"
+                                  >
+                                    ✏️ Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedUser(u)}
+                                    className="border border-[#ba1a1a] bg-white px-2 py-1 text-[11px] font-bold uppercase text-[#ba1a1a] hover:bg-red-50 shadow-[1px_1px_0px_#ba1a1a] transition"
+                                  >
+                                    ⚙️ Moderate
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))
@@ -993,21 +1113,32 @@ export default function AdminPanel() {
                     </div>
 
                     <div>
-                      <label className="block text-[#6e7a73] uppercase font-bold">PRIMARY ADMINISTRATOR IDENTIFIER</label>
+                      <label className="block text-[#6e7a73] uppercase font-bold">PRIMARY SUPER ADMINISTRATOR IDENTIFIER</label>
                       <input
                         type="text"
                         disabled
-                        value={user?.email || "admin@gigcraft.io"}
+                        value={user?.email || "azadbharati802223@gmail.com"}
                         className="mt-1 w-full border border-[#0b1c30] bg-slate-50 p-2 text-xs font-bold"
                       />
                     </div>
                   </div>
                 </div>
               )}
-            </div>
-          </div>
+            </>
+          )}
         </div>
-      </main>
+      </div>
+    </div>
+  </main>
+
+  {/* Edit User Profile Modal */}
+  {editingUser && (
+    <EditUserProfileModal
+      user={editingUser}
+      onClose={() => setEditingUser(null)}
+      onSave={handleUpdateUserProfile}
+    />
+  )}
 
       {/* User Details & Moderation Modal */}
       <UserDetailsModal

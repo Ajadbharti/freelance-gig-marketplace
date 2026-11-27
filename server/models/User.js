@@ -76,6 +76,20 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
+  const SUPER_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "azadbharati802223@gmail.com").toLowerCase();
+
+  // Strict rule: Only the designated single Super Admin email can hold the admin role
+  if (this.role === "admin" && this.email.toLowerCase() !== SUPER_ADMIN_EMAIL) {
+    return next(
+      new Error(`Security Violation: Only ${SUPER_ADMIN_EMAIL} is authorized to hold the administrator role.`)
+    );
+  }
+
+  // Prevent demotion of the Super Admin
+  if (this.email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+    this.role = "admin";
+  }
+
   if (!this.isModified("password") || !this.password) {
     return next();
   }

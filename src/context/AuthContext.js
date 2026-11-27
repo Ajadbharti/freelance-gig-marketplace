@@ -142,18 +142,18 @@ export function AuthProvider({ children }) {
       if (raw) registeredUsers = JSON.parse(raw);
     } catch {}
 
-    // 1. Check Root Administrator Credentials
-    const isAdminEmail = cleanEmail === "admin@gigcraft.io" || cleanEmail === "admin@gigcraft.com" || cleanEmail === "admin";
-    const isAdminPass = password === "AdminSecurePass2026!" || password === "admin" || password === "admin123";
+    // 1. Check Root Administrator Credentials - Strictly Single Super Admin
+    const SUPER_ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "azadbharati802223@gmail.com").toLowerCase();
+    const isSuperAdminEmail = cleanEmail === SUPER_ADMIN_EMAIL;
 
-    if (isAdminEmail && isAdminPass) {
+    if (isSuperAdminEmail) {
       const adminUser = {
-        id: "admin-root",
-        name: "Platform Administrator",
-        email: "admin@gigcraft.io",
+        id: "super-admin-azad",
+        name: "Azad Bharti (Platform Owner)",
+        email: SUPER_ADMIN_EMAIL,
         role: "admin",
         avatar: "",
-        initials: "SA",
+        initials: "AB",
         joinedAt: new Date().toISOString(),
       };
       setUser(adminUser);
@@ -336,14 +336,17 @@ export function AuthProvider({ children }) {
       .slice(0, 2)
       .toUpperCase();
 
+    // Strictly prevent public registration as admin
+    const safeRole = role === "freelancer" ? "freelancer" : "client";
+
     const newUser = {
       id: "usr-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: trimmedName,
       email: cleanEmail,
       password: password,
-      role: role || "client",
+      role: safeRole,
       avatar: "",
-      initials: initials || (role === "freelancer" ? "FL" : "CL"),
+      initials: initials || (safeRole === "freelancer" ? "FL" : "CL"),
       joinedAt: new Date().toISOString(),
     };
 

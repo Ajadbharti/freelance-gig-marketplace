@@ -39,11 +39,17 @@ const protect = async (req, res, next) => {
   }
 };
 
-// Admin only middleware: checks user role
+// Admin only middleware: checks user role and single Super Admin authorization
 const adminOnly = (req, res, next) => {
-  if (!req.user || req.user.role !== "admin") {
+  const SUPER_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "azadbharati802223@gmail.com").toLowerCase();
+
+  if (
+    !req.user ||
+    req.user.role !== "admin" ||
+    req.user.email.toLowerCase() !== SUPER_ADMIN_EMAIL
+  ) {
     return res.status(403).json({
-      error: "Access denied. Platform Administrator permissions required.",
+      error: "Access denied. Platform Administrator permissions restricted to designated Super Admin.",
     });
   }
   next();

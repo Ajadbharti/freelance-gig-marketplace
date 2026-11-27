@@ -94,10 +94,10 @@ export default function AdminSidebar({ activeSection, onSelectSection, stats, us
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate font-sans font-bold text-[#0b1c30]">
-              {user?.name || "Administrator"}
+              {user?.name || "Azad Bharti (Super Admin)"}
             </p>
             <p className="truncate text-[10px] text-[#6e7a73]">
-              {user?.email || "admin@gigcraft.io"}
+              {user?.email || "azadbharati802223@gmail.com"}
             </p>
           </div>
         </div>

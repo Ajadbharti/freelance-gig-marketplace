@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { categories as defaultCategories } from "@/data/categories";
 
 const EXPRESS_BASE = process.env.EXPRESS_URL || "http://localhost:5000/api/admin";
+const SUPER_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "azadbharati802223@gmail.com").toLowerCase();
 
 // In-memory fallback stores for when Express/MongoDB server is offline
 let localCategories = defaultCategories.map((c, i) => ({
@@ -16,11 +17,11 @@ let localCategories = defaultCategories.map((c, i) => ({
 let localAuditLogs = [
   {
     id: "log-init-1",
-    adminEmail: "admin@gigcraft.io",
+    adminEmail: SUPER_ADMIN_EMAIL,
     action: "SYSTEM_INITIALIZATION",
     targetResource: "PLATFORM_CORE",
     targetResourceId: "gigcraft-core",
-    reason: "Platform governance engine started",
+    reason: "Platform governance engine started for Azad Bharti (Super Admin)",
     ipAddress: "127.0.0.1",
     createdAt: new Date().toISOString(),
   },
@@ -100,19 +101,19 @@ function handleLocalFallback(path, method, body) {
   if (resource === "users") {
     const defaultUsers = [
       {
-        id: "admin-root",
-        name: "Platform Administrator",
-        email: "admin@gigcraft.io",
+        id: "super-admin-azad",
+        name: "Azad Bharti (Platform Owner)",
+        email: SUPER_ADMIN_EMAIL,
         role: "admin",
         status: "active",
-        createdAt: new Date().toISOString(),
+        createdAt: "2026-01-01T00:00:00.000Z",
       },
     ];
 
     if (subAction === "status" && method === "PATCH") {
       localAuditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "UPDATE_USER_STATUS",
         targetResource: "User",
         targetResourceId: id,
@@ -122,10 +123,23 @@ function handleLocalFallback(path, method, body) {
       return NextResponse.json({ ok: true, message: `Status updated to ${body?.status}` });
     }
 
+    if (subAction === "profile" && method === "PATCH") {
+      localAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: SUPER_ADMIN_EMAIL,
+        action: "UPDATE_USER_PROFILE",
+        targetResource: "User",
+        targetResourceId: id,
+        reason: body?.reason || "Profile updated by Super Admin",
+        createdAt: new Date().toISOString(),
+      });
+      return NextResponse.json({ ok: true, message: "User profile updated" });
+    }
+
     if (method === "DELETE") {
       localAuditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "DELETE_USER",
         targetResource: "User",
         targetResourceId: id,
@@ -140,11 +154,66 @@ function handleLocalFallback(path, method, body) {
 
   // 3. Freelancers
   if (resource === "freelancers") {
+    if (subAction === "dashboard") {
+      return NextResponse.json({
+        success: true,
+        freelancer: {
+          id,
+          name: "Sample Specialist",
+          email: "specialist@gigcraft.io",
+          role: "freelancer",
+          status: "active",
+          title: "Fullstack Architecture Specialist",
+          bio: "Specialist contracting under deterministic escrow milestones.",
+        },
+        dashboard: {
+          stats: {
+            totalGigs: 0,
+            publishedGigs: 0,
+            pendingGigs: 0,
+            totalOrders: 0,
+            activeOrders: 0,
+            completedOrders: 0,
+            totalEarned: 0,
+            avgRating: 5.0,
+            reviewsCount: 0,
+          },
+          gigs: [],
+          orders: [],
+          reviews: [],
+        },
+      });
+    }
     return NextResponse.json({ freelancers: [] });
   }
 
   // 4. Clients
   if (resource === "clients") {
+    if (subAction === "dashboard") {
+      return NextResponse.json({
+        success: true,
+        client: {
+          id,
+          name: "Sample Enterprise Client",
+          email: "client@enterprise.io",
+          role: "client",
+          status: "active",
+        },
+        dashboard: {
+          stats: {
+            totalOrders: 0,
+            activeOrders: 0,
+            deliveredOrders: 0,
+            completedOrders: 0,
+            cancelledOrders: 0,
+            totalSpent: 0,
+            inEscrow: 0,
+          },
+          orders: [],
+          reviews: [],
+        },
+      });
+    }
     return NextResponse.json({ clients: [] });
   }
 
@@ -153,7 +222,7 @@ function handleLocalFallback(path, method, body) {
     if (subAction === "approve" && method === "PATCH") {
       localAuditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "APPROVE_GIG",
         targetResource: "Gig",
         targetResourceId: id,
@@ -166,7 +235,7 @@ function handleLocalFallback(path, method, body) {
     if (subAction === "reject" && method === "PATCH") {
       localAuditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "REJECT_GIG",
         targetResource: "Gig",
         targetResourceId: id,
@@ -179,7 +248,7 @@ function handleLocalFallback(path, method, body) {
     if (subAction === "suspend" && method === "PATCH") {
       localAuditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "SUSPEND_GIG",
         targetResource: "Gig",
         targetResourceId: id,
@@ -206,7 +275,7 @@ function handleLocalFallback(path, method, body) {
       localCategories.push(newCat);
       localAuditLogs.unshift({
         id: `log-${Date.now()}`,
-        adminEmail: "admin@gigcraft.io",
+        adminEmail: SUPER_ADMIN_EMAIL,
         action: "CREATE_CATEGORY",
         targetResource: "Category",
         targetResourceId: newCat.id,
