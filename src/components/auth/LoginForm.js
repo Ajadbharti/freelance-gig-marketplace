@@ -34,7 +34,7 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const nextUrl = searchParams.get("next") || "/dashboard/client";
   const { login, loginWithProvider, loginWithGithubDemo, loginWithFirebaseGoogle } = useAuth();
-  const { gigs, freelancers } = useMarketplace();
+  const { gigs, freelancers, orders, reviews } = useMarketplace();
   const { showToast } = useToast();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -76,8 +76,8 @@ export default function LoginForm() {
     if (provider === "github") {
       setOauthLoading("github");
       const result = await loginWithGithubDemo({
-        name: "Linus Torvalds",
-        email: "developer@agency.io",
+        name: "Developer Workspace",
+        email: "dev@workspace.local",
         role: "client",
       });
       setOauthLoading(null);
@@ -311,7 +311,7 @@ export default function LoginForm() {
                     PUBLISHED GIGS
                   </p>
                   <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                    {gigs?.length || 7}
+                    {gigs?.length || 0}
                   </p>
                 </div>
 
@@ -320,7 +320,7 @@ export default function LoginForm() {
                     FREELANCERS
                   </p>
                   <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                    {freelancers?.length || 4}
+                    {freelancers?.length || 0}
                   </p>
                 </div>
 
@@ -329,7 +329,7 @@ export default function LoginForm() {
                     COMPLETED ORDERS
                   </p>
                   <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                    1
+                    {orders?.filter(o => o.status === "completed").length || 0}
                   </p>
                 </div>
 
@@ -338,7 +338,7 @@ export default function LoginForm() {
                     AVERAGE RATING
                   </p>
                   <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] flex items-center gap-1">
-                    5.0 <span className="text-[#005d42] text-xl">★</span>
+                    {reviews?.length ? (reviews.reduce((s, r) => s + (r.rating || 5), 0) / reviews.length).toFixed(1) : "5.0"} <span className="text-[#005d42] text-xl">★</span>
                   </p>
                 </div>
               </div>
@@ -351,7 +351,7 @@ export default function LoginForm() {
                       SIMULATED ESCROW RELEASED
                     </p>
                     <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] sm:text-4xl">
-                      ₹7,999
+                      ₹{(orders?.filter(o => o.status === "completed").reduce((sum, o) => sum + (o.price || 0), 0) || 0).toLocaleString("en-IN")}
                     </p>
                   </div>
                   <div className="flex h-10 w-10 items-center justify-center border border-[#e5e7eb] bg-[#eff4ff] text-[#005d42]">
@@ -360,24 +360,43 @@ export default function LoginForm() {
                 </div>
                 <div className="mt-4 border-t border-[#e5e7eb] pt-3">
                   <p className="font-mono text-xs text-[#3e4943]">
-                    Demo payments only, No real money moves on GigCraft.
+                    Deterministic escrow protection across all contract milestones.
                   </p>
                 </div>
               </div>
 
               {/* Verified Buyer Testimonial Card */}
               <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6">
-                <div className="flex items-center gap-1 text-[#005d42] text-sm">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                </div>
-                <p className="mt-3 text-xs italic leading-relaxed text-[#0b1c30]">
-                  &ldquo;Good Work personally i feel good experience&rdquo;
-                </p>
-                <div className="mt-4 border-t border-[#e5e7eb] pt-3">
-                  <p className="font-mono text-xs text-[#3e4943]">
-                    <span className="font-bold text-[#0b1c30]">Raj P.</span> on &ldquo;I will develop a custom vehicle rental and booking web application&rdquo;
-                  </p>
-                </div>
+                {reviews?.length > 0 ? (
+                  <>
+                    <div className="flex items-center gap-1 text-[#005d42] text-sm">
+                      {"★".repeat(reviews[0].rating || 5)}
+                    </div>
+                    <p className="mt-3 text-xs italic leading-relaxed text-[#0b1c30]">
+                      &ldquo;{reviews[0].comment}&rdquo;
+                    </p>
+                    <div className="mt-4 border-t border-[#e5e7eb] pt-3">
+                      <p className="font-mono text-xs text-[#3e4943]">
+                        <span className="font-bold text-[#0b1c30]">{reviews[0].clientName}</span> on &ldquo;{reviews[0].gigTitle || reviews[0].projectName}&rdquo;
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-[#005d42] uppercase">
+                      <ShieldCheck className="h-4 w-4" />
+                      <span>100% Escrow Protection</span>
+                    </div>
+                    <p className="mt-3 text-xs leading-relaxed text-[#0b1c30]">
+                      Every agreement is backed by simulated cryptographic escrow. Client funds are held in vault trust until specification acceptance.
+                    </p>
+                    <div className="mt-4 border-t border-[#e5e7eb] pt-3">
+                      <p className="font-mono text-xs text-[#6e7a73] uppercase">
+                        Zero Platform Fees · Audited Workflows
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

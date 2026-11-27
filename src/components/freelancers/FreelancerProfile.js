@@ -17,82 +17,10 @@ import { useToast } from "@/components/ui/ToastProvider";
 import SafeImage from "@/components/ui/SafeImage";
 import { formatPrice } from "@/lib/utils";
 
-const ELENA_GIGS = [
-  {
-    id: "g1",
-    title: "END-TO-END ENTERPRISE SAAS DASHBOARD ARCHITECTURE & UI",
-    desc: "Complete conversion-led frame sets, component trees, & figma design specs.",
-    delivery: "2-DAYS DELIVERY",
-    revisions: "4 REVISIONS",
-    price: 280,
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    id: "g4",
-    title: "IOS / ANDROID NATIVE MOBILE APP UI & MICRO-INTERACTIONS",
-    desc: "Pixel-perfect native screen layouts, prototyping, & interaction component sets.",
-    delivery: "24-HR DELIVERY",
-    revisions: "UNLIMITED",
-    price: 220,
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    id: "g6",
-    title: "FIGMA MULTI-BRAND DESIGN SYSTEM CREATION & TOKEN SPEC",
-    desc: "Scalable design architecture for enterprise teams. Auto-Layout 5.0, variables, dark mode.",
-    delivery: "5-DAYS DELIVERY",
-    revisions: "FULL COMMUNITY",
-    price: 450,
-    image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80",
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    id: "t1",
-    authorInitials: "SR",
-    authorRole: "VP Engineering @ Synapse Cloud Zurich",
-    flag: "🇨🇭",
-    rating: 5,
-    paidEscrow: "$4,250",
-    completedDate: "COMPLETED NOV 2024",
-    comment:
-      "Elena is exceptional. She didn't just generate pretty wireframes; she actively dove into our token emissions, cleared up edge-case user error fallbacks, and gave our frontend team components they could implement on day one without asking 50 questions. Delivered 2 days ahead of schedule. Will hire exclusively for sub-sequent platform modules.",
-    project: "Multi-Asset Execution Terminal Redesign",
-    duration: "12 DAYS",
-  },
-  {
-    id: "t2",
-    authorInitials: "MR",
-    authorRole: "Co-Founder & CTO, HyperFlow IO (Berlin)",
-    flag: "🇩🇪",
-    rating: 5,
-    paidEscrow: "$6,500",
-    completedDate: "COMPLETED OCT 2024",
-    comment:
-      "Brutal efficiency and immaculate precision. Elena overhauled our SaaS onboarding and analytics flow. Our trial-to-paid conversion rate jumped by 18% within three weeks of rolling out her work. Zero unnecessary fluff, strictly focused on data hierarchy and user momentum.",
-    project: "Conversion Funnel & Onboarding Redesign",
-    duration: "18 DAYS",
-  },
-  {
-    id: "t3",
-    authorInitials: "AC",
-    authorRole: "Design Operations Lead, ProximaEdge (Munich)",
-    flag: "🇩🇪",
-    rating: 5,
-    paidEscrow: "$4,000",
-    completedDate: "COMPLETED SEP 2024",
-    comment:
-      "Elena served as our fractional lead design system architect for the entire summer. Built an enterprise library of 300+ components with zero visual errors. Outstanding communication in Slack and flawless milestone delivery. A true top 1% talent on GigCraft.",
-    project: "Multi-Brand Design System Overhaul",
-    duration: "3 WEEKS",
-  },
-];
-
 export default function FreelancerProfile({ params }) {
   const { id } = use(params);
   const router = useRouter();
-  const { getFreelancer } = useMarketplace();
+  const { getFreelancer, getFreelancerReviews, getFreelancerGigs } = useMarketplace();
   const { showToast } = useToast();
 
   const [activeTab, setActiveTab] = useState("gigs");
@@ -102,7 +30,9 @@ export default function FreelancerProfile({ params }) {
   const reviewsRef = useRef(null);
   const workHistoryRef = useRef(null);
 
-  const freelancer = getFreelancer(id) || getFreelancer("f-elena");
+  const freelancer = getFreelancer(id);
+  const freelancerReviews = freelancer ? getFreelancerReviews(freelancer.id) : [];
+  const freelancerGigs = freelancer ? getFreelancerGigs(freelancer.id) : [];
 
   function scrollToSection(tabName, ref) {
     setActiveTab(tabName);
@@ -110,12 +40,36 @@ export default function FreelancerProfile({ params }) {
   }
 
   function handleContact() {
+    if (!freelancer) return;
     router.push(`/messages?freelancer=${freelancer.id}`);
   }
 
   function handleShare() {
-    navigator.clipboard?.writeText(window.location.href);
-    showToast("Profile link copied to clipboard!");
+    if (typeof window !== "undefined") {
+      navigator.clipboard?.writeText(window.location.href);
+      showToast("Profile link copied to clipboard!");
+    }
+  }
+
+  if (!freelancer) {
+    return (
+      <div className="min-h-screen bg-[#f8f9ff] py-16 px-4 text-center">
+        <div className="max-w-md mx-auto border border-[#0b1c30] bg-white p-8 shadow-[4px_4px_0px_#0b1c30]">
+          <h1 className="font-headline text-xl font-bold uppercase text-[#0b1c30]">
+            Specialist Not Found
+          </h1>
+          <p className="mt-2 font-mono text-xs text-[#6e7a73]">
+            No verified specialist found with ID: {id}
+          </p>
+          <Link
+            href="/explore"
+            className="mt-6 inline-flex items-center justify-center bg-[#005d42] px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30]"
+          >
+            Explore All Specialists
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -126,7 +80,7 @@ export default function FreelancerProfile({ params }) {
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 bg-[#005d42]" />
             <span className="font-bold tracking-wider">
-              CONTRACTOR // {freelancer.contractCode || "NODE-08914: ELENA ROSTOVA"}
+              CONTRACTOR // {freelancer.contractCode || `NODE-${freelancer.id?.toUpperCase() || "SPEC"}: ${(freelancer.name || "SPECIALIST").toUpperCase()}`}
             </span>
           </div>
           <div className="font-bold text-[#9ffdd3] uppercase">
@@ -343,7 +297,9 @@ export default function FreelancerProfile({ params }) {
               </div>
               <div className="mt-4 border-t border-[#e5e7eb] pt-3 text-[10px] text-[#6e7a73]">
                 <p className="font-bold uppercase text-[#0b1c30]">PROOF OF WORK REPOSITORIES</p>
-                <p className="mt-1 font-mono text-[#0047bf]">Github: elena-ui / 9.8k stars</p>
+                <p className="mt-1 font-mono text-[#0047bf]">
+                  Github: {freelancer.github || `${(freelancer.name || "specialist").toLowerCase().replace(/\s+/g, "-")}-repos`}
+                </p>
               </div>
             </div>
 
@@ -451,60 +407,65 @@ export default function FreelancerProfile({ params }) {
               <div className="flex items-center justify-between font-mono text-xs">
                 <span className="font-bold text-[#0b1c30] uppercase">AVAILABLE DIRECT CONTRACTS</span>
                 <span className="border border-[#005d42] bg-[#eff4ff] px-2 py-0.5 text-[#005d42] font-bold">
-                  3 GIGS ACTIVE
+                  {freelancerGigs.length} GIGS ACTIVE
                 </span>
               </div>
 
-              {/* 3 Gig Cards in 3-column layout */}
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {ELENA_GIGS.map((g) => (
-                  <article
-                    key={g.id}
-                    className="flex flex-col border border-[#e5e7eb] bg-white shadow-[3px_3px_0px_#0b1c30] hover:border-[#0b1c30] transition"
-                  >
-                    <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 border-b border-[#e5e7eb]">
-                      <SafeImage src={g.image} alt={g.title} className="h-full w-full object-cover" />
-                      <div className="absolute bottom-2 left-2 flex gap-1.5">
-                        <span className="border border-[#0b1c30] bg-white px-2 py-0.5 font-mono text-[9px] font-bold text-[#0b1c30]">
-                          ⚡ {g.delivery}
-                        </span>
-                        <span className="border border-[#0b1c30] bg-white px-2 py-0.5 font-mono text-[9px] font-bold text-[#0b1c30]">
-                          {g.revisions}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-1 flex-col p-4">
-                      <Link href={`/gigs/${g.id}`} className="block">
-                        <h3 className="line-clamp-2 font-headline text-sm font-bold uppercase leading-snug text-[#0b1c30] hover:text-[#005d42]">
-                          {g.title}
-                        </h3>
-                      </Link>
-
-                      <p className="mt-2 text-xs text-[#3e4943] line-clamp-2 leading-relaxed">
-                        {g.desc}
-                      </p>
-
-                      <div className="mt-auto flex items-center justify-between border-t border-[#e5e7eb] pt-3.5 mt-4">
-                        <div>
-                          <p className="font-mono text-[9px] uppercase tracking-wider text-[#6e7a73] font-semibold">
-                            STARTING FROM
-                          </p>
-                          <p className="font-headline text-lg font-bold text-[#0b1c30]">
-                            {formatPrice(g.price)}
-                          </p>
+              {freelancerGigs.length === 0 ? (
+                <div className="border border-dashed border-[#e5e7eb] bg-white p-8 text-center font-mono text-xs">
+                  <p className="text-[#6e7a73] uppercase">No active specifications published yet</p>
+                </div>
+              ) : (
+                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {freelancerGigs.map((g) => (
+                    <article
+                      key={g.id}
+                      className="flex flex-col border border-[#e5e7eb] bg-white shadow-[3px_3px_0px_#0b1c30] hover:border-[#0b1c30] transition"
+                    >
+                      <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 border-b border-[#e5e7eb]">
+                        <SafeImage src={g.image} alt={g.title} className="h-full w-full object-cover" />
+                        <div className="absolute bottom-2 left-2 flex gap-1.5">
+                          <span className="border border-[#0b1c30] bg-white px-2 py-0.5 font-mono text-[9px] font-bold text-[#0b1c30]">
+                            ⚡ {g.deliveryBadge || `${g.deliveryDays || 2}-DAYS DELIVERY`}
+                          </span>
+                          <span className="border border-[#0b1c30] bg-white px-2 py-0.5 font-mono text-[9px] font-bold text-[#0b1c30]">
+                            {g.revisions || 3} REVISIONS
+                          </span>
                         </div>
-                        <Link
-                          href={`/gigs/${g.id}`}
-                          className="px-3 py-1.5 bg-white border border-[#0b1c30] font-mono font-bold text-[11px] uppercase tracking-wider text-[#0b1c30] shadow-[2px_2px_0px_#0b1c30] hover:bg-[#eff4ff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                        >
-                          SELECT SPEC
-                        </Link>
                       </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
+
+                      <div className="flex flex-1 flex-col p-4">
+                        <Link href={`/gigs/${g.id}`} className="block">
+                          <h3 className="line-clamp-2 font-headline text-sm font-bold uppercase leading-snug text-[#0b1c30] hover:text-[#005d42]">
+                            {g.title}
+                          </h3>
+                        </Link>
+
+                        <p className="mt-2 text-xs text-[#3e4943] line-clamp-2 leading-relaxed">
+                          {g.description || g.desc}
+                        </p>
+
+                        <div className="mt-auto flex items-center justify-between border-t border-[#e5e7eb] pt-3.5 mt-4">
+                          <div>
+                            <p className="font-mono text-[9px] uppercase tracking-wider text-[#6e7a73] font-semibold">
+                              STARTING FROM
+                            </p>
+                            <p className="font-headline text-lg font-bold text-[#0b1c30]">
+                              {formatPrice(g.price)}
+                            </p>
+                          </div>
+                          <Link
+                            href={`/gigs/${g.id}`}
+                            className="px-3 py-1.5 bg-white border border-[#0b1c30] font-mono font-bold text-[11px] uppercase tracking-wider text-[#0b1c30] shadow-[2px_2px_0px_#0b1c30] hover:bg-[#eff4ff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                          >
+                            SELECT SPEC
+                          </Link>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* MODULE 2: FEATURED CASE STUDIES & PRODUCT PROOFS */}
@@ -513,54 +474,59 @@ export default function FreelancerProfile({ params }) {
                 <span className="font-bold text-[#0b1c30] uppercase">
                   FEATURED CASE STUDIES & PRODUCT PROOFS
                 </span>
-                <span className="font-mono text-xs text-[#0047bf] font-bold hover:underline cursor-pointer">
-                  FULL ARCHIVE (12) →
+                <span className="font-mono text-xs text-[#0047bf] font-bold">
+                  {freelancer.caseStudies?.length ? `FULL ARCHIVE (${freelancer.caseStudies.length}) →` : "ARCHIVE (0)"}
                 </span>
               </div>
 
-              {/* 4 Case Studies in 2x2 Grid */}
-              <div className="grid gap-6 sm:grid-cols-2">
-                {freelancer.caseStudies?.map((cs) => (
-                  <div
-                    key={cs.id}
-                    className="border border-[#e5e7eb] bg-white p-4 shadow-[3px_3px_0px_#0b1c30] flex flex-col"
-                  >
-                    <div className="relative aspect-[16/10] overflow-hidden bg-slate-950 border border-[#e5e7eb]">
-                      <SafeImage src={cs.image} alt={cs.title} className="h-full w-full object-cover" />
-                      <span className="absolute top-2 left-2 border border-[#0b1c30] bg-white px-2 py-0.5 font-mono text-[9px] font-bold text-[#0b1c30] uppercase">
-                        {cs.category} {"//"} {cs.sprint}
-                      </span>
-                    </div>
-
-                    <h3 className="mt-3 font-headline text-base font-bold text-[#0b1c30] uppercase leading-tight">
-                      {cs.title}
-                    </h3>
-
-                    <p className="mt-2 text-xs text-[#3e4943] leading-relaxed flex-1">
-                      {cs.desc}
-                    </p>
-
-                    <div className="mt-4 flex flex-wrap gap-1.5 border-t border-[#e5e7eb] pt-3">
-                      {cs.tags.map((t) => (
-                        <span
-                          key={t}
-                          className="border border-[#dae2fd] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] text-[#0047bf]"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => showToast(`Opening audit spec for ${cs.title}`, "info")}
-                      className="mt-3 text-left font-mono text-xs font-bold text-[#005d42] hover:underline"
+              {!freelancer.caseStudies?.length ? (
+                <div className="border border-dashed border-[#e5e7eb] bg-white p-8 text-center font-mono text-xs">
+                  <p className="text-[#6e7a73] uppercase">No case studies or proofs submitted yet</p>
+                </div>
+              ) : (
+                <div className="grid gap-6 sm:grid-cols-2">
+                  {freelancer.caseStudies.map((cs) => (
+                    <div
+                      key={cs.id}
+                      className="border border-[#e5e7eb] bg-white p-4 shadow-[3px_3px_0px_#0b1c30] flex flex-col"
                     >
-                      VIEW DETAILED CASE STUDY ↗
-                    </button>
-                  </div>
-                ))}
-              </div>
+                      <div className="relative aspect-[16/10] overflow-hidden bg-slate-950 border border-[#e5e7eb]">
+                        <SafeImage src={cs.image} alt={cs.title} className="h-full w-full object-cover" />
+                        <span className="absolute top-2 left-2 border border-[#0b1c30] bg-white px-2 py-0.5 font-mono text-[9px] font-bold text-[#0b1c30] uppercase">
+                          {cs.category} {"//"} {cs.sprint}
+                        </span>
+                      </div>
+
+                      <h3 className="mt-3 font-headline text-base font-bold text-[#0b1c30] uppercase leading-tight">
+                        {cs.title}
+                      </h3>
+
+                      <p className="mt-2 text-xs text-[#3e4943] leading-relaxed flex-1">
+                        {cs.desc}
+                      </p>
+
+                      <div className="mt-4 flex flex-wrap gap-1.5 border-t border-[#e5e7eb] pt-3">
+                        {cs.tags?.map((t) => (
+                          <span
+                            key={t}
+                            className="border border-[#dae2fd] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] text-[#0047bf]"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => showToast(`Opening audit spec for ${cs.title}`, "info")}
+                        className="mt-3 text-left font-mono text-xs font-bold text-[#005d42] hover:underline"
+                      >
+                        VIEW DETAILED CASE STUDY ↗
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* MODULE 3: VERIFIED CLIENT TESTIMONIALS & AUDIT LOGS */}
@@ -569,81 +535,70 @@ export default function FreelancerProfile({ params }) {
                 <span className="font-bold text-[#0b1c30] uppercase">
                   VERIFIED CLIENT TESTIMONIALS & AUDIT LOGS
                 </span>
-                <span className="font-mono text-xs text-[#005d42] font-bold hover:underline cursor-pointer">
-                  VIEW ALL (248) →
+                <span className="font-mono text-xs text-[#005d42] font-bold">
+                  TOTAL ({freelancerReviews.length})
                 </span>
               </div>
 
               <div className="space-y-4">
-                {TESTIMONIALS.map((t) => (
-                  <div
-                    key={t.id}
-                    className="border border-[#e5e7eb] bg-white p-5 shadow-[3px_3px_0px_#0b1c30]"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e5e7eb] pb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center border border-[#0b1c30] bg-[#0b1c30] font-mono text-xs font-bold text-white">
-                          {t.authorInitials}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-xs text-[#0b1c30]">{t.authorRole}</span>
-                            <span>{t.flag}</span>
-                          </div>
-                          <div className="flex items-center gap-1 font-mono text-xs text-amber-500 mt-0.5">
-                            ★★★★★ <span className="font-bold text-[#0b1c30] ml-1">5.0</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="text-right font-mono text-[11px]">
-                        <span className="border border-[#dae2fd] bg-[#eff4ff] px-2 py-0.5 font-bold text-[#0047bf]">
-                          PAID: {t.paidEscrow} ESCROW
-                        </span>
-                        <p className="text-[10px] text-[#6e7a73] mt-1">{t.completedDate}</p>
-                      </div>
-                    </div>
-
-                    <p className="mt-3 text-xs leading-relaxed text-[#0b1c30]">
-                      "{t.comment}"
+                {freelancerReviews.length === 0 ? (
+                  <div className="border border-[#e5e7eb] bg-white p-8 text-center shadow-[2px_2px_0px_#0b1c30]">
+                    <p className="font-headline text-sm font-bold uppercase text-[#0b1c30]">
+                      No Client Reviews Yet
                     </p>
-
-                    <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-[#e5e7eb] pt-2 font-mono text-[10px] text-[#6e7a73]">
-                      <span>PROJECT: {t.project}</span>
-                      <span>·</span>
-                      <span>DURATION: {t.duration}</span>
-                      <span>·</span>
-                      <span className="text-[#005d42] font-bold">VERIFIED GIGCRAFT ESCROW</span>
-                    </div>
+                    <p className="mt-1 font-mono text-xs text-[#6e7a73]">
+                      Verified reviews will be posted here once escrow contracts are successfully settled.
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  freelancerReviews.map((t) => (
+                    <div
+                      key={t.id}
+                      className="border border-[#e5e7eb] bg-white p-5 shadow-[3px_3px_0px_#0b1c30]"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e5e7eb] pb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center border border-[#0b1c30] bg-[#0b1c30] font-mono text-xs font-bold text-white">
+                            {t.clientName ? t.clientName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "CL"}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-xs text-[#0b1c30]">{t.clientName || "Client"}</span>
+                              <span className="font-mono text-[10px] text-[#005d42]">{t.clientBadge || "VERIFIED"}</span>
+                            </div>
+                            <div className="flex items-center gap-1 font-mono text-xs text-amber-500 mt-0.5">
+                              {"★".repeat(t.rating || 5)} <span className="font-bold text-[#0b1c30] ml-1">{t.rating || 5}.0</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right font-mono text-[11px]">
+                          <span className="border border-[#dae2fd] bg-[#eff4ff] px-2 py-0.5 font-bold text-[#0047bf]">
+                            PAID: {t.paidEscrow || "$0"} ESCROW
+                          </span>
+                          <p className="text-[10px] text-[#6e7a73] mt-1">{t.completedDate || "Recently"}</p>
+                        </div>
+                      </div>
+
+                      <p className="mt-3 text-xs leading-relaxed text-[#0b1c30]">
+                        "{t.comment}"
+                      </p>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-[#e5e7eb] pt-2 font-mono text-[10px] text-[#6e7a73]">
+                        <span>PROJECT: {t.projectName || "Contract Spec"}</span>
+                        <span>·</span>
+                        <span className="text-[#005d42] font-bold">VERIFIED GIGCRAFT ESCROW</span>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
 
-              {/* Pagination footer matching image */}
-              <div className="mt-4 flex flex-col sm:flex-row items-center justify-between border-t border-[#e5e7eb] pt-4 font-mono text-xs">
-                <span className="text-[#6e7a73]">DISPLAYING 3 OF 248 ENTRIES</span>
-                <div className="flex items-center gap-1.5 mt-2 sm:mt-0">
-                  <button type="button" className="border border-[#0b1c30] bg-white px-2 py-1 hover:bg-[#eff4ff]">
-                    PREV
-                  </button>
-                  <button type="button" className="bg-[#0b1c30] text-white px-2.5 py-1 font-bold">
-                    1
-                  </button>
-                  <button type="button" className="border border-[#e5e7eb] bg-white px-2.5 py-1 hover:bg-[#eff4ff]">
-                    2
-                  </button>
-                  <button type="button" className="border border-[#e5e7eb] bg-white px-2.5 py-1 hover:bg-[#eff4ff]">
-                    3
-                  </button>
-                  <span className="px-1 text-[#6e7a73]">...</span>
-                  <button type="button" className="border border-[#e5e7eb] bg-white px-2.5 py-1 hover:bg-[#eff4ff]">
-                    83
-                  </button>
-                  <button type="button" className="border border-[#0b1c30] bg-white px-2 py-1 hover:bg-[#eff4ff]">
-                    NEXT
-                  </button>
+              {freelancerReviews.length > 3 && (
+                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between border-t border-[#e5e7eb] pt-4 font-mono text-xs">
+                  <span className="text-[#6e7a73]">DISPLAYING {freelancerReviews.length} OF {freelancerReviews.length} ENTRIES</span>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* MODULE 4: WORK HISTORY & CAREER TRAJECTORY */}
@@ -653,25 +608,29 @@ export default function FreelancerProfile({ params }) {
                   WORK HISTORY & CAREER TRAJECTORY
                 </span>
                 <span className="border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 text-[#0047bf] font-bold">
-                  24 TRANS-CONTRACTS
+                  {freelancer.workHistory?.length || 0} TRANS-CONTRACTS
                 </span>
               </div>
 
               <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-6">
-                {freelancer.workHistory?.map((wh, idx) => (
-                  <div key={idx} className="border-l-2 border-[#005d42] pl-4">
-                    <div className="flex flex-wrap items-baseline justify-between font-mono text-xs">
-                      <h3 className="font-headline font-bold text-sm uppercase text-[#0b1c30]">
-                        {wh.role}
-                      </h3>
-                      <span className="border border-[#dae2fd] bg-[#eff4ff] px-2 py-0.5 text-[10px] font-bold text-[#0047bf]">
-                        {wh.period}
-                      </span>
+                {!freelancer.workHistory?.length ? (
+                  <p className="font-mono text-xs text-[#6e7a73] text-center py-4">No verified work history records published yet</p>
+                ) : (
+                  freelancer.workHistory.map((wh, idx) => (
+                    <div key={idx} className="border-l-2 border-[#005d42] pl-4">
+                      <div className="flex flex-wrap items-baseline justify-between font-mono text-xs">
+                        <h3 className="font-headline font-bold text-sm uppercase text-[#0b1c30]">
+                          {wh.role}
+                        </h3>
+                        <span className="border border-[#dae2fd] bg-[#eff4ff] px-2 py-0.5 text-[10px] font-bold text-[#0047bf]">
+                          {wh.period}
+                        </span>
+                      </div>
+                      <p className="font-mono text-xs text-[#005d42] font-semibold mt-0.5">{wh.company}</p>
+                      <p className="mt-2 text-xs text-[#3e4943] leading-relaxed">{wh.desc}</p>
                     </div>
-                    <p className="font-mono text-xs text-[#005d42] font-semibold mt-0.5">{wh.company}</p>
-                    <p className="mt-2 text-xs text-[#3e4943] leading-relaxed">{wh.desc}</p>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>

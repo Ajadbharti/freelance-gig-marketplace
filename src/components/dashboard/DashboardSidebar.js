@@ -26,7 +26,7 @@ export default function DashboardSidebar({ role, userId }) {
           { href: "/orders", label: "Active Contracts", icon: ShieldCheck },
           { href: "/messages", label: "Encrypted Messages", icon: MessageSquare },
           { href: "/dashboard/freelancer/gigs/new", label: "Publish New Spec", icon: Plus },
-          { href: `/freelancers/${userId || "f1"}`, label: "Audited Profile", icon: User },
+          { href: userId ? `/freelancers/${userId}` : "/dashboard/freelancer", label: "Audited Profile", icon: User },
           { href: "/account", label: "Security & Keys", icon: Settings },
         ]
       : [

@@ -51,6 +51,18 @@ export default function OrderDetails({ initialOrderId }) {
 
   const activeOrder = getOrder(selectedId) || orders[0];
 
+  const orderCounts = {
+    all: orders.length,
+    inProgress: orders.filter((o) => o.status === "in-progress" || o.status === "active").length,
+    underReview: orders.filter((o) => o.status === "under-review" || o.status === "delivered").length,
+    delivered: orders.filter((o) => o.status === "delivered").length,
+    completed: orders.filter((o) => o.status === "completed").length,
+  };
+
+  const totalEscrowSecured = orders
+    .filter((o) => o.status !== "completed" && o.status !== "cancelled")
+    .reduce((sum, o) => sum + (o.price || 0), 0);
+
   // Filtering orders for Contract Ledger
   const ledgerOrders = orders.filter((o) => {
     if (filterTab === "in-progress" && o.status !== "in-progress" && o.status !== "active") return false;
@@ -157,7 +169,7 @@ export default function OrderDetails({ initialOrderId }) {
                 : "text-slate-700 hover:bg-slate-50 border-r border-slate-200"
             }`}
           >
-            ALL ORDERS (14)
+            ALL ORDERS ({orderCounts.all})
           </button>
           <button
             type="button"
@@ -168,7 +180,7 @@ export default function OrderDetails({ initialOrderId }) {
                 : "text-slate-700 hover:bg-slate-50"
             }`}
           >
-            IN PROGRESS (4)
+            IN PROGRESS ({orderCounts.inProgress})
           </button>
           <button
             type="button"
@@ -179,7 +191,7 @@ export default function OrderDetails({ initialOrderId }) {
                 : "text-slate-700 hover:bg-slate-50"
             }`}
           >
-            UNDER REVIEW (2)
+            UNDER REVIEW ({orderCounts.underReview})
           </button>
           <button
             type="button"
@@ -190,7 +202,7 @@ export default function OrderDetails({ initialOrderId }) {
                 : "text-slate-700 hover:bg-slate-50"
             }`}
           >
-            DELIVERED (1)
+            DELIVERED ({orderCounts.delivered})
           </button>
           <button
             type="button"
@@ -201,11 +213,11 @@ export default function OrderDetails({ initialOrderId }) {
                 : "text-slate-700 hover:bg-slate-50"
             }`}
           >
-            COMPLETED (7)
+            COMPLETED ({orderCounts.completed})
           </button>
         </div>
 
-        {/* 4 Telemetry Metrics Cards matching exact design */}
+        {/* 4 Telemetry Metrics Cards */}
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4 font-mono">
           {/* Card 1: Active Pipeline */}
           <div className="border border-slate-200 bg-white p-5 shadow-sm rounded-none">
@@ -215,7 +227,7 @@ export default function OrderDetails({ initialOrderId }) {
                 <FileText className="h-3.5 w-3.5" />
               </div>
             </div>
-            <p className="mt-2 font-serif text-3xl font-bold text-slate-950">4</p>
+            <p className="mt-2 font-serif text-3xl font-bold text-slate-950">{orderCounts.inProgress}</p>
             <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400 uppercase">SLA PACE</span>
               <span className="text-[#0047bf] font-bold">100% HEALTHY</span>
@@ -230,10 +242,10 @@ export default function OrderDetails({ initialOrderId }) {
                 <Clock className="h-3.5 w-3.5" />
               </div>
             </div>
-            <p className="mt-2 font-serif text-3xl font-bold text-slate-950">2</p>
+            <p className="mt-2 font-serif text-3xl font-bold text-slate-950">{orderCounts.underReview}</p>
             <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400 uppercase">PENDING SIGN-OFF</span>
-              <span className="text-slate-900 font-bold uppercase">ACTION REQ.</span>
+              <span className="text-slate-900 font-bold uppercase">{orderCounts.underReview > 0 ? "ACTION REQ." : "ALL CLEAR"}</span>
             </div>
           </div>
 
@@ -245,7 +257,7 @@ export default function OrderDetails({ initialOrderId }) {
                 <ShieldCheck className="h-3.5 w-3.5" />
               </div>
             </div>
-            <p className="mt-2 font-serif text-3xl font-bold text-[#047857]">₹7,999</p>
+            <p className="mt-2 font-serif text-3xl font-bold text-[#047857]">{formatPrice(totalEscrowSecured)}</p>
             <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400 uppercase">DISPUTE PROTECTION</span>
               <span className="text-slate-900 font-bold uppercase">MULTI-SIG LOCK</span>
@@ -260,15 +272,35 @@ export default function OrderDetails({ initialOrderId }) {
                 <Check className="h-3.5 w-3.5" />
               </div>
             </div>
-            <p className="mt-2 font-serif text-3xl font-bold text-slate-950">100%</p>
+            <p className="mt-2 font-serif text-3xl font-bold text-slate-950">{orders.length > 0 ? "100%" : "0%"}</p>
             <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
               <span className="text-slate-400 uppercase">BENCHMARK BASELINE</span>
-              <span className="text-slate-900 font-bold uppercase">TOP 1% FREELANCER</span>
+              <span className="text-slate-900 font-bold uppercase">SETTLED DELIVERIES</span>
             </div>
           </div>
         </div>
 
-        {/* 2-Column Split: Contract Ledger (Left) + Detailed Contract Panel (Right) */}
+        {orders.length === 0 ? (
+          <div className="mt-8 border border-slate-200 bg-white p-12 text-center shadow-sm">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center bg-[#f8f9ff] border border-[#0b1c30] text-[#0b1c30]">
+              <FileText className="h-6 w-6" />
+            </div>
+            <h2 className="mt-4 font-headline text-xl font-bold uppercase text-slate-950">
+              No Active Contracts in Escrow
+            </h2>
+            <p className="mt-2 font-mono text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+              You do not have any orders in escrow yet. Browse verified gigs to initiate a contract sprint with milestone protection.
+            </p>
+            <div className="mt-6 flex justify-center gap-3">
+              <Link
+                href="/gigs"
+                className="px-6 py-3 bg-[#005d42] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] transition-all"
+              >
+                Browse Marketplace Gigs
+              </Link>
+            </div>
+          </div>
+        ) : (
         <div className="mt-6 grid gap-6 lg:grid-cols-[360px_1fr]">
           {/* Left Column: Contract Ledger */}
           <div className="space-y-4">
@@ -693,6 +725,7 @@ export default function OrderDetails({ initialOrderId }) {
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );

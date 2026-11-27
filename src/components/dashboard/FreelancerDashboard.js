@@ -50,9 +50,10 @@ export default function FreelancerDashboard() {
   const [tab, setTab] = useState("all");
   const [deliverTarget, setDeliverTarget] = useState(null);
 
-  const me = getFreelancer(user?.id || "f1");
-  const myGigs = allGigs;
-  const myOrders = orders;
+  const me = user ? getFreelancer(user.id) : null;
+  const myGigs = user ? allGigs.filter((g) => g.freelancerId === user.id) : allGigs;
+  const myOrders = user ? orders.filter((o) => o.freelancerId === user.id) : orders;
+  const filteredOrders = tab === "all" ? myOrders : myOrders.filter((o) => o.status === tab);
 
   const counts = {
     all: myOrders.length,
@@ -64,8 +65,12 @@ export default function FreelancerDashboard() {
   const earned = myOrders.filter((o) => o.status === "completed").reduce((sum, o) => sum + o.price, 0);
 
   function copyProfileLink() {
-    navigator.clipboard?.writeText(window.location.origin + `/freelancers/${me.id}`);
-    showToast("Profile link copied to clipboard.");
+    if (me?.id) {
+      navigator.clipboard?.writeText(window.location.origin + `/freelancers/${me.id}`);
+      showToast("Profile link copied to clipboard.");
+    } else {
+      showToast("Create a profile or gig first to share your link.", "info");
+    }
   }
 
   return (
@@ -97,7 +102,7 @@ export default function FreelancerDashboard() {
         <StatCard icon={Briefcase} label="Active Specs" value={myGigs.length} tone="indigo" />
         <StatCard icon={ShoppingBag} label="Sprints In Flight" value={counts.active} tone="amber" />
         <StatCard icon={CheckCircle2} label="Milestones Settled" value={counts.completed} tone="emerald" />
-        <StatCard icon={Wallet} label="Total Escrow Earned" value={`$${(earned + 142000).toLocaleString("en-US")}`} hint="All-time settled" tone="emerald" />
+        <StatCard icon={Wallet} label="Total Escrow Earned" value={`$${earned.toLocaleString("en-US")}`} hint="All-time settled" tone="emerald" />
       </div>
 
       {/* Published Technical Specs Section */}
@@ -114,40 +119,52 @@ export default function FreelancerDashboard() {
           </Link>
         </div>
 
-        <div className="mt-5 space-y-3 font-mono text-xs">
-          {myGigs.map((g) => (
-            <div
-              key={g.id}
-              className="border border-slate-200 bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        {myGigs.length === 0 ? (
+          <div className="mt-5 border border-dashed border-slate-300 bg-white p-8 text-center font-mono text-xs">
+            <p className="text-slate-500 uppercase">No active specifications published yet</p>
+            <Link
+              href="/dashboard/freelancer/gigs/new"
+              className="mt-3 inline-block bg-[#047857] px-4 py-2 font-bold uppercase tracking-wider text-white hover:bg-[#065f46]"
             >
-              <div className="flex items-center gap-3">
-                <SafeImage src={g.image} alt="" className="h-14 w-20 object-cover border border-slate-200" />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-[#047857]">
-                      {g.tier || "VERIFIED"}
-                    </span>
-                    <span className="text-slate-400">·</span>
-                    <span className="text-slate-500">{g.deliveryBadge || `⚡ ${g.deliveryDays}-Day SLA`}</span>
+              + Publish First Specification
+            </Link>
+          </div>
+        ) : (
+          <div className="mt-5 space-y-3 font-mono text-xs">
+            {myGigs.map((g) => (
+              <div
+                key={g.id}
+                className="border border-slate-200 bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+              >
+                <div className="flex items-center gap-3">
+                  <SafeImage src={g.image} alt="" className="h-14 w-20 object-cover border border-slate-200" />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-[#047857]">
+                        {g.tier || "VERIFIED"}
+                      </span>
+                      <span className="text-slate-400">·</span>
+                      <span className="text-slate-500">{g.deliveryBadge || `⚡ ${g.deliveryDays}-Day SLA`}</span>
+                    </div>
+                    <Link href={`/gigs/${g.id}`} className="font-serif text-base font-bold text-slate-950 font-sans hover:text-[#047857]">
+                      {g.title}
+                    </Link>
                   </div>
-                  <Link href={`/gigs/${g.id}`} className="font-serif text-base font-bold text-slate-950 font-sans hover:text-[#047857]">
-                    {g.title}
+                </div>
+
+                <div className="flex items-center gap-4 shrink-0">
+                  <span className="font-serif text-lg font-bold text-slate-950">${g.price}</span>
+                  <Link
+                    href={`/gigs/${g.id}`}
+                    className="border border-slate-300 bg-white px-3 py-1.5 uppercase font-bold text-slate-700 hover:bg-slate-50"
+                  >
+                    INSPECT SPEC
                   </Link>
                 </div>
               </div>
-
-              <div className="flex items-center gap-4 shrink-0">
-                <span className="font-serif text-lg font-bold text-slate-950">${g.price}</span>
-                <Link
-                  href={`/gigs/${g.id}`}
-                  className="border border-slate-300 bg-white px-3 py-1.5 uppercase font-bold text-slate-700 hover:bg-slate-50"
-                >
-                  INSPECT SPEC
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Incoming Orders Section */}
@@ -182,47 +199,53 @@ export default function FreelancerDashboard() {
           ))}
         </div>
 
-        <div className="mt-6 space-y-4 font-mono text-xs">
-          {myOrders.map((ord) => (
-            <div
-              key={ord.id}
-              className="border border-slate-200 bg-white p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-            >
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-950">{ord.code || `#${ord.id}`}</span>
-                  <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-[#047857] uppercase">
-                    {ord.statusLabel || ord.status.toUpperCase()}
-                  </span>
-                  <span className="text-slate-400">·</span>
-                  <span className="font-sans font-semibold text-slate-700">Client: {ord.clientName}</span>
+        {filteredOrders.length === 0 ? (
+          <div className="mt-6 border border-dashed border-slate-300 bg-white p-8 text-center font-mono text-xs">
+            <p className="text-slate-500 uppercase">No contract sprints in this status</p>
+          </div>
+        ) : (
+          <div className="mt-6 space-y-4 font-mono text-xs">
+            {filteredOrders.map((ord) => (
+              <div
+                key={ord.id}
+                className="border border-slate-200 bg-white p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-950">{ord.code || `#${ord.id}`}</span>
+                    <span className="border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-[#047857] uppercase">
+                      {ord.statusLabel || ord.status.toUpperCase()}
+                    </span>
+                    <span className="text-slate-400">·</span>
+                    <span className="font-sans font-semibold text-slate-700">Client: {ord.clientName}</span>
+                  </div>
+                  <h3 className="mt-2 font-serif text-lg font-bold text-slate-950 font-sans">
+                    {ord.title}
+                  </h3>
+                  <p className="mt-1 text-slate-500 font-sans text-xs">
+                    {ord.dueText || "Due in 2 days"} · Locked Escrow: ${ord.price}.00 USD
+                  </p>
                 </div>
-                <h3 className="mt-2 font-serif text-lg font-bold text-slate-950 font-sans">
-                  {ord.title}
-                </h3>
-                <p className="mt-1 text-slate-500 font-sans text-xs">
-                  {ord.dueText || "Due in 2 days"} · Locked Escrow: ${ord.price}.00 USD
-                </p>
-              </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setDeliverTarget(ord)}
-                  className="bg-[#047857] px-4 py-2 font-bold uppercase tracking-wider text-white hover:bg-[#065f46]"
-                >
-                  PUSH DELIVERABLE →
-                </button>
-                <Link
-                  href={`/orders/${ord.id}`}
-                  className="border border-slate-300 bg-white px-3 py-2 font-bold uppercase tracking-wider text-slate-800 hover:bg-slate-50"
-                >
-                  AUDIT
-                </Link>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setDeliverTarget(ord)}
+                    className="bg-[#047857] px-4 py-2 font-bold uppercase tracking-wider text-white hover:bg-[#065f46]"
+                  >
+                    PUSH DELIVERABLE →
+                  </button>
+                  <Link
+                    href={`/orders/${ord.id}`}
+                    className="border border-slate-300 bg-white px-3 py-2 font-bold uppercase tracking-wider text-slate-800 hover:bg-slate-50"
+                  >
+                    AUDIT
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <DeliverModal order={deliverTarget} open={Boolean(deliverTarget)} onClose={() => setDeliverTarget(null)} />

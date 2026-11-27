@@ -27,33 +27,27 @@ export default function ClientDashboard() {
   const [activeSection, setActiveSection] = useState("overview");
 
   // Filter orders for the client
-  const clientOrders = orders.filter(
-    (o) =>
-      o.clientId === user?.id ||
-      o.clientName?.toLowerCase().includes("raj") ||
-      o.id === "GC-D7C133"
-  );
-  const myOrders = clientOrders.length > 0 ? clientOrders : orders;
+  const myOrders = user?.id ? orders.filter((o) => o.clientId === user.id) : orders;
 
   const counts = {
     all: myOrders.length,
     active: myOrders.filter((o) => o.status === "active" || o.status === "in-progress").length,
     delivered: myOrders.filter((o) => o.status === "delivered" || o.status === "under-review").length,
-    completed: myOrders.filter((o) => o.status === "completed").length || 1,
+    completed: myOrders.filter((o) => o.status === "completed").length,
     cancelled: myOrders.filter((o) => o.status === "cancelled").length,
   };
 
   const totalSpent = myOrders
     .filter((o) => o.status === "completed")
-    .reduce((sum, o) => sum + (o.price || 0), 0) || 7999;
+    .reduce((sum, o) => sum + (o.price || 0), 0);
 
   const inEscrow = myOrders
     .filter((o) => o.status === "active" || o.status === "delivered")
     .reduce((sum, o) => sum + (o.price || 0), 0);
 
-  const savedGigs = gigs.filter((g) => (savedIds?.length ? savedIds.includes(g.id) : g.id === "g7"));
+  const savedGigs = gigs.filter((g) => (savedIds?.length ? savedIds.includes(g.id) : false));
   const recentOrders = myOrders.slice(0, 3);
-  const firstName = user?.name ? user.name.split(" ")[0].toUpperCase() : "RAJ";
+  const firstName = user?.name ? user.name.split(" ")[0].toUpperCase() : "CLIENT";
 
   return (
     <div className="min-h-screen bg-[#f8f9ff]">
@@ -66,11 +60,11 @@ export default function ClientDashboard() {
               <div className="border border-[#e5e7eb] bg-white p-4 shadow-[2px_2px_0px_#0b1c30]">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#0b1c30] bg-[#eff4ff] font-mono text-xs font-bold text-[#0047bf]">
-                    {user?.initials || "RP"}
+                    {user?.initials || (user?.name ? user.name.slice(0, 2).toUpperCase() : "CL")}
                   </div>
                   <div className="min-w-0">
                     <h2 className="truncate font-sans text-base font-bold text-[#0b1c30]">
-                      {user?.name || "Raj Patel"}
+                      {user?.name || "Client Workspace"}
                     </h2>
                     <span className="mt-0.5 inline-block border border-[#005d42]/30 bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#005d42]">
                       {user?.role === "freelancer" ? "FREELANCER" : "CLIENT"}
@@ -290,7 +284,7 @@ export default function ClientDashboard() {
                         </div>
                       </div>
                       <p className="mt-2 text-3xl font-bold font-headline text-[#0b1c30]">
-                        {savedIds?.length || 1}
+                        {savedIds?.length || 0}
                       </p>
                       <div className="mt-2 h-4" />
                     </div>
@@ -326,39 +320,51 @@ export default function ClientDashboard() {
                       </Link>
                     </div>
 
-                    <div className="mt-4 space-y-3">
-                      {recentOrders.map((order) => (
-                        <div
-                          key={order.id}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-[#e5e7eb] p-3.5 hover:border-[#0b1c30] transition bg-white"
+                    {recentOrders.length === 0 ? (
+                      <div className="mt-4 border border-dashed border-[#e5e7eb] p-8 text-center bg-slate-50/50">
+                        <p className="font-mono text-xs uppercase tracking-wider text-[#6e7a73]">No orders placed yet</p>
+                        <Link
+                          href="/gigs"
+                          className="mt-3 inline-block bg-[#005d42] px-4 py-2 font-mono text-xs font-bold uppercase text-white hover:bg-[#047857]"
                         >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-[#0b1c30] bg-[#eff4ff] font-headline text-xs font-bold text-[#0047bf]">
-                              AK
+                          Browse Available Specifications
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="mt-4 space-y-3">
+                        {recentOrders.map((order) => (
+                          <div
+                            key={order.id}
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-[#e5e7eb] p-3.5 hover:border-[#0b1c30] transition bg-white"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-[#0b1c30] bg-[#eff4ff] font-headline text-xs font-bold text-[#0047bf]">
+                                {order.freelancerName ? order.freelancerName.slice(0, 2).toUpperCase() : "SP"}
+                              </div>
+                              <div className="min-w-0">
+                                <Link
+                                  href={`/orders/${order.id}`}
+                                  className="block truncate font-sans text-xs sm:text-sm font-bold text-[#0b1c30] hover:text-[#005d42]"
+                                >
+                                  {order.title}
+                                </Link>
+                                <p className="font-mono text-xs text-[#6e7a73] mt-0.5">
+                                  {order.code || `#${order.id}`} // {order.freelancerName || "Specialist"}
+                                </p>
+                              </div>
                             </div>
-                            <div className="min-w-0">
-                              <Link
-                                href={`/orders/${order.id}`}
-                                className="block truncate font-sans text-xs sm:text-sm font-bold text-[#0b1c30] hover:text-[#005d42]"
-                              >
-                                {order.title}
-                              </Link>
-                              <p className="font-mono text-xs text-[#6e7a73] mt-0.5">
-                                {order.code || `#${order.id}`} // {order.freelancerName || "Ajju Kumar"}
-                              </p>
+                            <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
+                              <span className="border border-[#005d42] bg-[#005d42] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
+                                {order.statusLabel || "IN PROGRESS"}
+                              </span>
+                              <span className="font-headline text-base font-bold text-[#0b1c30]">
+                                ₹{(order.price || 0).toLocaleString("en-IN")}
+                              </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-                            <span className="border border-[#005d42] bg-[#005d42] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
-                              {order.statusLabel || "COMPLETED"}
-                            </span>
-                            <span className="font-headline text-base font-bold text-[#0b1c30]">
-                              ₹{(order.price || 7999).toLocaleString("en-IN")}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </>
               )}
@@ -369,9 +375,15 @@ export default function ClientDashboard() {
                     SAVED GIGS
                   </h2>
                   <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {savedGigs.map((gig) => (
-                      <GigCard key={gig.id} gig={gig} />
-                    ))}
+                    {savedGigs.length === 0 ? (
+                      <div className="col-span-full border border-dashed border-[#e5e7eb] p-8 text-center bg-slate-50/50">
+                        <p className="font-mono text-xs uppercase tracking-wider text-[#6e7a73]">No saved specifications yet</p>
+                      </div>
+                    ) : (
+                      savedGigs.map((gig) => (
+                        <GigCard key={gig.id} gig={gig} />
+                      ))
+                    )}
                   </div>
                 </div>
               )}
@@ -382,21 +394,27 @@ export default function ClientDashboard() {
                     SUBMITTED REVIEWS
                   </h2>
                   <div className="mt-4 space-y-4">
-                    {reviews.slice(0, 3).map((r) => (
-                      <div key={r.id} className="border border-[#e5e7eb] p-4 bg-white">
-                        <div className="flex items-center justify-between">
-                          <p className="font-sans text-sm font-bold text-[#0b1c30]">{r.gigTitle || r.projectName}</p>
-                          <span className="text-amber-500 font-bold">★ {r.rating}.0</span>
-                        </div>
-                        <p className="mt-2 text-xs italic text-[#3e4943]">&ldquo;{r.comment}&rdquo;</p>
-                        {r.reply && (
-                          <div className="mt-3 border-l-2 border-[#005d42] pl-3 text-xs text-[#6e7a73]">
-                            <p className="font-bold text-[#005d42]">{r.replyAuthor || "Seller Response"}:</p>
-                            <p className="mt-0.5">{r.reply}</p>
-                          </div>
-                        )}
+                    {reviews.length === 0 ? (
+                      <div className="border border-dashed border-[#e5e7eb] p-8 text-center bg-slate-50/50">
+                        <p className="font-mono text-xs uppercase tracking-wider text-[#6e7a73]">No reviews submitted yet</p>
                       </div>
-                    ))}
+                    ) : (
+                      reviews.slice(0, 3).map((r) => (
+                        <div key={r.id} className="border border-[#e5e7eb] p-4 bg-white">
+                          <div className="flex items-center justify-between">
+                            <p className="font-sans text-sm font-bold text-[#0b1c30]">{r.gigTitle || r.projectName}</p>
+                            <span className="text-amber-500 font-bold">★ {r.rating}.0</span>
+                          </div>
+                          <p className="mt-2 text-xs italic text-[#3e4943]">&ldquo;{r.comment}&rdquo;</p>
+                          {r.reply && (
+                            <div className="mt-3 border-l-2 border-[#005d42] pl-3 text-xs text-[#6e7a73]">
+                              <p className="font-bold text-[#005d42]">{r.replyAuthor || "Seller Response"}:</p>
+                              <p className="mt-0.5">{r.reply}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               )}

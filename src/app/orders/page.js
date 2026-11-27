@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function OrdersPage() {
-  return <OrderDetails initialOrderId="GC-0821" />;
+  return <OrderDetails />;
 }

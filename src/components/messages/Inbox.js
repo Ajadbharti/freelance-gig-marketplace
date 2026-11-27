@@ -35,7 +35,26 @@ export default function Inbox() {
 
         {/* Conversation Cards List */}
         <div className="mt-8 space-y-4">
-          {orders.map((ord) => {
+          {orders.length === 0 ? (
+            <div className="border border-slate-200 bg-white p-12 text-center shadow-sm">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center border border-[#0b1c30] bg-[#f8f9ff] text-[#0b1c30]">
+                <MessageSquare className="h-6 w-6" />
+              </div>
+              <h2 className="mt-4 font-headline text-lg font-bold text-slate-950 uppercase">
+                No Contract Threads Yet
+              </h2>
+              <p className="mt-1 font-mono text-xs text-slate-600 max-w-md mx-auto">
+                Contract messages and milestone discussions with clients or freelancers will appear here once an order is commissioned.
+              </p>
+              <Link
+                href="/gigs"
+                className="mt-6 inline-flex items-center justify-center bg-[#005d42] px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30]"
+              >
+                Browse Marketplace Gigs
+              </Link>
+            </div>
+          ) : (
+            orders.map((ord) => {
             const lastMsg =
               ord.messages && ord.messages.length > 0
                 ? ord.messages[ord.messages.length - 1]
@@ -76,7 +95,7 @@ export default function Inbox() {
                 </div>
               </Link>
             );
-          })}
+          }))}
         </div>
       </div>
     </div>

@@ -6,16 +6,6 @@ import { signInWithGooglePopup, signOutFromFirebase } from "@/lib/firebase/auth"
 
 const AuthContext = createContext(null);
 
-const DEMO_CLIENT = {
-  id: "c-raj",
-  name: "Raj Patel",
-  email: "rajpatel123@gmail.com",
-  role: "client",
-  avatar: "",
-  initials: "RP",
-  joinedAt: "2024-01-01T00:00:00.000Z",
-};
-
 function mapSupabaseUser(sbUser, defaultRole = "client") {
   const meta = sbUser?.user_metadata || {};
   const fullName =
@@ -88,13 +78,18 @@ export function AuthProvider({ children }) {
       try {
         const saved = localStorage.getItem("gigcraft_in:user");
         if (saved) {
-          setUser(JSON.parse(saved));
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.id !== "c-raj" && parsed.id !== "f-elena") {
+            setUser(parsed);
+          } else {
+            setUser(null);
+            localStorage.removeItem("gigcraft_in:user");
+          }
         } else {
-          setUser(DEMO_CLIENT);
-          localStorage.setItem("gigcraft_in:user", JSON.stringify(DEMO_CLIENT));
+          setUser(null);
         }
       } catch {
-        setUser(DEMO_CLIENT);
+        setUser(null);
       }
       setHydrated(true);
 
@@ -140,15 +135,6 @@ export function AuthProvider({ children }) {
       return { ok: false, error: "Please enter your access key / password." };
     }
 
-    // Direct check for demo client
-    if (cleanEmail === "rajpatel123@gmail.com" || cleanEmail.includes("rajpatel")) {
-      setUser(DEMO_CLIENT);
-      try {
-        localStorage.setItem("gigcraft_in:user", JSON.stringify(DEMO_CLIENT));
-      } catch {}
-      return { ok: true, user: DEMO_CLIENT };
-    }
-
     // Check registered accounts in storage
     let registeredUsers = [];
     try {
@@ -177,27 +163,9 @@ export function AuthProvider({ children }) {
       return { ok: true, user: sessionUser };
     }
 
-    // Allow quick login with developer@agency.io for testing
-    if (cleanEmail === "developer@agency.io") {
-      const demoFreelancer = {
-        id: "f-elena",
-        name: "Elena Rostova",
-        email: "developer@agency.io",
-        role: "freelancer",
-        avatar: "",
-        initials: "ER",
-        joinedAt: "2024-01-01T00:00:00.000Z",
-      };
-      setUser(demoFreelancer);
-      try {
-        localStorage.setItem("gigcraft_in:user", JSON.stringify(demoFreelancer));
-      } catch {}
-      return { ok: true, user: demoFreelancer };
-    }
-
     return {
       ok: false,
-      error: "No account found with this email. Please register as a Client or apply as a Freelancer.",
+      error: "No account found with this email. Please register or sign in with Google.",
     };
   }, []);
 

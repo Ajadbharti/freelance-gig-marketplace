@@ -32,31 +32,31 @@ function mapSupabaseGig(g) {
     title: g.title,
     description: g.description,
     category: g.category || "graphics-design",
-    serviceType: g.service_type || g.serviceType || "Figma UI Design",
-    freelancerId: g.freelancer_id || g.freelancerId || "f-elena",
-    price: Number(g.price) || 280,
-    deliveryDays: Number(g.delivery_days || g.deliveryDays || 2),
-    deliveryBadge: `⚡ ${g.delivery_days || g.deliveryDays || 2}-DAY DELIVERY`,
-    revisions: Number(g.revisions || 3),
-    tier: g.tier || "TOP RATED",
+    serviceType: g.service_type || g.serviceType || "Technical Service",
+    freelancerId: g.freelancer_id || g.freelancerId || "",
+    price: Number(g.price) || 0,
+    deliveryDays: Number(g.delivery_days || g.deliveryDays || 1),
+    deliveryBadge: `⚡ ${g.delivery_days || g.deliveryDays || 1}-DAY DELIVERY`,
+    revisions: Number(g.revisions || 1),
+    tier: g.tier || "VERIFIED",
     image: g.image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
-    skills: Array.isArray(g.skills) ? g.skills : (typeof g.skills === "string" ? g.skills.split(",").map(s => s.trim()) : ["Figma", "SaaS", "UI/UX"]),
-    tags: Array.isArray(g.tags) ? g.tags : ["Figma", "SaaS", "UI/UX"],
-    rating: Number(g.rating) || 4.9,
-    reviewsCount: Number(g.reviews_count || g.reviewsCount) || 248,
-    ordersInQueue: Number(g.orders_in_queue || g.ordersInQueue) || 3,
+    skills: Array.isArray(g.skills) ? g.skills : (typeof g.skills === "string" ? g.skills.split(",").map(s => s.trim()) : ["Engineering", "Architecture"]),
+    tags: Array.isArray(g.tags) ? g.tags : ["Engineering", "Architecture"],
+    rating: Number(g.rating) || 5.0,
+    reviewsCount: Number(g.reviews_count || g.reviewsCount) || 0,
+    ordersInQueue: Number(g.orders_in_queue || g.ordersInQueue) || 0,
     packages: g.packages || {
       standard: {
-        name: "FULL SAAS SYSTEM",
-        price: Number(g.price) || 280,
-        deliveryDays: Number(g.delivery_days || g.deliveryDays || 2),
-        revisions: 3,
-        screens: "8 Complete Views",
+        name: "CORE SPECIFICATION",
+        price: Number(g.price) || 0,
+        deliveryDays: Number(g.delivery_days || g.deliveryDays || 1),
+        revisions: 1,
+        screens: "1 Complete Scope",
         recommended: true,
-        features: ["Full 8-screen SaaS dashboard", "Design tokens spec (JSON)", "Auto-Layout 5.0 system", "Interactive prototype"],
+        features: ["Core Architecture & Implementation", "Full Documentation & Specs", "100% Escrow Protection"],
       },
     },
-    featuresList: Array.isArray(g.features_list) ? g.features_list : ["ENTERPRISE SAAS UI", "FIGMA DESIGN TOKENS", "DEVELOPER READY HANDOFF"],
+    featuresList: Array.isArray(g.features_list) ? g.features_list : ["AUDITED WORKFLOW", "ESCROW PROTECTED", "DEVELOPER READY HANDOFF"],
     faqs: Array.isArray(g.faqs) ? g.faqs : [],
     createdAt: g.created_at || g.createdAt || new Date().toISOString(),
   };
@@ -65,14 +65,14 @@ function mapSupabaseGig(g) {
 function mapSupabaseProfile(p) {
   return {
     id: String(p.id),
-    name: p.full_name || p.name || "Elena Rostova",
-    headline: p.headline || "Staff UI/UX & Design Systems Architect",
-    tier: p.tier || "TOP RATED",
+    name: p.full_name || p.name || "Specialist",
+    headline: p.headline || "Independent Specialist",
+    tier: p.tier || "VERIFIED",
     verified: true,
-    rating: Number(p.rating) || 4.9,
-    reviewsCount: Number(p.reviews_count) || 248,
+    rating: Number(p.rating) || 5.0,
+    reviewsCount: Number(p.reviews_count) || 0,
     bio: p.bio || "Specialist contracting under deterministic cryptographic escrow milestones on GigCraft.",
-    avatar: p.avatar_url || p.avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+    avatar: p.avatar_url || p.avatar || "",
     location: p.location || "San Francisco, CA, USA (PST)",
     skills: Array.isArray(p.skills) ? p.skills : ["Figma", "Design Systems", "SaaS UI"],
     languages: ["English (Fluent)", "German (Conversational)"],
@@ -96,36 +96,34 @@ function mapSupabaseOrder(o) {
   return {
     id: String(o.id),
     code: o.code || `#${String(o.id).slice(-7).toUpperCase()}`,
-    gigId: String(o.gig_id || o.gigId || "g1"),
-    clientId: String(o.client_id || o.clientId || "c1"),
-    clientName: o.client_name || o.clientName || "Linus T.",
+    gigId: String(o.gig_id || o.gigId || ""),
+    clientId: String(o.client_id || o.clientId || ""),
+    clientName: o.client_name || o.clientName || "Client",
     clientBadge: "Verified Buyer",
-    freelancerId: String(o.freelancer_id || o.freelancerId || "f-elena"),
-    freelancerName: o.freelancer_name || o.freelancerName || "Elena Rostova",
-    freelancerBadge: "Staff Architect",
-    freelancerAvatar: o.freelancer_avatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
-    title: o.title || "Conversion-driven SaaS Web App and Design System",
-    description: o.description || o.requirements || "Comprehensive SaaS dashboard design system with design tokens.",
-    price: Number(o.price) || 280,
-    vaultCommitment: `$${(Number(o.price) || 280).toLocaleString("en-US")} USD`,
-    status: o.status || "completed",
-    subStatus: o.sub_status || o.subStatus || "completed",
-    statusLabel: (o.status || "completed").toUpperCase(),
+    freelancerId: String(o.freelancer_id || o.freelancerId || ""),
+    freelancerName: o.freelancer_name || o.freelancerName || "Specialist",
+    freelancerBadge: "Verified Specialist",
+    freelancerAvatar: o.freelancer_avatar || "",
+    title: o.title || "Contract Specification",
+    description: o.description || o.requirements || "Escrow milestone contract.",
+    price: Number(o.price) || 0,
+    vaultCommitment: `$${(Number(o.price) || 0).toLocaleString("en-US")} USD`,
+    status: o.status || "active",
+    subStatus: o.sub_status || o.subStatus || "active",
+    statusLabel: (o.status || "active").toUpperCase(),
     milestoneFlight: o.status === "completed" ? "CONTRACT SETTLED & ESCROW RELEASED" : "MILESTONE IN FLIGHT",
     progress: o.status === "completed" ? 100 : 50,
-    dueText: "Settled recently",
+    dueText: "In Escrow",
     initiatedAt: o.created_at || new Date().toISOString(),
     createdAt: o.created_at || new Date().toISOString(),
-    revisionsUsed: 1,
+    revisionsUsed: 0,
     revisionsTotal: 3,
     deliveryDays: 2,
     milestones: o.milestones || [
-      { step: 1, title: "Token Architecture & Specs", completed: true, tag: "RELEASED ($140)", amount: 140 },
-      { step: 2, title: "SaaS Views & Figma Export", completed: true, tag: "RELEASED ($140)", amount: 140 },
+      { step: 1, title: "Milestone Deliverable", completed: o.status === "completed", tag: "ESCROW SECURED", amount: Number(o.price) || 0 },
     ],
     timeline: o.timeline || [
       { label: "Contract Initiated", at: o.created_at || new Date().toISOString() },
-      { label: "Deliverables Accepted & Funds Released", at: new Date().toISOString() },
     ],
   };
 }
@@ -133,22 +131,22 @@ function mapSupabaseOrder(o) {
 function mapSupabaseReview(r) {
   return {
     id: String(r.id),
-    orderId: String(r.order_id || r.orderId || "GC-0821"),
-    gigId: String(r.gig_id || r.gigId || "g1"),
-    gigTitle: r.gig_title || r.gigTitle || "I will design a conversion-driven SaaS web app and design syste...",
-    freelancerId: String(r.freelancer_id || r.freelancerId || "f-elena"),
-    clientId: String(r.client_id || r.clientId || "c1"),
-    clientName: r.client_name || r.clientName || "Marcus Vance",
-    clientRole: "VP Infrastructure",
+    orderId: String(r.order_id || r.orderId || ""),
+    gigId: String(r.gig_id || r.gigId || ""),
+    gigTitle: r.gig_title || r.gigTitle || "Contract Specification",
+    freelancerId: String(r.freelancer_id || r.freelancerId || ""),
+    clientId: String(r.client_id || r.clientId || ""),
+    clientName: r.client_name || r.clientName || "Verified Buyer",
+    clientRole: "Client",
     clientBadge: "VERIFIED BUYER",
     rating: Number(r.rating) || 5,
     verifiedOrder: true,
-    paidEscrow: `$${(Number(r.paid_escrow) || 280).toLocaleString("en-US")}`,
+    paidEscrow: `$${(Number(r.paid_escrow) || 0).toLocaleString("en-US")}`,
     completedDate: "Completed Recently",
-    projectName: r.project_name || "SaaS Dashboard UI & Design System",
-    comment: r.comment || "Elena delivered full responsive Figma frames that matched our tokens 1-to-1!",
-    reply: r.reply || "Thank you Marcus! It was an absolute pleasure collaborating with your team.",
-    replyAuthor: "ELENA ROSTOVA (SELLER)",
+    projectName: r.project_name || "Contract Deliverable",
+    comment: r.comment || "Deliverable completed to specifications.",
+    reply: r.reply || null,
+    replyAuthor: r.reply ? (r.replyAuthor || "SELLER") : null,
     createdAt: r.created_at || r.createdAt || new Date().toISOString(),
   };
 }
@@ -184,26 +182,30 @@ export function MarketplaceProvider({ children }) {
       localStorage.removeItem("gigcraft_v3:orders");
       localStorage.removeItem("gigcraft_v3:reviews");
       localStorage.removeItem("gigcraft_v4:orders");
+      localStorage.removeItem("gigcraft_v5:gigs");
+      localStorage.removeItem("gigcraft_v5:freelancers");
+      localStorage.removeItem("gigcraft_v5:orders");
+      localStorage.removeItem("gigcraft_v5:reviews");
 
-      const savedGigs = localStorage.getItem("gigcraft_v5:gigs");
+      const savedGigs = localStorage.getItem("gigcraft_clean:gigs");
       if (savedGigs) {
         const parsed = JSON.parse(savedGigs);
-        if (Array.isArray(parsed) && parsed.length > 0) setGigs(parsed);
+        if (Array.isArray(parsed)) setGigs(parsed);
       }
-      const savedFreelancers = localStorage.getItem("gigcraft_v5:freelancers");
+      const savedFreelancers = localStorage.getItem("gigcraft_clean:freelancers");
       if (savedFreelancers) {
         const parsed = JSON.parse(savedFreelancers);
-        if (Array.isArray(parsed) && parsed.length > 0) setFreelancers(parsed);
+        if (Array.isArray(parsed)) setFreelancers(parsed);
       }
-      const savedOrders = localStorage.getItem("gigcraft_v5:orders");
+      const savedOrders = localStorage.getItem("gigcraft_clean:orders");
       if (savedOrders) {
         const parsed = JSON.parse(savedOrders);
-        if (Array.isArray(parsed) && parsed.length > 0) setOrders(parsed);
+        if (Array.isArray(parsed)) setOrders(parsed);
       }
-      const savedReviews = localStorage.getItem("gigcraft_v5:reviews");
+      const savedReviews = localStorage.getItem("gigcraft_clean:reviews");
       if (savedReviews) {
         const parsed = JSON.parse(savedReviews);
-        if (Array.isArray(parsed) && parsed.length > 0) setReviews(parsed);
+        if (Array.isArray(parsed)) setReviews(parsed);
       }
     } catch {}
   }, []);
@@ -212,7 +214,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v5:gigs", JSON.stringify(gigs));
+        localStorage.setItem("gigcraft_clean:gigs", JSON.stringify(gigs));
       } catch {}
     }
   }, [gigs, hydrated]);
@@ -220,7 +222,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v5:freelancers", JSON.stringify(freelancers));
+        localStorage.setItem("gigcraft_clean:freelancers", JSON.stringify(freelancers));
       } catch {}
     }
   }, [freelancers, hydrated]);
@@ -228,7 +230,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v5:orders", JSON.stringify(orders));
+        localStorage.setItem("gigcraft_clean:orders", JSON.stringify(orders));
       } catch {}
     }
   }, [orders, hydrated]);
@@ -236,7 +238,7 @@ export function MarketplaceProvider({ children }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("gigcraft_v5:reviews", JSON.stringify(reviews));
+        localStorage.setItem("gigcraft_clean:reviews", JSON.stringify(reviews));
       } catch {}
     }
   }, [reviews, hydrated]);
@@ -296,9 +298,9 @@ export function MarketplaceProvider({ children }) {
   const getProfile = (id) => {
     const f = freelancers.find((item) => item.id === id);
     if (f) return f;
-    return { id, name: id === "c1" ? "Apex Cloud Labs" : id === "c-raj" ? "Raj P." : "Enterprise Client", role: "client" };
+    return { id, name: user?.id === id ? user.name : "Client", role: "client" };
   };
-  const getFreelancer = (id) => freelancers.find((f) => f.id === id) ?? freelancers[0];
+  const getFreelancer = (id) => freelancers.find((f) => f.id === id) || null;
   const getOrder = (id) => orders.find((o) => o.id === id || o.code === id || o.id === `#${id}`) ?? null;
   const getOrderGig = (order) => (order ? getGig(order.gigId) || { title: order.title, price: order.price, deliveryDays: 5, revisions: 3 } : null);
   const getFreelancerGigs = (freelancerId) => gigs.filter((g) => g.freelancerId === freelancerId);
@@ -368,12 +370,12 @@ export function MarketplaceProvider({ children }) {
   async function addGig(data) {
     if (!user) return fail("Please log in first.");
     const newGig = {
-      id: "g" + (gigs.length + 1),
-      freelancerId: user.id || "f2",
+      id: "g-" + Date.now().toString(36),
+      freelancerId: user?.id || "f-creator",
       title: data.title,
       description: data.description,
       category: data.category,
-      serviceType: "Technical Gig",
+      serviceType: data.serviceType || "Technical Service",
       price: Number(data.price),
       deliveryDays: Number(data.deliveryDays),
       revisions: Number(data.revisions),
@@ -440,14 +442,14 @@ export function MarketplaceProvider({ children }) {
       clientId: user.id,
       clientName: user.name || "Enterprise Client",
       clientBadge: "Verified Client",
-      freelancerId: targetGig?.freelancerId || "f2",
-      freelancerName: targetGig ? getFreelancer(targetGig.freelancerId)?.name : "Arjun Mehta",
+      freelancerId: targetGig?.freelancerId || "f-specialist",
+      freelancerName: targetGig ? (getFreelancer(targetGig.freelancerId)?.name || "Specialist") : "Specialist",
       freelancerBadge: "Staff Architect",
-      freelancerAvatar: targetGig ? getFreelancer(targetGig.freelancerId)?.avatar : "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
-      title: targetGig?.title || "Conversion-driven SaaS Web App and Design System",
+      freelancerAvatar: targetGig ? (getFreelancer(targetGig.freelancerId)?.avatar || "") : "",
+      title: targetGig?.title || "Technical Service Contract",
       description: requirements,
-      price: targetGig?.price || 280,
-      vaultCommitment: `$${(targetGig?.price || 280).toLocaleString("en-US")} USD`,
+      price: targetGig?.price || 100,
+      vaultCommitment: `$${(targetGig?.price || 100).toLocaleString("en-US")} USD`,
       status: "active",
       subStatus: "in-progress",
       statusLabel: "IN PROGRESS",
@@ -678,18 +680,18 @@ export function MarketplaceProvider({ children }) {
     const newRev = {
       id: "rev-" + Date.now(),
       orderId,
-      gigId: targetOrder?.gigId || "g7",
-      gigTitle: targetOrder?.title || "I will develop a custom vehicle rental and booking web application",
-      freelancerId: targetOrder?.freelancerId || "f2",
-      clientId: user?.id || "c-raj",
-      clientName: user?.name || "Marcus Vance",
-      clientRole: "Operations Lead",
+      gigId: targetOrder?.gigId || "",
+      gigTitle: targetOrder?.title || "Contract Specification",
+      freelancerId: targetOrder?.freelancerId || "",
+      clientId: user?.id || "guest",
+      clientName: user?.name || "Verified Buyer",
+      clientRole: "Buyer",
       clientBadge: "VERIFIED BUYER",
       rating: Number(rating),
       verifiedOrder: true,
-      paidEscrow: targetOrder ? `$${targetOrder.price?.toLocaleString("en-US")}` : "$280",
+      paidEscrow: targetOrder ? `$${targetOrder.price?.toLocaleString("en-US")}` : "$0",
       completedDate: "Completed Just now",
-      projectName: targetOrder?.title || "SaaS Dashboard UI & Design System",
+      projectName: targetOrder?.title || "Contract Deliverable",
       comment,
       reply: null,
       createdAt: new Date().toISOString(),

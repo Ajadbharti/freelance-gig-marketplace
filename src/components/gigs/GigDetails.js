@@ -32,52 +32,7 @@ const SHOWCASE_GALLERY = [
   "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80",
 ];
 
-const DEFAULT_REVIEWS = [
-  {
-    id: "rev-1",
-    clientName: "Marcus Vance",
-    clientRole: "VP INFRASTRUCTURE",
-    clientBadge: "VERIFIED BUYER",
-    rating: 5,
-    packageUsed: "STANDARD PACKAGE",
-    timeAgo: "2 WEEKS AGO",
-    comment:
-      "Elena's component architecture saved our engineering team weeks. She delivered full responsive Figma frames that matched our Tailwind tokens 1-to-1! No unnecessary fluff, just enterprise-grade product UX and clean token specifications.",
-    replyAuthor: "TO: VP INFRASTRUCTURE, M. VANCE //",
-    reply:
-      "Thank you Marcus! It was an absolute pleasure collaborating with your engineering team. Looking forward to Sprint 2.",
-    tags: ["component library", "speed"],
-  },
-  {
-    id: "rev-2",
-    clientName: "Sarah Jenkins",
-    clientRole: "HEAD OF PRODUCT",
-    clientBadge: "VERIFIED BUYER",
-    rating: 5,
-    packageUsed: "PREMIUM PACKAGE",
-    timeAgo: "1 MONTH AGO",
-    comment:
-      "Outstanding execution across high-fidelity wireframing and UI screens. She didn't just design screens—she questioned UX assumptions and simplified our user onboarding flow drastically. Her strict Auto-Layout 5.0 practices made developer handoff effortless.",
-    replyAuthor: "TO: SARAH JENKINS, HEAD OF PRODUCT //",
-    reply:
-      "Always a pleasure Sarah! Glad the design token JSON made the engineering handoff smooth. Thanks for your trust.",
-    tags: ["design system"],
-  },
-  {
-    id: "rev-3",
-    clientName: "Rohit Deshmukh",
-    clientRole: "VP ENGINEERING",
-    clientBadge: "VERIFIED BUYER",
-    rating: 5,
-    packageUsed: "STANDARD PACKAGE",
-    timeAgo: "2 MONTHS AGO",
-    comment:
-      "Elena is exceptional. She didn't just generate pretty wireframes; she actively dove into our token emissions, cleared up edge-case user error fallbacks, and gave our frontend team components they could implement on day one without asking 50 questions. Delivered 2 days ahead of schedule.",
-    replyAuthor: null,
-    reply: null,
-    tags: ["speed", "component library"],
-  },
-];
+const DEFAULT_REVIEWS = [];
 
 const FAQS = [
   {
@@ -103,12 +58,13 @@ export default function GigDetails({ params }) {
   const router = useRouter();
   const { user } = useAuth();
   const { isSaved, toggle } = useFavorites();
-  const { getGig, getFreelancer } = useMarketplace();
+  const { getGig, getFreelancer, getGigReviews } = useMarketplace();
   const { showToast } = useToast();
 
-  const gig = getGig(id) || getGig("g1");
+  const gig = getGig(id);
   const freelancer = gig ? getFreelancer(gig.freelancerId) : null;
   const saved = gig ? isSaved(gig.id) : false;
+  const gigReviews = gig ? getGigReviews(gig.id) : [];
 
   const [activePackageTab, setActivePackageTab] = useState("standard");
   const [orderModalOpen, setOrderModalOpen] = useState(false);
@@ -191,28 +147,53 @@ export default function GigDetails({ params }) {
   function handleOrderClick() {
     if (!user) {
       showToast("Please log in as client to initiate escrow contract.", "info");
-      router.push(`/login?next=${encodeURIComponent(`/gigs/${gig?.id || "g1"}`)}`);
+      router.push(`/login?next=${encodeURIComponent(`/gigs/${gig?.id || ""}`)}`);
       return;
     }
     setOrderModalOpen(true);
   }
 
   function handleContactSeller() {
-    router.push(`/messages?freelancer=${freelancer?.id || "f-elena"}`);
+    if (freelancer?.id) {
+      router.push(`/messages?freelancer=${freelancer.id}`);
+    } else {
+      router.push(`/messages`);
+    }
   }
 
   // Filtered reviews
   const filteredReviews = useMemo(() => {
-    return DEFAULT_REVIEWS.filter((rev) => {
+    return (gigReviews || []).filter((rev) => {
       const matchSearch =
         !reviewSearch ||
-        rev.comment.toLowerCase().includes(reviewSearch.toLowerCase()) ||
-        rev.clientName.toLowerCase().includes(reviewSearch.toLowerCase());
+        rev.comment?.toLowerCase().includes(reviewSearch.toLowerCase()) ||
+        rev.clientName?.toLowerCase().includes(reviewSearch.toLowerCase());
       const matchTag =
-        reviewTagFilter === "all" || rev.tags.includes(reviewTagFilter);
+        reviewTagFilter === "all" || (rev.tags && rev.tags.includes(reviewTagFilter));
       return matchSearch && matchTag;
     });
-  }, [reviewSearch, reviewTagFilter]);
+  }, [gigReviews, reviewSearch, reviewTagFilter]);
+
+  if (!gig) {
+    return (
+      <div className="min-h-screen bg-[#f8f9ff] py-16 px-4 text-center">
+        <div className="max-w-md mx-auto border border-[#0b1c30] bg-white p-8 shadow-[4px_4px_0px_#0b1c30]">
+          <h1 className="font-headline text-xl font-bold uppercase text-[#0b1c30]">
+            Specification Not Found
+          </h1>
+          <p className="mt-2 font-mono text-xs text-[#6e7a73]">
+            No active specification found with ID: {id}
+          </p>
+          <Link
+            href="/gigs"
+            className="mt-6 inline-flex items-center justify-center bg-[#005d42] px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30]"
+          >
+            Explore All Gigs
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] py-6 px-4 sm:px-6 lg:px-8">
@@ -255,19 +236,19 @@ export default function GigDetails({ params }) {
               SPEC: TECH-INT
             </span>
             <span className="border border-[#e5e7eb] bg-white px-2 py-0.5 text-[#3e4943]">
-              SAAS & DESIGN SYSTEM ARCH
+              {gig.category ? gig.category.replace(/-/g, " ").toUpperCase() : "TECHNICAL SPECIFICATION"}
             </span>
           </div>
 
           <h1 className="font-headline text-2xl font-bold uppercase tracking-tight text-[#0b1c30] sm:text-3xl lg:text-4xl leading-tight">
-            I WILL DESIGN A CONVERSION-FOCUSED SAAS DASHBOARD AND RESPONSIVE WEB APP IN FIGMA
+            {gig.title}
           </h1>
 
           {/* Author Row with Badges and Save/Contact Actions */}
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-b border-[#e5e7eb] pb-4">
             <div className="flex flex-wrap items-center gap-3">
               <Link
-                href={`/freelancers/${freelancer?.id || "f-elena"}`}
+                href={freelancer?.id ? `/freelancers/${freelancer.id}` : "/freelancers"}
                 className="flex items-center gap-2 group"
               >
                 <div className="h-8 w-8 border border-[#0b1c30] overflow-hidden bg-slate-100 shrink-0">
@@ -279,7 +260,7 @@ export default function GigDetails({ params }) {
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="font-headline text-sm font-bold text-[#0b1c30] group-hover:text-[#005d42]">
-                    {freelancer?.name || "Elena Rostova"}
+                    {freelancer?.name || "Specialist"}
                   </span>
                   <span className="material-symbols-outlined text-sm text-[#005d42] leading-none">
                     check_circle
@@ -929,12 +910,14 @@ export default function GigDetails({ params }) {
                 </div>
                 <div>
                   <Link
-                    href={`/freelancers/${freelancer?.id || "f-elena"}`}
+                    href={freelancer?.id ? `/freelancers/${freelancer.id}` : "/freelancers"}
                     className="font-headline text-sm font-bold text-[#0b1c30] hover:text-[#005d42]"
                   >
-                    {freelancer?.name || "Elena Rostova"}
+                    {freelancer?.name || "Specialist"}
                   </Link>
-                  <p className="font-mono text-xs text-[#3e4943]">Design Systems Specialist</p>
+                  <p className="font-mono text-xs text-[#3e4943]">
+                    {freelancer?.headline || freelancer?.roleTitle || "Independent Specialist"}
+                  </p>
                   <p className="mt-0.5 font-mono text-[10px] font-bold text-[#005d42]">
                     🟢 ACTIVE IN WORKSPACE
                   </p>
@@ -944,23 +927,25 @@ export default function GigDetails({ params }) {
               <div className="mt-4 border-t border-[#e5e7eb] pt-3 space-y-2 font-mono text-xs text-[#3e4943]">
                 <div className="flex justify-between">
                   <span className="text-[#6e7a73]">LOCATION</span>
-                  <span className="text-[#0b1c30] font-semibold">San Francisco, USA 🇺🇸</span>
+                  <span className="text-[#0b1c30] font-semibold">{freelancer?.location || "Global Remote"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#6e7a73]">MEMBER SINCE</span>
-                  <span className="text-[#0b1c30] font-semibold">October 2021</span>
+                  <span className="text-[#0b1c30] font-semibold">{freelancer?.memberSince || "Recent"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#6e7a73]">AVG. RESPONSE TIME</span>
-                  <span className="text-[#0b1c30] font-semibold">1 Hour</span>
+                  <span className="text-[#0b1c30] font-semibold">{freelancer?.responseTime || "Within 24 Hours"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#6e7a73]">LAST CONTRACT</span>
-                  <span className="text-[#0b1c30] font-semibold">3 Hours Ago</span>
+                  <span className="text-[#0b1c30] font-semibold">{freelancer?.lastDelivery || "Recent"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#6e7a73]">TOTAL ESCROW CLEARED</span>
-                  <span className="text-[#005d42] font-bold">Phase I: $142,000</span>
+                  <span className="text-[#005d42] font-bold">
+                    {freelancer?.totalEarned ? `$${freelancer.totalEarned.toLocaleString()}` : "100% Escrow Protected"}
+                  </span>
                 </div>
               </div>
 
@@ -969,7 +954,7 @@ export default function GigDetails({ params }) {
                 onClick={handleContactSeller}
                 className="mt-5 w-full border border-[#dae2fd] bg-[#eff4ff] py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-[#0047bf] shadow-[2px_2px_0px_#0b1c30] hover:bg-[#dce9ff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
               >
-                ✉ CONTACT ELENA
+                ✉ CONTACT {freelancer?.name ? freelancer.name.toUpperCase() : "SPECIALIST"}
               </button>
             </div>
 

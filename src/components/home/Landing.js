@@ -89,24 +89,24 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 text-center">
             <div className="p-2 border-r border-slate-200 last:border-none">
-              <p className="text-[10px] uppercase text-slate-500">ESCROW LIQUIDITY</p>
-              <p className="font-headline text-2xl font-bold text-[#0b1c30]">$24.2M</p>
-              <p className="text-[10px] text-[#005d42] font-semibold">Q1 VERIFIED</p>
+              <p className="text-[10px] uppercase text-slate-500">PUBLISHED GIGS</p>
+              <p className="font-headline text-2xl font-bold text-[#0b1c30]">{gigs.length}</p>
+              <p className="text-[10px] text-[#005d42] font-semibold">LIVE CATALOG</p>
             </div>
             <div className="p-2 border-r border-slate-200 last:border-none">
-              <p className="text-[10px] uppercase text-slate-500">AVG CONTRACT FILL TIME</p>
-              <p className="font-headline text-2xl font-bold text-[#0b1c30]">3.8 Hours</p>
-              <p className="text-[10px] text-[#005d42] font-semibold">▲ 14% FASTER</p>
+              <p className="text-[10px] uppercase text-slate-500">SPECIALISTS</p>
+              <p className="font-headline text-2xl font-bold text-[#0b1c30]">{freelancers.length}</p>
+              <p className="text-[10px] text-[#005d42] font-semibold">VERIFIED TALENT</p>
             </div>
             <div className="p-2 border-r border-slate-200 last:border-none">
-              <p className="text-[10px] uppercase text-slate-500">DISPUTE RATE</p>
-              <p className="font-headline text-2xl font-bold text-[#005d42]">0.08%</p>
-              <p className="text-[10px] text-slate-500">DETERMINISTIC SLA</p>
+              <p className="text-[10px] uppercase text-slate-500">CONTRACT SECURITY</p>
+              <p className="font-headline text-2xl font-bold text-[#005d42]">100%</p>
+              <p className="text-[10px] text-slate-500">ESCROW PROTECTED</p>
             </div>
             <div className="p-2">
-              <p className="text-[10px] uppercase text-slate-500">APPLICANT ACCEPTANCE</p>
-              <p className="font-headline text-2xl font-bold text-[#0b1c30]">Top 1.4%</p>
-              <p className="text-[10px] text-slate-500">CODE AUDIT PASS</p>
+              <p className="text-[10px] uppercase text-slate-500">ZERO COMMISSION</p>
+              <p className="font-headline text-2xl font-bold text-[#0b1c30]">0%</p>
+              <p className="text-[10px] text-slate-500">DIRECT DISBURSEMENT</p>
             </div>
           </div>
         </div>
@@ -128,14 +128,31 @@ export default function Landing() {
               href="/gigs"
               className="font-mono text-xs font-bold uppercase tracking-wider text-slate-800 hover:text-[#047857]"
             >
-              EXPLORE ALL 1,428 SPECS →
+              EXPLORE ALL {gigs.length} SPECS →
             </Link>
           </div>
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {gigs.slice(0, 6).map((gig) => (
-              <GigCard key={gig.id} gig={gig} />
-            ))}
+            {gigs.length === 0 ? (
+              <div className="col-span-full border border-[#0b1c30] bg-white p-12 text-center shadow-[3px_3px_0px_#0b1c30]">
+                <p className="font-headline text-lg font-bold uppercase text-[#0b1c30]">
+                  NO GIGS PUBLISHED YET
+                </p>
+                <p className="mt-2 font-mono text-xs text-[#6e7a73] max-w-md mx-auto">
+                  Be the first to publish a technical service specification and start receiving client escrow contracts.
+                </p>
+                <Link
+                  href="/dashboard/freelancer/gigs/new"
+                  className="mt-6 inline-flex items-center justify-center bg-[#005d42] px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-white hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px]"
+                >
+                  + PUBLISH FIRST GIG
+                </Link>
+              </div>
+            ) : (
+              gigs.slice(0, 6).map((gig) => (
+                <GigCard key={gig.id} gig={gig} />
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -153,15 +170,31 @@ export default function Landing() {
               </h2>
             </div>
             <Link
-              href="/freelancers/f1"
+              href="/explore"
               className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] hover:text-[#005d42]"
             >
-              INSPECT VERIFIED SPECIALIST (ELENA) →
+              EXPLORE ALL SPECIALISTS →
             </Link>
           </div>
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {freelancers.slice(0, 3).map((f) => (
+            {freelancers.length === 0 ? (
+              <div className="col-span-full border border-[#0b1c30] bg-white p-12 text-center shadow-[3px_3px_0px_#0b1c30]">
+                <p className="font-headline text-lg font-bold uppercase text-[#0b1c30]">
+                  NO SPECIALISTS REGISTERED YET
+                </p>
+                <p className="mt-2 font-mono text-xs text-[#6e7a73] max-w-md mx-auto">
+                  Create a freelancer account to list your technical credentials and receive escrow-backed work.
+                </p>
+                <Link
+                  href="/register?role=freelancer"
+                  className="mt-6 inline-flex items-center justify-center border border-[#0b1c30] bg-white px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] hover:bg-[#eff4ff] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px]"
+                >
+                  APPLY AS FREELANCER
+                </Link>
+              </div>
+            ) : (
+              freelancers.slice(0, 3).map((f) => (
               <div key={f.id} className="border border-[#e5e7eb] bg-white p-5 shadow-[3px_3px_0px_#0b1c30] flex flex-col justify-between">
                 <div>
                   <div className="flex items-start justify-between">

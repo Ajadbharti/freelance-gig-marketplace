@@ -45,7 +45,7 @@ export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { register: registerUser, loginWithProvider, loginWithGithubDemo, loginWithFirebaseGoogle } = useAuth();
-  const { gigs, freelancers } = useMarketplace();
+  const { gigs, freelancers, orders, reviews } = useMarketplace();
   const { showToast } = useToast();
 
   const [archetype, setArchetype] = useState(
@@ -135,8 +135,8 @@ export default function RegisterForm() {
     }
     if (provider === "github") {
       const result = await loginWithGithubDemo({
-        name: archetype === "freelancer" ? "Elena Rostova" : "Apex Cloud Labs",
-        email: archetype === "freelancer" ? "developer@agency.io" : "contact@apexcloud.io",
+        name: archetype === "freelancer" ? "Freelancer Specialist" : "Client Organization",
+        email: archetype === "freelancer" ? "dev@workspace.local" : "client@workspace.local",
         role: archetype,
       });
       if (result.ok) {
@@ -553,7 +553,7 @@ export default function RegisterForm() {
                       PUBLISHED GIGS
                     </p>
                     <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                      {gigs?.length || 7}
+                      {gigs?.length || 0}
                     </p>
                   </div>
 
@@ -562,7 +562,7 @@ export default function RegisterForm() {
                       FREELANCERS
                     </p>
                     <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                      {freelancers?.length || 4}
+                      {freelancers?.length || 0}
                     </p>
                   </div>
 
@@ -571,7 +571,7 @@ export default function RegisterForm() {
                       COMPLETED ORDERS
                     </p>
                     <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                      1
+                      {orders?.filter(o => o.status === "completed").length || 0}
                     </p>
                   </div>
 
@@ -580,7 +580,7 @@ export default function RegisterForm() {
                       AVERAGE RATING
                     </p>
                     <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] flex items-center gap-1">
-                      5.0 <span className="text-[#005d42] text-xl">★</span>
+                      {reviews?.length ? (reviews.reduce((s, r) => s + (r.rating || 5), 0) / reviews.length).toFixed(1) : "5.0"} <span className="text-[#005d42] text-xl">★</span>
                     </p>
                   </div>
                 </div>
@@ -593,7 +593,7 @@ export default function RegisterForm() {
                         SIMULATED ESCROW RELEASED
                       </p>
                       <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] sm:text-4xl">
-                        ₹7,999
+                        ₹{(orders?.filter(o => o.status === "completed").reduce((sum, o) => sum + (o.price || 0), 0) || 0).toLocaleString("en-IN")}
                       </p>
                     </div>
                     <div className="flex h-10 w-10 items-center justify-center border border-[#e5e7eb] bg-[#eff4ff] text-[#005d42]">
@@ -601,7 +601,7 @@ export default function RegisterForm() {
                     </div>
                   </div>
                   <p className="mt-3 text-xs text-[#3e4943]">
-                    Demo payments only, No real money moves on GigCraft.
+                    Deterministic escrow protection across all contract milestones.
                   </p>
                 </div>
               </div>

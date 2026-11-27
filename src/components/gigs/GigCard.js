@@ -94,7 +94,7 @@ export default function GigCard({ gig }) {
         {/* Author & Rating Row */}
         <div className="flex items-center justify-between">
           <Link
-            href={`/freelancers/${freelancer?.id || "f-elena"}`}
+            href={freelancer?.id ? `/freelancers/${freelancer.id}` : "/freelancers"}
             className="flex items-center gap-2 group/author min-w-0"
           >
             {/* Square Avatar matching screenshot */}
@@ -107,13 +107,13 @@ export default function GigCard({ gig }) {
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center font-headline text-[10px] font-bold text-[#0047bf]">
-                  {freelancer?.initials || "AK"}
+                  {freelancer?.initials || (freelancer?.name ? freelancer.name.slice(0, 2).toUpperCase() : "SP")}
                 </div>
               )}
             </div>
             <div className="flex items-center gap-1 min-w-0">
               <span className="truncate text-xs font-bold text-[#0b1c30] group-hover/author:text-[#005d42]">
-                {freelancer?.name || "Ajju Kumar"}
+                {freelancer?.name || "Specialist"}
               </span>
               {freelancer?.verified && tier !== "RISING TALENT" && (
                 <span className="material-symbols-outlined text-[13px] text-[#005d42] leading-none shrink-0">
