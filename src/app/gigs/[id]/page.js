@@ -1,31 +1,41 @@
 import { Suspense } from "react";
-import GigDetails from "@/components/gigs/GigDetails";
+import GigDetailsView from "@/components/gig-details/GigDetailsView";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 
 export const metadata = {
-  title: "Specification & Escrow Contract Details | GigCraft",
+  title: "I will design a modern and professional business logo | GigMarket",
+  description:
+    "Hire Elena Rostova, Top Rated Pro on GigMarket. Get custom minimalist business logo design with vector files, 3D mockups, and 100% milestone escrow protection.",
 };
 
-export function GigDetailsSkeleton() {
+function GigDetailsSkeleton() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10" role="status" aria-label="Loading gig spec">
-      <LoadingSkeleton className="h-5 w-64" />
-      <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-4">
-          <LoadingSkeleton className="h-9 w-3/4" />
-          <LoadingSkeleton className="h-10 w-1/3" />
-          <LoadingSkeleton className="aspect-[16/10] w-full" />
+    <div className="mx-auto max-w-7xl px-4 py-10" role="status" aria-label="Loading gig details">
+      <LoadingSkeleton className="h-5 w-64 rounded-md" />
+      <div className="mt-6 grid gap-8 lg:grid-cols-12">
+        <div className="lg:col-span-8 space-y-4">
+          <LoadingSkeleton className="h-10 w-3/4 rounded-lg" />
+          <LoadingSkeleton className="h-12 w-1/2 rounded-md" />
+          <LoadingSkeleton className="aspect-[16/10] w-full rounded-2xl" />
         </div>
-        <LoadingSkeleton className="h-72 w-full" />
+        <div className="lg:col-span-4">
+          <LoadingSkeleton className="h-96 w-full rounded-3xl" />
+        </div>
       </div>
     </div>
   );
 }
 
+async function GigDetailsContent({ paramsPromise }) {
+  const resolved = await paramsPromise;
+  const gigId = resolved?.id || "gig-1";
+  return <GigDetailsView gigId={gigId} />;
+}
+
 export default function GigPage({ params }) {
   return (
     <Suspense fallback={<GigDetailsSkeleton />}>
-      <GigDetails params={params} />
+      <GigDetailsContent paramsPromise={params} />
     </Suspense>
   );
 }

@@ -1,9 +1,10 @@
-import Inbox from "@/components/messages/Inbox";
+import ClientMessagesView from "@/components/client-messages/ClientMessagesView";
 
 export const metadata = {
-  title: "Messages | GigNest",
+  title: "Messages | GigMarket — Freelance Marketplace",
+  description: "Direct communications, project milestone discussions, and deliverable reviews with your freelancers.",
 };
 
 export default function MessagesPage() {
-  return <Inbox />;
+  return <ClientMessagesView />;
 }

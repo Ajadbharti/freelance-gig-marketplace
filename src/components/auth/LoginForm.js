@@ -4,42 +4,24 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import {
-  Eye,
-  EyeOff,
-  KeyRound,
-  Landmark,
-  Lock,
-  LogIn,
-  Mail,
-  Shield,
-  ShieldCheck,
-  Star,
-} from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useMarketplace } from "@/context/MarketplaceContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
-
-function GithubIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-    </svg>
-  );
-}
+import AuthHeader from "./AuthHeader";
+import RoleSelector from "./RoleSelector";
+import SocialLoginButtons from "./SocialLoginButtons";
+import LoginVisualSection from "./LoginVisualSection";
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextUrl = searchParams.get("next") || "/dashboard/client";
-  const { login, loginWithProvider, loginWithGithubDemo, loginWithFirebaseGoogle } = useAuth();
-  const { gigs, freelancers, orders, reviews } = useMarketplace();
+  const nextParam = searchParams.get("next");
+  const { login } = useAuth();
   const { showToast } = useToast();
 
+  const [role, setRole] = useState(searchParams.get("role") === "freelancer" ? "freelancer" : "client");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberHardware, setRememberHardware] = useState(true);
-  const [oauthLoading, setOauthLoading] = useState(null);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const {
     register,
@@ -53,481 +35,283 @@ export default function LoginForm() {
     },
   });
 
-  async function onSubmit(data) {
-    const result = await login(data.email, data.password);
-    if (!result.ok) {
-      showToast(result.error || "Authentication failed. Please verify credentials.", "error");
-      return;
-    }
-    showToast("Signed in successfully. Routing to workspace...", "success");
-    if (result.user?.role === "admin") {
-      window.location.href = "/admin";
-    } else if (result.user?.role === "freelancer") {
-      window.location.href = nextUrl !== "/dashboard/client" ? nextUrl : "/dashboard/freelancer";
-    } else {
-      window.location.href = nextUrl || "/dashboard/client";
-    }
+  // Load remembered email on mount
+  useEffect(() => {
+    try {
+      const savedEmail = localStorage.getItem("gigmarket_remember_email");
+      if (savedEmail) {
+        setValue("email", savedEmail);
+      }
+    } catch {}
+  }, [setValue]);
+
+  // Handle role switch (conveniently pre-populates demo email if desired)
+  function handleRoleChange(selectedRole) {
+    setRole(selectedRole);
   }
 
-  async function handleOAuth(provider) {
-    if (provider === "google") {
-      const result = await loginWithFirebaseGoogle("client");
-      if (result.ok && result.user) {
-        showToast(`Welcome, ${result.user.name}! Signed in with Google.`, "success");
-        window.location.href = nextUrl || "/dashboard/client";
-      } else if (result.error) {
-        showToast(result.error, "error");
-      }
-      return;
-    }
-    if (provider === "github") {
-      setOauthLoading("github");
-      const result = await loginWithGithubDemo({
-        name: "Developer Workspace",
-        email: "dev@workspace.local",
-        role: "client",
-      });
-      setOauthLoading(null);
-      if (result.ok) {
-        showToast("Signed in with GitHub Workspace!", "success");
-        window.location.href = nextUrl || "/dashboard/client";
-      }
-      return;
-    }
-    setOauthLoading(provider);
+  // Handle Form Submission
+  async function onSubmit(data) {
     try {
-      const result = await loginWithProvider(provider, "client");
+      const result = await login(data.email, data.password);
+
       if (!result.ok) {
-        showToast(
-          result.error || `${provider.toUpperCase()} authentication failed.`,
-          "error"
-        );
+        showToast(result.error || "Authentication failed. Please verify your credentials.", "error");
+        return;
       }
-    } catch {
-      showToast(`${provider.toUpperCase()} provider sign-in failed.`, "error");
-    } finally {
-      setOauthLoading(null);
+
+      // Handle Remember Me persistence
+      try {
+        if (rememberMe) {
+          localStorage.setItem("gigmarket_remember_email", data.email);
+        } else {
+          localStorage.removeItem("gigmarket_remember_email");
+        }
+      } catch {}
+
+      showToast(`Welcome back, ${result.user?.name || "User"}! Redirecting...`, "success");
+
+      // Redirect user according to role
+      const userRole = result.user?.role;
+      let destination = nextParam;
+
+      if (!destination) {
+        if (userRole === "admin") {
+          destination = "/admin/dashboard";
+        } else if (userRole === "freelancer") {
+          destination = "/freelancer/dashboard";
+        } else {
+          destination = "/client/dashboard";
+        }
+      }
+
+      window.location.href = destination;
+    } catch (err) {
+      showToast(err.message || "An unexpected error occurred during login.", "error");
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff]">
-      {/* Top Protocol Header (Single Header) */}
-      <header className="border-b border-[#e5e7eb] bg-white py-3.5 px-4 sm:px-8">
-        <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <Link href="/" className="font-headline text-xl font-bold tracking-tight text-[#005d42] uppercase">
-            GIGCRAFT
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin"
-              className="border border-[#0b1c30] bg-[#eff4ff] px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-[#005d42] hover:bg-[#005d42] hover:text-white transition shadow-[1px_1px_0px_#0b1c30]"
-            >
-              🛡️ ADMIN PORTAL
-            </Link>
-            <Link
-              href="/gigs"
-              className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] hover:text-[#005d42] transition"
-            >
-              BACK TO MARKETPLACE
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-50/60 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        
+        {/* LEFT COLUMN: Login Form Area */}
+        <main className="lg:col-span-6 xl:col-span-5 flex flex-col justify-between rounded-3xl bg-white p-6 sm:p-10 xl:p-12 border border-slate-200/80 shadow-xl shadow-slate-200/50">
+          
+          {/* Top Brand & Signup Header */}
+          <AuthHeader actionText="Create an account" actionHref="/register" />
 
-      <main className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          {/* Subheader Protocol Indicator */}
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-2 border-b border-[#e5e7eb] pb-3 font-mono text-xs text-[#3e4943]">
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#005d42]">
-                <span className="h-2 w-2 bg-[#005d42]" />
-                SECURE SIGN-IN HTTPS // HTTPONLY SESSION COOKIE
-              </span>
-            </div>
-            <div className="flex items-center gap-4 text-[11px] text-[#3e4943]">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="h-3.5 w-3.5 text-[#005d42]" /> BCRYPT PASSWORDS
-              </span>
-              <span className="text-[#e5e7eb]">|</span>
-              <span className="flex items-center gap-1">
-                <Lock className="h-3.5 w-3.5 text-[#005d42]" /> SIMULATED ESCROW
-              </span>
-            </div>
-          </div>
-
-          {/* 2-Column Split: Form (Left) + Platform Metrics (Right) */}
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-            {/* Left Column: Login Card */}
-            <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6 sm:p-10">
-              <div className="inline-flex items-center gap-1.5 border border-[#e5e7eb] bg-[#eff4ff] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#0b1c30]">
-                <Shield className="h-3 w-3 text-[#005d42]" />
-                SECURE ESCROW AUTHENTICATION
-              </div>
-
-              <h1 className="mt-4 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] sm:text-4xl">
-                Sign in to GigCraft
+          {/* Form Content Container */}
+          <div className="my-8 w-full max-w-md mx-auto space-y-6">
+            
+            {/* Heading & Subtitle */}
+            <div className="space-y-1.5 text-left">
+              <h1 className="font-headline text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+                Welcome Back!
               </h1>
-              <p className="mt-1 text-xs text-[#3e4943] leading-relaxed">
-                Access your digital contracts, active sprints, and milestone disbursements.
+              <p className="font-sans text-sm text-slate-500 leading-relaxed">
+                Sign in to continue your freelance journey.
               </p>
-
-              {/* Quick Role & Admin Selector Banner */}
-              <div className="mt-5 border border-[#0b1c30] bg-[#eff4ff] p-3 shadow-[2px_2px_0px_#0b1c30]">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#0b1c30] flex items-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5 text-[#005d42]" /> Quick Login Mode / Roles
-                  </span>
-                  <span className="font-mono text-[10px] text-[#005d42] font-bold uppercase tracking-wider bg-white border border-[#005d42]/30 px-1.5 py-0.5">
-                    Auto-Fill
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValue("email", "client@gigcraft.io");
-                      setValue("password", "ClientPass2026!");
-                    }}
-                    className="flex items-center justify-center gap-1.5 border border-[#0b1c30] bg-white py-2 px-2.5 font-mono text-[11px] font-bold uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] transition"
-                  >
-                    <span>👤 Client</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setValue("email", "azadbharati802223@gmail.com");
-                      setValue("password", "AdminSecureAuth");
-                      const res = await login("azadbharati802223@gmail.com", "AdminSecureAuth");
-                      if (res.ok) {
-                        showToast("Super Admin authenticated! Loading Governance Console...", "success");
-                        window.location.href = "/admin";
-                      } else {
-                        showToast(res.error || "Super Admin authentication failed", "error");
-                      }
-                    }}
-                    className="flex items-center justify-center gap-1.5 border border-[#005d42] bg-[#005d42] py-2 px-2.5 font-mono text-[11px] font-bold uppercase text-white hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] transition"
-                  >
-                    <ShieldCheck className="h-3.5 w-3.5 text-[#9ffdd3]" />
-                    <span>⚡ Super Admin</span>
-                  </button>
-                </div>
-                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1 border-t border-[#0b1c30]/10 pt-1.5 font-mono text-[10px] text-[#6e7a73]">
-                  <span>Super Admin: <strong className="text-[#0b1c30]">azadbharati802223@gmail.com</strong></span>
-                  <span className="text-[#005d42] font-bold">Platform Owner</span>
-                </div>
-              </div>
-
-              {/* OAuth Providers */}
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => handleOAuth("github")}
-                  disabled={Boolean(oauthLoading)}
-                  className="flex h-11 items-center justify-center gap-2 border border-[#0b1c30] bg-white py-2.5 px-3 font-mono text-xs font-semibold text-[#0b1c30] shadow-[2px_2px_0px_#0b1c30] hover:bg-[#eff4ff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-50"
-                >
-                  <GithubIcon className="h-4 w-4" />
-                  <span>{oauthLoading === "github" ? "Connecting..." : "GitHub Workspace"}</span>
-                </button>
-
-                <GoogleLoginButton askRole={true} text="Continue with Google" />
-              </div>
-
-              {/* Divider */}
-              <div className="relative my-6 text-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#e5e7eb]" />
-                </div>
-                <span className="relative bg-white px-3 font-mono text-[11px] uppercase tracking-wider text-[#6e7a73]">
-                  OR WITH WORK EMAIL
-                </span>
-              </div>
-
-              {/* Login Form */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between font-mono text-xs">
-                    <label htmlFor="login-email" className="font-bold uppercase tracking-wider text-[#0b1c30]">
-                      CORPORATE EMAIL
-                    </label>
-                    <span className="text-[10px] text-[#6e7a73] uppercase">REQUIRED</span>
-                  </div>
-                  <div className="relative mt-1.5 flex h-11 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
-                    <span className="px-3 font-mono text-xs text-[#6e7a73] shrink-0">@</span>
-                    <input
-                      id="login-email"
-                      type="email"
-                      placeholder="developer@agency.io"
-                      className="h-full flex-1 bg-transparent px-1 font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
-                      {...register("email", { required: "Corporate email is required" })}
-                    />
-                  </div>
-                  {errors.email && (
-                    <p role="alert" className="mt-1 font-mono text-xs text-[#ba1a1a]">
-                      {errors.email.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between font-mono text-xs">
-                    <label htmlFor="login-pass" className="font-bold uppercase tracking-wider text-[#0b1c30]">
-                      ACCESS KEY / PASSWORD
-                    </label>
-                    <Link
-                      href="/forgot-password"
-                      className="text-[11px] font-semibold text-[#005d42] hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative mt-1.5 flex h-11 items-center border border-[#6e7a73] bg-white focus-within:border-2 focus-within:border-[#0b1c30]">
-                    <span className="px-3 text-[#6e7a73] shrink-0">
-                      <KeyRound className="h-4 w-4" />
-                    </span>
-                    <input
-                      id="login-pass"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••••••"
-                      className="h-full flex-1 bg-transparent px-1 font-mono text-xs text-[#0b1c30] placeholder:text-[#6e7a73] focus:outline-none"
-                      {...register("password", { required: "Password is required" })}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center text-[#6e7a73] hover:text-[#0b1c30] cursor-pointer focus:outline-none"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <p role="alert" className="mt-1 font-mono text-xs text-[#ba1a1a]">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 cursor-pointer font-mono text-xs text-[#0b1c30]">
-                    <input
-                      type="checkbox"
-                      checked={rememberHardware}
-                      onChange={(e) => setRememberHardware(e.target.checked)}
-                      className="h-4 w-4 rounded-none accent-[#005d42]"
-                    />
-                    <span>Keep me signed in on this hardware</span>
-                  </label>
-                  <span className="flex items-center gap-1 border border-[#e5e7eb] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] text-[#0b1c30]">
-                    <ShieldCheck className="h-3 w-3 text-[#005d42]" /> HTTPS session
-                  </span>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex h-12 w-full items-center justify-center gap-2 px-5 py-2.5 bg-[#005d42] text-white border border-[#005d42] font-semibold text-sm uppercase tracking-wide hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-70"
-                >
-                  <LogIn className="h-4 w-4" />
-                  <span>{isSubmitting ? "Authenticating..." : "→ Sign In to Workspace"}</span>
-                </button>
-
-                {/* 1-Click Super Admin Access Button */}
-                <button
-                  type="button"
-                  onClick={async () => {
-                    setValue("email", "azadbharati802223@gmail.com");
-                    setValue("password", "AdminSecureAuth");
-                    const res = await login("azadbharati802223@gmail.com", "AdminSecureAuth");
-                    if (res.ok) {
-                      showToast("Authenticated as Super Administrator! Loading Governance Console...", "success");
-                      window.location.href = "/admin";
-                    } else {
-                      showToast(res.error || "Super Admin authentication failed", "error");
-                    }
-                  }}
-                  className="flex h-11 w-full items-center justify-center gap-2 border border-[#0b1c30] bg-[#0b1c30] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-slate-800 shadow-[2px_2px_0px_#005d42] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition"
-                >
-                  <ShieldCheck className="h-4 w-4 text-[#9ffdd3]" />
-                  <span>⚡ 1-CLICK SUPER ADMIN (AZAD BHARATI)</span>
-                </button>
-
-                {/* Bottom Register Switch */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#e5e7eb] pt-4 font-mono text-xs text-[#3e4943]">
-                  <span>Don&apos;t have an enterprise account?</span>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href="/register?role=client"
-                      className="border border-[#0b1c30] px-2.5 py-1 uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] font-semibold transition"
-                    >
-                      SIGN UP AS CLIENT
-                    </Link>
-                    <Link
-                      href="/register?role=freelancer"
-                      className="border border-[#0b1c30] px-2.5 py-1 uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] font-semibold transition"
-                    >
-                      APPLY AS FREELANCER
-                    </Link>
-                  </div>
-                </div>
-              </form>
             </div>
 
-            {/* Right Column: Platform Metrics matching Image 2 */}
-            <div className="space-y-5">
-              {/* Header Bar */}
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  PLATFORM METRICS
-                </span>
-                <span className="bg-[#005d42] px-2 py-0.5 font-mono text-[10px] font-bold text-white uppercase tracking-wider">
-                  LIVE DATA
-                </span>
+            {/* Role Switcher (Client / Freelancer) */}
+            <RoleSelector role={role} onRoleChange={handleRoleChange} />
+
+            {/* Quick Demo Pre-fill Pills */}
+            <div className="flex items-center justify-between text-xs font-medium text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+              <span className="text-slate-400">Quick Test Fill:</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValue("email", "client@gigcraft.io");
+                    setValue("password", "ClientPass2026!");
+                    setRole("client");
+                  }}
+                  className="px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-700 hover:border-violet-300 hover:text-violet-600 transition shadow-2xs font-semibold cursor-pointer"
+                >
+                  👤 Client
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValue("email", "freelancer@gigcraft.io");
+                    setValue("password", "FreelancerPass2026!");
+                    setRole("freelancer");
+                  }}
+                  className="px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-700 hover:border-violet-300 hover:text-violet-600 transition shadow-2xs font-semibold cursor-pointer"
+                >
+                  💻 Freelancer
+                </button>
+              </div>
+            </div>
+
+            {/* Login Form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-1">
+              
+              {/* Email Address Field */}
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="login-email"
+                  className="block font-sans text-xs sm:text-sm font-semibold text-slate-800"
+                >
+                  Email address
+                </label>
+                <div className="relative flex items-center rounded-xl border border-slate-200 bg-slate-50/40 focus-within:bg-white focus-within:border-violet-600 focus-within:ring-4 focus-within:ring-violet-500/10 transition-all">
+                  <span className="pl-3.5 pr-1 text-slate-400 shrink-0">
+                    <Mail className="w-4 h-4" />
+                  </span>
+                  <input
+                    id="login-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@company.com"
+                    className="w-full bg-transparent px-2.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                    {...register("email", {
+                      required: "Email address is required.",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Please enter a valid email address.",
+                      },
+                    })}
+                  />
+                </div>
+                {errors.email && (
+                  <p role="alert" className="font-sans text-xs text-rose-600 font-medium">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
 
-              {/* 4-Stat Grid: Published Gigs, Freelancers, Completed Orders, Average Rating */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white border border-[#e5e7eb] p-4 shadow-[2px_2px_0px_#0b1c30]">
-                  <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-bold">
-                    PUBLISHED GIGS
-                  </p>
-                  <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                    {gigs?.length || 0}
-                  </p>
+              {/* Password Field */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="login-password"
+                    className="font-sans text-xs sm:text-sm font-semibold text-slate-800"
+                  >
+                    Password
+                  </label>
+                  <Link
+                    href="/forgot-password"
+                    className="font-sans text-xs font-semibold text-violet-600 hover:text-violet-700 hover:underline transition"
+                  >
+                    Forgot password?
+                  </Link>
                 </div>
-
-                <div className="bg-white border border-[#e5e7eb] p-4 shadow-[2px_2px_0px_#0b1c30]">
-                  <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-bold">
-                    FREELANCERS
-                  </p>
-                  <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                    {freelancers?.length || 0}
-                  </p>
+                <div className="relative flex items-center rounded-xl border border-slate-200 bg-slate-50/40 focus-within:bg-white focus-within:border-violet-600 focus-within:ring-4 focus-within:ring-violet-500/10 transition-all">
+                  <span className="pl-3.5 pr-1 text-slate-400 shrink-0">
+                    <Lock className="w-4 h-4" />
+                  </span>
+                  <input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    className="w-full bg-transparent px-2.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                    {...register("password", {
+                      required: "Password is required.",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters.",
+                      },
+                    })}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="pr-3 text-slate-400 hover:text-slate-700 transition focus:outline-none cursor-pointer"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
-
-                <div className="bg-white border border-[#e5e7eb] p-4 shadow-[2px_2px_0px_#0b1c30]">
-                  <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-bold">
-                    COMPLETED ORDERS
+                {errors.password && (
+                  <p role="alert" className="font-sans text-xs text-rose-600 font-medium">
+                    {errors.password.message}
                   </p>
-                  <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30]">
-                    {orders?.filter(o => o.status === "completed").length || 0}
-                  </p>
-                </div>
-
-                <div className="bg-white border border-[#e5e7eb] p-4 shadow-[2px_2px_0px_#0b1c30]">
-                  <p className="font-mono text-[10px] uppercase tracking-wider text-[#6e7a73] font-bold">
-                    AVERAGE RATING
-                  </p>
-                  <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] flex items-center gap-1">
-                    {reviews?.length ? (reviews.reduce((s, r) => s + (r.rating || 5), 0) / reviews.length).toFixed(1) : "5.0"} <span className="text-[#005d42] text-xl">★</span>
-                  </p>
-                </div>
+                )}
               </div>
 
-              {/* Simulated Escrow Released Card */}
-              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-wider text-[#6e7a73] font-bold">
-                      SIMULATED ESCROW RELEASED
-                    </p>
-                    <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-[#0b1c30] sm:text-4xl">
-                      ₹{(orders?.filter(o => o.status === "completed").reduce((sum, o) => sum + (o.price || 0), 0) || 0).toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                  <div className="flex h-10 w-10 items-center justify-center border border-[#e5e7eb] bg-[#eff4ff] text-[#005d42]">
-                    <Landmark className="h-5 w-5" />
-                  </div>
-                </div>
-                <div className="mt-4 border-t border-[#e5e7eb] pt-3">
-                  <p className="font-mono text-xs text-[#3e4943]">
-                    Deterministic escrow protection across all contract milestones.
-                  </p>
-                </div>
+              {/* Remember Me Checkbox */}
+              <div className="flex items-center justify-between pt-1">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="h-4 w-4 rounded-md border-slate-300 text-violet-600 focus:ring-violet-500/30 accent-violet-600"
+                  />
+                  <span className="font-sans text-xs sm:text-sm text-slate-600 font-medium">
+                    Remember Me
+                  </span>
+                </label>
               </div>
 
-              {/* Verified Buyer Testimonial Card */}
-              <div className="bg-white border border-[#e5e7eb] shadow-[3px_3px_0px_#0b1c30] p-6">
-                {reviews?.length > 0 ? (
+              {/* Primary Sign In Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-sans text-sm font-semibold shadow-lg shadow-violet-500/25 hover:from-violet-700 hover:to-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 active:scale-[0.99] transition-all disabled:opacity-60 cursor-pointer"
+              >
+                {isSubmitting ? (
                   <>
-                    <div className="flex items-center gap-1 text-[#005d42] text-sm">
-                      {"★".repeat(reviews[0].rating || 5)}
-                    </div>
-                    <p className="mt-3 text-xs italic leading-relaxed text-[#0b1c30]">
-                      &ldquo;{reviews[0].comment}&rdquo;
-                    </p>
-                    <div className="mt-4 border-t border-[#e5e7eb] pt-3">
-                      <p className="font-mono text-xs text-[#3e4943]">
-                        <span className="font-bold text-[#0b1c30]">{reviews[0].clientName}</span> on &ldquo;{reviews[0].gigTitle || reviews[0].projectName}&rdquo;
-                      </p>
-                    </div>
+                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                    <span>Signing in...</span>
                   </>
                 ) : (
                   <>
-                    <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-[#005d42] uppercase">
-                      <ShieldCheck className="h-4 w-4" />
-                      <span>100% Escrow Protection</span>
-                    </div>
-                    <p className="mt-3 text-xs leading-relaxed text-[#0b1c30]">
-                      Every agreement is backed by simulated cryptographic escrow. Client funds are held in vault trust until specification acceptance.
-                    </p>
-                    <div className="mt-4 border-t border-[#e5e7eb] pt-3">
-                      <p className="font-mono text-xs text-[#6e7a73] uppercase">
-                        Zero Platform Fees · Audited Workflows
-                      </p>
-                    </div>
+                    <span>Sign In to {role === "freelancer" ? "Freelancer" : "Client"} Workspace</span>
+                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
+              </button>
+            </form>
+
+            {/* Divider with "OR CONTINUE WITH" */}
+            <div className="relative my-6 text-center">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-slate-200" />
               </div>
+              <span className="relative bg-white px-3 font-sans text-xs font-semibold uppercase tracking-wider text-slate-400">
+                OR CONTINUE WITH
+              </span>
+            </div>
+
+            {/* Social Google Sign-In */}
+            <SocialLoginButtons role={role} />
+
+            {/* Bottom Sign-Up Link */}
+            <div className="pt-2 text-center">
+              <p className="font-sans text-xs sm:text-sm text-slate-500">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href="/register"
+                  className="font-semibold text-violet-600 hover:text-violet-700 hover:underline transition"
+                >
+                  Sign Up
+                </Link>
+              </p>
             </div>
           </div>
 
-          {/* Bottom Security Cards matching Image 2 */}
-          <div className="mt-8 grid gap-4 border border-[#e5e7eb] bg-white p-6 sm:grid-cols-3 shadow-[3px_3px_0px_#0b1c30]">
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
-              <div>
-                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  Secure sessions
-                </h4>
-                <p className="mt-1 text-xs text-[#3e4943] leading-relaxed">
-                  Passwords are hashed with bcrypt. Sign-in uses an httpOnly cookie that scripts can&apos;t read.
-                </p>
-              </div>
+          {/* Footer Copyright */}
+          <footer className="pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+            <span>© 2026 GigMarket Inc.</span>
+            <div className="flex items-center gap-4">
+              <Link href="/terms" className="hover:text-slate-600 transition">Terms</Link>
+              <span>·</span>
+              <Link href="/privacy" className="hover:text-slate-600 transition">Privacy</Link>
             </div>
+          </footer>
+        </main>
 
-            <div className="flex items-start gap-3 border-[#e5e7eb] sm:border-l sm:pl-4">
-              <Lock className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
-              <div>
-                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  Simulated escrow
-                </h4>
-                <p className="mt-1 text-xs text-[#3e4943] leading-relaxed">
-                  Order payments are held in a demo escrow and released when the client approves the delivery. No real money moves.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 border-[#e5e7eb] sm:border-l sm:pl-4">
-              <Star className="mt-1 h-5 w-5 shrink-0 text-[#005d42]" />
-              <div>
-                <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30]">
-                  Reviews from real orders
-                </h4>
-                <p className="mt-1 text-xs text-[#3e4943] leading-relaxed">
-                  Only clients with a completed order can leave a review, one per order.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Mini Footer */}
-          <div className="mt-6 flex items-center justify-between border-t border-[#e5e7eb] pt-4 font-mono text-xs text-[#3e4943]">
-            <span>GIGCRAFT © 2025 GigCraft Marketplace Inc.</span>
-            <span className="uppercase tracking-wider">SECURE ACCESS PORTAL</span>
-          </div>
+        {/* RIGHT COLUMN: Visual Illustration & Floating UI Elements */}
+        <div className="lg:col-span-6 xl:col-span-7 flex">
+          <LoginVisualSection />
         </div>
-      </main>
+
+      </div>
     </div>
   );
 }

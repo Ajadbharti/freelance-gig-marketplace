@@ -23,7 +23,20 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const userRef = useRef(null);
 
-  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname.startsWith("/auth");
+  const isAuthPage =
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password" ||
+    pathname.startsWith("/gigs") ||
+    pathname.startsWith("/freelancers") ||
+    pathname.startsWith("/client") ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/orders") ||
+    pathname.startsWith("/saved-gigs") ||
+    pathname.startsWith("/messages") ||
+    pathname.startsWith("/auth");
 
   useEffect(() => {
     function handleClick(e) {
@@ -207,12 +220,6 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-3">
-              <Link
-                href="/admin"
-                className="hidden sm:inline-flex items-center gap-1 border border-[#0b1c30] bg-[#eff4ff] px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-[#005d42] hover:bg-[#005d42] hover:text-white shadow-[1px_1px_0px_#0b1c30] transition"
-              >
-                🛡️ ADMIN
-              </Link>
               <Link
                 href="/login"
                 className="px-2 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] transition hover:text-[#005d42]"

@@ -1,10 +1,11 @@
-import ClientDashboard from "@/components/dashboard/ClientDashboard";
+import ClientDashboardView from "@/components/client-dashboard/ClientDashboardView";
 
 export const metadata = {
-  title: "Client dashboard | GigCraft",
-  description: "Your contracts, escrow and activity at a glance.",
+  title: "Client Dashboard — Overview | GigMarket",
+  description:
+    "Manage your active projects, milestone escrow payments, orders, and messages on GigMarket.",
 };
 
-export default function ClientDashboardPage() {
-  return <ClientDashboard />;
+export default function DashboardClientRoutePage() {
+  return <ClientDashboardView />;
 }

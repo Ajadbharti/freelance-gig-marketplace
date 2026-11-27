@@ -91,6 +91,43 @@ export function AuthProvider({ children }) {
       } catch {
         setUser(null);
       }
+
+      // Seed local storage with default demo users if not present
+      try {
+        const raw = localStorage.getItem("gigcraft_in:registered_users");
+        let regList = raw ? JSON.parse(raw) : [];
+        const defaultSeeds = [
+          {
+            id: "usr-demo-client",
+            name: "Enterprise Client",
+            email: "client@gigcraft.io",
+            password: "ClientPass2026!",
+            role: "client",
+            initials: "EC",
+            joinedAt: new Date().toISOString(),
+          },
+          {
+            id: "usr-demo-freelancer",
+            name: "Priya Sharma (Fullstack Specialist)",
+            email: "freelancer@gigcraft.io",
+            password: "FreelancerPass2026!",
+            role: "freelancer",
+            initials: "PS",
+            joinedAt: new Date().toISOString(),
+          },
+        ];
+        let hasNew = false;
+        for (const def of defaultSeeds) {
+          if (!regList.some((u) => u.email.toLowerCase() === def.email.toLowerCase())) {
+            regList.push(def);
+            hasNew = true;
+          }
+        }
+        if (hasNew) {
+          localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(regList));
+        }
+      } catch {}
+
       setHydrated(true);
 
       // 3. Listen to Supabase auth events (e.g. Google OAuth sign-in)
@@ -135,14 +172,35 @@ export function AuthProvider({ children }) {
       return { ok: false, error: "Please enter your access key / password." };
     }
 
-    // Check registered accounts in storage
-    let registeredUsers = [];
+    // 1. Try server login route first
     try {
-      const raw = localStorage.getItem("gigcraft_in:registered_users");
-      if (raw) registeredUsers = JSON.parse(raw);
-    } catch {}
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.ok && data?.user) {
+        setUser(data.user);
+        try {
+          localStorage.setItem("gigcraft_in:user", JSON.stringify(data.user));
+          const raw = localStorage.getItem("gigcraft_in:registered_users");
+          const list = raw ? JSON.parse(raw) : [];
+          if (!list.some((u) => u.email?.toLowerCase() === cleanEmail)) {
+            list.push(data.user);
+            localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(list));
+          }
+        } catch {}
+        return { ok: true, user: data.user };
+      }
+      if (!res.ok) {
+        return { ok: false, error: data?.error || "Invalid credentials." };
+      }
+    } catch {
+      // Offline fallback
+    }
 
-    // 1. Check Root Administrator Credentials - Strictly Single Super Admin
+    // 2. Super Admin local check
     const SUPER_ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "azadbharati802223@gmail.com").toLowerCase();
     const isSuperAdminEmail = cleanEmail === SUPER_ADMIN_EMAIL;
 
@@ -163,7 +221,14 @@ export function AuthProvider({ children }) {
       return { ok: true, user: adminUser };
     }
 
-    const found = registeredUsers.find((u) => u.email.toLowerCase() === cleanEmail);
+    // 3. Registered accounts in client storage
+    let registeredUsers = [];
+    try {
+      const raw = localStorage.getItem("gigcraft_in:registered_users");
+      if (raw) registeredUsers = JSON.parse(raw);
+    } catch {}
+
+    const found = registeredUsers.find((u) => u.email?.toLowerCase() === cleanEmail);
     if (found) {
       if (found.password && found.password !== password) {
         return { ok: false, error: "Invalid password for this account." };
@@ -317,6 +382,37 @@ export function AuthProvider({ children }) {
       return { ok: false, error: "Password must be at least 6 characters." };
     }
 
+    const safeRole = role === "freelancer" ? "freelancer" : "client";
+
+    // 1. Try server register endpoint first
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email: cleanEmail, password, role: safeRole }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.ok && data?.user) {
+        setUser(data.user);
+        try {
+          localStorage.setItem("gigcraft_in:user", JSON.stringify(data.user));
+          const raw = localStorage.getItem("gigcraft_in:registered_users");
+          const list = raw ? JSON.parse(raw) : [];
+          if (!list.some((u) => u.email?.toLowerCase() === cleanEmail)) {
+            list.push({ ...data.user, password });
+            localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(list));
+          }
+        } catch {}
+        return { ok: true, user: data.user };
+      }
+      if (!res.ok) {
+        return { ok: false, error: data?.error || "Registration failed." };
+      }
+    } catch {
+      // Fallback to client storage if server route is unreachable
+    }
+
+    // 2. Client storage fallback
     let registeredUsers = [];
     try {
       const raw = localStorage.getItem("gigcraft_in:registered_users");
@@ -335,9 +431,6 @@ export function AuthProvider({ children }) {
       .join("")
       .slice(0, 2)
       .toUpperCase();
-
-    // Strictly prevent public registration as admin
-    const safeRole = role === "freelancer" ? "freelancer" : "client";
 
     const newUser = {
       id: "usr-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -368,12 +461,6 @@ export function AuthProvider({ children }) {
     setUser(sessionUser);
     try {
       localStorage.setItem("gigcraft_in:user", JSON.stringify(sessionUser));
-      const raw = localStorage.getItem("gigcraft_in:registered_users");
-      const list = raw ? JSON.parse(raw) : [];
-      if (!list.some((u) => u.email === cleanEmail)) {
-        list.push(sessionUser);
-        localStorage.setItem("gigcraft_in:registered_users", JSON.stringify(list));
-      }
     } catch {}
 
     return { ok: true, user: sessionUser };

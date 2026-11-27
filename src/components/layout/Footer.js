@@ -5,7 +5,19 @@ import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const pathname = usePathname();
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAuthPage =
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password" ||
+    pathname.startsWith("/gigs") ||
+    pathname.startsWith("/freelancers") ||
+    pathname.startsWith("/client") ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/orders") ||
+    pathname.startsWith("/saved-gigs") ||
+    pathname.startsWith("/messages");
 
   if (isAuthPage) {
     return null;
@@ -121,8 +133,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="transition text-[#005d42] font-bold hover:underline">
-                  🛡️ Admin Governance
+                <Link href="/#standards" className="transition hover:text-[#005d42]">
+                  Platform Standards
                 </Link>
               </li>
             </ul>

@@ -1,10 +1,10 @@
-import OrderDetails from "@/components/orders/OrderDetails";
+import ClientOrdersView from "@/components/client-orders/ClientOrdersView";
 
 export const metadata = {
-  title: "Order Management & Active Deliveries | GigCraft",
-  description: "Real-time cryptographic milestone reconciliation, audit trails, and multi-signature escrow disbursement.",
+  title: "My Orders | GigMarket — Freelance Marketplace",
+  description: "Track and manage all your freelance orders, review active deliverables, and disburse milestone payments securely.",
 };
 
 export default function OrdersPage() {
-  return <OrderDetails />;
+  return <ClientOrdersView />;
 }
