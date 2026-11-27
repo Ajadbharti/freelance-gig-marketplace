@@ -6,6 +6,9 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
+    "server": "node server/server.js",
+    "server:dev": "cd server && npm run dev",
+    "dev:all": "npm run dev & (cd server && npm start)",
     "lint": "eslint"
   },
   "dependencies": {
