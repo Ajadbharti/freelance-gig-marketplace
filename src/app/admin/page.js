@@ -1,7 +1,7 @@
 import AdminPanel from "@/components/admin/AdminPanel";
 
 export const metadata = {
-  title: "Admin panel | GigNest",
+  title: "Admin Console // Governance & Escrow Audit | GigCraft",
 };
 
 export default function AdminPage() {

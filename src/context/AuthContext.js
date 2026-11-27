@@ -142,6 +142,24 @@ export function AuthProvider({ children }) {
       if (raw) registeredUsers = JSON.parse(raw);
     } catch {}
 
+    // 1. Check Root Administrator Credentials
+    if (cleanEmail === "admin@gigcraft.io" && password === "AdminSecurePass2026!") {
+      const adminUser = {
+        id: "admin-root",
+        name: "System Administrator",
+        email: "admin@gigcraft.io",
+        role: "admin",
+        avatar: "",
+        initials: "SA",
+        joinedAt: new Date().toISOString(),
+      };
+      setUser(adminUser);
+      try {
+        localStorage.setItem("gigcraft_in:user", JSON.stringify(adminUser));
+      } catch {}
+      return { ok: true, user: adminUser };
+    }
+
     const found = registeredUsers.find((u) => u.email.toLowerCase() === cleanEmail);
     if (found) {
       if (found.password && found.password !== password) {

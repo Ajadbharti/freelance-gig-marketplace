@@ -59,7 +59,13 @@ export default function LoginForm() {
       return;
     }
     showToast("Signed in successfully. Routing to workspace...", "success");
-    window.location.href = nextUrl || "/dashboard/client";
+    if (result.user?.role === "admin") {
+      window.location.href = "/admin";
+    } else if (result.user?.role === "freelancer") {
+      window.location.href = nextUrl !== "/dashboard/client" ? nextUrl : "/dashboard/freelancer";
+    } else {
+      window.location.href = nextUrl || "/dashboard/client";
+    }
   }
 
   async function handleOAuth(provider) {

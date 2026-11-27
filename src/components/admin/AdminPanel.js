@@ -1,1047 +1,1004 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
-  Activity,
+  AlertTriangle,
   Briefcase,
   CheckCircle2,
+  Clock,
   Download,
+  Eye,
+  Filter,
+  Layers,
+  LayoutDashboard,
+  Lock,
+  Package,
+  Plus,
   RefreshCw,
+  Search,
   ShieldAlert,
-  ShoppingBag,
+  ShieldCheck,
   Star,
-  UserPlus,
+  Trash2,
+  UserCheck,
   UserX,
   Users,
   Wallet,
+  X,
 } from "lucide-react";
-import { categories } from "@/data/categories";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/ToastProvider";
-import { createClient } from "@/lib/supabase/client";
-import { downloadCsv } from "@/lib/csv";
-import StatCard from "@/components/dashboard/StatCard";
-import StatusBadge from "@/components/ui/StatusBadge";
-import ConfirmModal from "@/components/ui/ConfirmModal";
-import RatingStars from "@/components/ui/RatingStars";
-import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
-import OrderDetailModal from "@/components/admin/OrderDetailModal";
-import { inputClass } from "@/components/ui/FormField";
-import { cn, formatDate, formatPrice } from "@/lib/utils";
-
-const PAGE = 25;
-
-const TABS = [
-  { value: "overview", label: "Overview" },
-  { value: "users", label: "Users" },
-  { value: "gigs", label: "Gigs" },
-  { value: "orders", label: "Orders" },
-  { value: "reviews", label: "Reviews" },
-  { value: "activity", label: "Activity log" },
-];
-
-const ORDER_STATUSES = ["active", "delivered", "completed", "cancelled"];
-
-const ROLE_STYLES = {
-  client: "bg-sky-50 text-sky-700 ring-sky-200",
-  freelancer: "bg-violet-50 text-violet-700 ring-violet-200",
-  admin: "bg-amber-50 text-amber-800 ring-amber-200",
-};
-
-const th = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500";
-const td = "px-4 py-3 align-middle";
-
-function formatDateTime(iso) {
-  return new Date(iso).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
-}
-
-function Notice({ title, text, href, label }) {
-  return (
-    <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-24 text-center">
-      <ShieldAlert className="h-14 w-14 text-slate-300" />
-      <h1 className="mt-4 text-2xl font-bold text-slate-900">{title}</h1>
-      <p className="mt-2 text-slate-600">{text}</p>
-      <Link
-        href={href}
-        className="mt-6 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
-      >
-        {label}
-      </Link>
-    </div>
-  );
-}
-
-function RoleBadge({ role }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize ring-1 ring-inset",
-        ROLE_STYLES[role] ?? ROLE_STYLES.client
-      )}
-    >
-      {role}
-    </span>
-  );
-}
-
-function TableShell({ children }) {
-  return (
-    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <table className="min-w-full text-sm">{children}</table>
-    </div>
-  );
-}
-
-function EmptyRow({ colSpan, text }) {
-  return (
-    <tr>
-      <td colSpan={colSpan} className="px-4 py-10 text-center text-slate-500">
-        {text}
-      </td>
-    </tr>
-  );
-}
-
-function ShowMore({ total, shown, onClick }) {
-  if (shown >= total) return null;
-  return (
-    <div className="mt-4 text-center">
-      <button
-        type="button"
-        onClick={onClick}
-        className="rounded-lg border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
-      >
-        Show more ({total - shown} left)
-      </button>
-    </div>
-  );
-}
-
-function ActionButton({ tone = "neutral", onClick, children }) {
-  const styles =
-    tone === "danger"
-      ? "border-red-200 text-red-600 hover:bg-red-50"
-      : tone === "good"
-        ? "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-        : "border-slate-300 text-slate-700 hover:bg-slate-50";
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn("rounded-lg border px-3 py-1.5 text-xs font-semibold transition", styles)}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Toolbar({ children, onExport, exportLabel = "Export CSV" }) {
-  return (
-    <div className="mb-4 flex flex-wrap items-center gap-3">
-      {children}
-      {onExport && (
-        <button
-          type="button"
-          onClick={onExport}
-          className="ml-auto inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-        >
-          <Download className="h-4 w-4" /> {exportLabel}
-        </button>
-      )}
-    </div>
-  );
-}
+import AdminSidebar from "./AdminSidebar";
+import AdminHeader from "./AdminHeader";
+import AdminStatsCard from "./AdminStatsCard";
+import UserDetailsModal from "./UserDetailsModal";
+import GigDetailsModal from "./GigDetailsModal";
+import { adminApi } from "@/lib/api/adminApi";
+import { formatPrice } from "@/lib/utils";
 
 export default function AdminPanel() {
-  const { user, hydrated } = useAuth();
+  const { user, logout } = useAuth();
   const { showToast } = useToast();
 
-  const [tab, setTab] = useState("overview");
-  const [data, setData] = useState(null);
-  const [reloadKey, setReloadKey] = useState(0);
-  const [confirm, setConfirm] = useState(null);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [visible, setVisible] = useState({ users: PAGE, gigs: PAGE, orders: PAGE, reviews: 20, activity: PAGE });
+  const [activeSection, setActiveSection] = useState("overview");
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // Core Data Stores
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalFreelancers: 0,
+    totalClients: 0,
+    activeUsers: 0,
+    suspendedUsers: 0,
+    totalGigs: 0,
+    pendingGigs: 0,
+    publishedGigs: 0,
+    totalOrders: 0,
+    completedOrders: 0,
+    cancelledOrders: 0,
+    simulatedVolume: 0,
+    transactionCount: 0,
+  });
+
+  const [users, setUsers] = useState([]);
+  const [gigs, setGigs] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
+
+  // Modals & Inspect Targets
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedGig, setSelectedGig] = useState(null);
+  const [categoryModal, setCategoryModal] = useState(false);
+  const [newCatName, setNewCatName] = useState("");
+  const [newCatSlug, setNewCatSlug] = useState("");
+  const [newCatDesc, setNewCatDesc] = useState("");
+
+  // Filters & Search
   const [userSearch, setUserSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [gigSearch, setGigSearch] = useState("");
-  const [gigCategory, setGigCategory] = useState("all");
-  const [orderSearch, setOrderSearch] = useState("");
-  const [orderStatus, setOrderStatus] = useState("all");
-  const [reviewSearch, setReviewSearch] = useState("");
-  const [reviewRating, setReviewRating] = useState("all");
+  const [userRoleFilter, setUserRoleFilter] = useState("all");
+  const [userStatusFilter, setUserStatusFilter] = useState("all");
 
-  const isAdmin = hydrated && user?.role === "admin";
+  const [gigSearch, setGigSearch] = useState("");
+  const [gigStatusFilter, setGigStatusFilter] = useState("all");
+
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderStatusFilter, setOrderStatusFilter] = useState("all");
+
+  // Load All Telemetry & Records
+  const loadData = useCallback(async () => {
+    try {
+      setRefreshing(true);
+
+      const [statsRes, usersRes, gigsRes, catsRes, ordersRes, reviewsRes, paymentsRes, reportsRes, logsRes] =
+        await Promise.allSettled([
+          adminApi.getStats(),
+          adminApi.getUsers(),
+          adminApi.getGigs(),
+          adminApi.getCategories(),
+          adminApi.getOrders(),
+          adminApi.getReviews(),
+          adminApi.getPayments(),
+          adminApi.getReports(),
+          adminApi.getAuditLogs(),
+        ]);
+
+      if (statsRes.status === "fulfilled" && statsRes.value?.stats) {
+        setStats(statsRes.value.stats);
+      }
+      if (usersRes.status === "fulfilled" && usersRes.value?.users) {
+        setUsers(usersRes.value.users);
+      }
+      if (gigsRes.status === "fulfilled" && gigsRes.value?.gigs) {
+        setGigs(gigsRes.value.gigs);
+      }
+      if (catsRes.status === "fulfilled" && catsRes.value?.categories) {
+        setCategories(catsRes.value.categories);
+      }
+      if (ordersRes.status === "fulfilled" && ordersRes.value?.orders) {
+        setOrders(ordersRes.value.orders);
+      }
+      if (reviewsRes.status === "fulfilled" && reviewsRes.value?.reviews) {
+        setReviews(reviewsRes.value.reviews);
+      }
+      if (paymentsRes.status === "fulfilled" && paymentsRes.value?.payments) {
+        setPayments(paymentsRes.value.payments);
+      }
+      if (reportsRes.status === "fulfilled" && reportsRes.value?.reports) {
+        setReports(reportsRes.value.reports);
+      }
+      if (logsRes.status === "fulfilled" && logsRes.value?.logs) {
+        setAuditLogs(logsRes.value.logs);
+      }
+    } catch (err) {
+      console.warn("Backend connectivity notice:", err.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!isAdmin) return;
-    let cancelled = false;
+    loadData();
+  }, [loadData]);
 
-    async function load() {
-      const supabase = createClient();
-      const [usersRes, gigsRes, ordersRes, reviewsRes, logsRes] = await Promise.all([
-        supabase.rpc("admin_list_users"),
-        supabase.from("gigs").select("*").order("created_at", { ascending: false }),
-        supabase.from("orders").select("*").order("created_at", { ascending: false }),
-        supabase.from("reviews").select("*").order("created_at", { ascending: false }),
-        supabase.from("admin_logs").select("*").order("created_at", { ascending: false }).limit(200),
-      ]);
-      if (cancelled) return;
+  // Actions
+  async function handleUpdateUserStatus(userId, status, reason) {
+    try {
+      await adminApi.updateUserStatus(userId, { status, reason });
+      showToast(`User status successfully changed to ${status}.`, "success");
+      loadData();
+      setSelectedUser(null);
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
 
-      const userRows = usersRes.data ?? [];
-      const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      const failure = usersRes.error || gigsRes.error || ordersRes.error || reviewsRes.error || logsRes.error;
+  async function handleDeleteUser(userId, reason) {
+    try {
+      await adminApi.deleteUser(userId, { reason });
+      showToast("User account permanently purged.", "success");
+      loadData();
+      setSelectedUser(null);
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
 
-      setData({
-        users: userRows,
-        gigs: gigsRes.data ?? [],
-        orders: ordersRes.data ?? [],
-        reviews: reviewsRes.data ?? [],
-        logs: logsRes.data ?? [],
-        newUsers7d: userRows.filter((u) => new Date(u.created_at).getTime() >= weekAgo).length,
-        error: failure ? failure.message : "",
+  async function handleApproveGig(gigId) {
+    try {
+      await adminApi.approveGig(gigId, { reason: "Standard approval" });
+      showToast("Gig approved and published to public catalog.", "success");
+      loadData();
+      setSelectedGig(null);
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
+  async function handleRejectGig(gigId, reason) {
+    try {
+      await adminApi.rejectGig(gigId, { reason });
+      showToast("Gig rejected with audited reason.", "info");
+      loadData();
+      setSelectedGig(null);
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
+  async function handleSuspendGig(gigId, reason) {
+    try {
+      await adminApi.suspendGig(gigId, { reason });
+      showToast("Gig suspended from search.", "info");
+      loadData();
+      setSelectedGig(null);
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
+  async function handleCreateCategory(e) {
+    e.preventDefault();
+    if (!newCatName || !newCatSlug) return;
+    try {
+      await adminApi.createCategory({
+        name: newCatName,
+        slug: newCatSlug,
+        description: newCatDesc,
       });
+      showToast("New category node deployed.", "success");
+      setCategoryModal(false);
+      setNewCatName("");
+      setNewCatSlug("");
+      setNewCatDesc("");
+      loadData();
+    } catch (err) {
+      showToast(err.message, "error");
     }
+  }
 
-    load().catch((problem) => {
-      if (!cancelled) {
-        setData({
-          users: [],
-          gigs: [],
-          orders: [],
-          reviews: [],
-          logs: [],
-          newUsers7d: 0,
-          error: problem?.message || "Could not load data.",
-        });
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isAdmin, reloadKey]);
-
-  async function runAdminAction(fn, args, successMessage) {
-    const { error } = await createClient().rpc(fn, args);
-    if (error) {
-      showToast(error.message || "The action failed.", "error");
-      return;
+  async function handleDeleteCategory(catId) {
+    if (!window.confirm("Delete this category? (Will be rejected if active gigs exist).")) return;
+    try {
+      await adminApi.deleteCategory(catId);
+      showToast("Category removed successfully.", "success");
+      loadData();
+    } catch (err) {
+      showToast(err.message, "error");
     }
-    showToast(successMessage);
-    setReloadKey((key) => key + 1);
   }
 
-  async function handleConfirm() {
-    const current = confirm;
-    setConfirm(null);
-    if (current) await runAdminAction(current.fn, current.args, current.success);
+  async function handleToggleHideReview(revId) {
+    try {
+      await adminApi.toggleHideReview(revId);
+      showToast("Review visibility updated.", "success");
+      loadData();
+    } catch (err) {
+      showToast(err.message, "error");
+    }
   }
 
-  function showMore(key) {
-    setVisible((v) => ({ ...v, [key]: v[key] + PAGE }));
+  async function handleDeleteReview(revId) {
+    if (!window.confirm("Permanently delete this review from the ledger?")) return;
+    try {
+      await adminApi.deleteReview(revId);
+      showToast("Review deleted.", "success");
+      loadData();
+    } catch (err) {
+      showToast(err.message, "error");
+    }
   }
 
-  if (!hydrated) {
-    return (
-      <div className="mx-auto max-w-7xl space-y-4 px-4 py-10" role="status" aria-label="Loading admin panel">
-        <LoadingSkeleton className="h-9 w-1/3" />
-        <LoadingSkeleton className="h-64 w-full" />
-      </div>
-    );
+  async function handleResolveReport(repId, status) {
+    try {
+      await adminApi.updateReportStatus(repId, { status, notes: "Marked resolved by Admin" });
+      showToast(`Report updated to ${status}.`, "success");
+      loadData();
+    } catch (err) {
+      showToast(err.message, "error");
+    }
   }
 
-  if (!user) {
-    return (
-      <Notice
-        title="Please log in"
-        text="Log in with an admin account to open the admin panel."
-        href={`/login?as=admin&next=${encodeURIComponent("/admin")}`}
-        label="Go to admin login"
-      />
-    );
-  }
-
-  if (user.role !== "admin") {
-    return (
-      <Notice
-        title="Admins only"
-        text="This area is only for administrator accounts."
-        href={user.role === "freelancer" ? "/dashboard/freelancer" : "/dashboard/client"}
-        label="Go to my dashboard"
-      />
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className="mx-auto max-w-7xl space-y-4 px-4 py-10" role="status" aria-label="Loading admin data">
-        <LoadingSkeleton className="h-9 w-1/3" />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <LoadingSkeleton key={i} className="h-28 w-full" />
-          ))}
-        </div>
-        <LoadingSkeleton className="h-64 w-full" />
-      </div>
-    );
-  }
-
-  const { users, gigs, orders, reviews, logs } = data;
-  const nameById = new Map(users.map((u) => [u.id, u.full_name]));
-  const gigTitleById = new Map(gigs.map((g) => [g.id, g.title]));
-
-  /* ---------- Stats ---------- */
-  const clientCount = users.filter((u) => u.role === "client").length;
-  const freelancerCount = users.filter((u) => u.role === "freelancer").length;
-  const adminCount = users.filter((u) => u.role === "admin").length;
-  const suspendedCount = users.filter((u) => u.suspended).length;
-  const completed = orders.filter((o) => o.status === "completed");
-  const revenue = completed.reduce((sum, o) => sum + o.price, 0);
-  const averageRating = reviews.length
-    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-    : "-";
-
-  const statusCounts = ORDER_STATUSES.map((status) => ({
-    status,
-    count: orders.filter((o) => o.status === status).length,
-  }));
-  const maxStatusCount = Math.max(1, ...statusCounts.map((s) => s.count));
-
-  const earningsByFreelancer = new Map();
-  completed.forEach((o) => {
-    const entry = earningsByFreelancer.get(o.freelancer_id) ?? { orders: 0, value: 0 };
-    entry.orders += 1;
-    entry.value += o.price;
-    earningsByFreelancer.set(o.freelancer_id, entry);
-  });
-  const topFreelancers = [...earningsByFreelancer.entries()]
-    .sort((a, b) => b[1].orders - a[1].orders || b[1].value - a[1].value)
-    .slice(0, 5);
-
-  const counts = {
-    overview: null,
-    users: users.length,
-    gigs: gigs.length,
-    orders: orders.length,
-    reviews: reviews.length,
-    activity: logs.length,
-  };
-
-  /* ---------- Filters ---------- */
-  const uq = userSearch.trim().toLowerCase();
+  // Filtered Computed Sets
   const filteredUsers = users.filter((u) => {
-    if (roleFilter !== "all" && u.role !== roleFilter) return false;
-    if (statusFilter === "active" && u.suspended) return false;
-    if (statusFilter === "suspended" && !u.suspended) return false;
-    if (!uq) return true;
-    return (u.full_name ?? "").toLowerCase().includes(uq) || (u.email ?? "").toLowerCase().includes(uq);
+    const matchSearch =
+      !userSearch ||
+      u.name?.toLowerCase().includes(userSearch.toLowerCase()) ||
+      u.email?.toLowerCase().includes(userSearch.toLowerCase());
+    const matchRole = userRoleFilter === "all" || u.role === userRoleFilter;
+    const matchStatus = userStatusFilter === "all" || u.status === userStatusFilter;
+    return matchSearch && matchRole && matchStatus;
   });
 
-  const gq = gigSearch.trim().toLowerCase();
   const filteredGigs = gigs.filter((g) => {
-    if (gigCategory !== "all" && g.category !== gigCategory) return false;
-    if (!gq) return true;
-    return (
-      g.title.toLowerCase().includes(gq) || (nameById.get(g.freelancer_id) ?? "").toLowerCase().includes(gq)
-    );
+    const matchSearch = !gigSearch || g.title?.toLowerCase().includes(gigSearch.toLowerCase());
+    const matchStatus = gigStatusFilter === "all" || g.status === gigStatusFilter;
+    return matchSearch && matchStatus;
   });
 
-  const oq = orderSearch.trim().toLowerCase();
+  const pendingGigsList = gigs.filter((g) => g.status === "pending");
+
   const filteredOrders = orders.filter((o) => {
-    if (orderStatus !== "all" && o.status !== orderStatus) return false;
-    if (!oq) return true;
-    return (
-      o.gig_title.toLowerCase().includes(oq) ||
-      (nameById.get(o.client_id) ?? "").toLowerCase().includes(oq) ||
-      (nameById.get(o.freelancer_id) ?? "").toLowerCase().includes(oq) ||
-      o.id.slice(-6).toLowerCase().includes(oq)
-    );
+    const matchSearch = !orderSearch || o.code?.toLowerCase().includes(orderSearch.toLowerCase());
+    const matchStatus = orderStatusFilter === "all" || o.status === orderStatusFilter;
+    return matchSearch && matchStatus;
   });
-
-  const rq = reviewSearch.trim().toLowerCase();
-  const filteredReviews = reviews.filter((r) => {
-    if (reviewRating !== "all" && r.rating !== Number(reviewRating)) return false;
-    if (!rq) return true;
-    return (
-      r.comment.toLowerCase().includes(rq) ||
-      (nameById.get(r.client_id) ?? "").toLowerCase().includes(rq) ||
-      (nameById.get(r.freelancer_id) ?? "").toLowerCase().includes(rq)
-    );
-  });
-
-  /* ---------- CSV exports ---------- */
-  function exportUsers() {
-    downloadCsv(
-      "gignest-users.csv",
-      filteredUsers.map((u) => ({
-        Name: u.full_name,
-        Email: u.email,
-        Role: u.role,
-        Status: u.suspended ? "Suspended" : "Active",
-        Joined: formatDate(u.created_at),
-        "Last sign-in": u.last_sign_in_at ? formatDate(u.last_sign_in_at) : "",
-      }))
-    );
-  }
-
-  function exportGigs() {
-    downloadCsv(
-      "gignest-gigs.csv",
-      filteredGigs.map((g) => ({
-        Title: g.title,
-        Freelancer: nameById.get(g.freelancer_id) ?? "Unknown",
-        Category: categories.find((c) => c.slug === g.category)?.name ?? g.category,
-        Price: g.price,
-        "Delivery days": g.delivery_days,
-        Created: formatDate(g.created_at),
-      }))
-    );
-  }
-
-  function exportOrders() {
-    downloadCsv(
-      "gignest-orders.csv",
-      filteredOrders.map((o) => ({
-        Order: o.id.slice(-6).toUpperCase(),
-        Gig: o.gig_title,
-        Client: nameById.get(o.client_id) ?? "Unknown",
-        Freelancer: nameById.get(o.freelancer_id) ?? "Unknown",
-        Price: o.price,
-        Status: o.status,
-        Placed: formatDate(o.created_at),
-      }))
-    );
-  }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Admin panel</h1>
-          <p className="mt-1 text-slate-600">Manage users, gigs, orders and reviews across GigNest.</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setReloadKey((key) => key + 1)}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-        >
-          <RefreshCw className="h-4 w-4" /> Refresh
-        </button>
-      </div>
-
-      {data.error && (
-        <p role="alert" className="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-          Some data could not be loaded: {data.error}. Check that the admin SQL scripts were run.
-        </p>
-      )}
-
-      <div className="mb-8 flex flex-wrap gap-2" role="tablist" aria-label="Admin sections">
-        {TABS.map((t) => (
-          <button
-            key={t.value}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.value}
-            onClick={() => setTab(t.value)}
-            className={cn(
-              "rounded-full border px-4 py-1.5 text-sm font-medium transition",
-              tab === t.value
-                ? "border-indigo-600 bg-indigo-600 text-white"
-                : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-            )}
-          >
-            {t.label}
-            {counts[t.value] !== null && ` (${counts[t.value]})`}
-          </button>
-        ))}
-      </div>
-
-      {/* ---------- Overview ---------- */}
-      {tab === "overview" && (
-        <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard
-              icon={Users}
-              label="Total users"
-              value={users.length}
-              hint={`${clientCount} clients, ${freelancerCount} freelancers, ${adminCount} admins`}
-              tone="indigo"
+    <div className="min-h-screen bg-[#f8f9ff]">
+      <main className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr] items-start">
+            {/* Sidebar Navigation */}
+            <AdminSidebar
+              activeSection={activeSection}
+              onSelectSection={setActiveSection}
+              stats={stats}
+              user={user}
+              onLogout={logout}
             />
-            <StatCard icon={UserPlus} label="New users (7 days)" value={data.newUsers7d} tone="emerald" />
-            <StatCard icon={UserX} label="Suspended users" value={suspendedCount} tone="slate" />
-            <StatCard icon={Briefcase} label="Gigs" value={gigs.length} tone="indigo" />
-            <StatCard
-              icon={ShoppingBag}
-              label="Orders"
-              value={orders.length}
-              hint={`${orders.filter((o) => o.status === "active").length} active`}
-              tone="amber"
-            />
-            <StatCard icon={CheckCircle2} label="Completed orders" value={completed.length} tone="emerald" />
-            <StatCard icon={Wallet} label="Completed order value" value={formatPrice(revenue)} tone="emerald" />
-            <StatCard
-              icon={Star}
-              label="Reviews"
-              value={reviews.length}
-              hint={`Average rating ${averageRating}`}
-              tone="amber"
-            />
-          </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" aria-label="Orders by status">
-              <h2 className="text-lg font-semibold text-slate-900">Orders by status</h2>
-              <ul className="mt-4 space-y-4">
-                {statusCounts.map((s) => (
-                  <li key={s.status}>
-                    <div className="mb-1 flex items-center justify-between text-sm">
-                      <StatusBadge status={s.status} />
-                      <span className="font-semibold text-slate-800">{s.count}</span>
+            {/* Main Admin Content Body */}
+            <div className="space-y-6 min-w-0">
+              <AdminHeader
+                title={activeSection.replace(/-/g, " ")}
+                subtitle="Deterministic Governance & Escrow Controls"
+                onRefresh={loadData}
+                isRefreshing={refreshing}
+              />
+
+              {/* 1. OVERVIEW SECTION */}
+              {activeSection === "overview" && (
+                <div className="space-y-6">
+                  {/* Key Metrics Grid */}
+                  <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                    <AdminStatsCard
+                      icon={Users}
+                      label="REGISTERED USERS"
+                      value={stats.totalUsers}
+                      sublabel={`${stats.totalFreelancers} Freelancers · ${stats.totalClients} Clients`}
+                      tone="navy"
+                    />
+                    <AdminStatsCard
+                      icon={Clock}
+                      label="PENDING GIG SPECS"
+                      value={stats.pendingGigs}
+                      sublabel="AWAITING GOVERNANCE AUDIT"
+                      tone={stats.pendingGigs > 0 ? "amber" : "emerald"}
+                    />
+                    <AdminStatsCard
+                      icon={Package}
+                      label="PUBLISHED GIGS"
+                      value={stats.publishedGigs}
+                      sublabel="IN PUBLIC REPOSITORY"
+                      tone="emerald"
+                    />
+                    <AdminStatsCard
+                      icon={Wallet}
+                      label="SIMULATED ESCROW"
+                      value={`₹${stats.simulatedVolume.toLocaleString("en-IN")}`}
+                      sublabel={`${stats.totalOrders} TOTAL CONTRACTS`}
+                      tone="emerald"
+                    />
+                  </div>
+
+                  {/* Pending Gig Queue Quick Audit */}
+                  <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+                    <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 bg-amber-500" />
+                        <h2 className="font-headline text-base font-bold uppercase text-[#0b1c30]">
+                          PENDING SPEC APPROVAL QUEUE ({pendingGigsList.length})
+                        </h2>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setActiveSection("gig-approvals")}
+                        className="font-mono text-xs font-bold uppercase text-[#005d42] hover:underline"
+                      >
+                        VIEW FULL QUEUE →
+                      </button>
                     </div>
-                    <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full bg-indigo-500"
-                        style={{ width: `${(s.count / maxStatusCount) * 100}%` }}
+
+                    {pendingGigsList.length === 0 ? (
+                      <div className="py-8 text-center font-mono text-xs text-[#6e7a73]">
+                        <CheckCircle2 className="mx-auto h-8 w-8 text-[#005d42] mb-2" />
+                        ALL SPECIFICATIONS AUDITED. ZERO PENDING SUBMISSIONS.
+                      </div>
+                    ) : (
+                      <div className="mt-4 divide-y divide-slate-100 font-mono text-xs">
+                        {pendingGigsList.slice(0, 3).map((g) => (
+                          <div key={g._id || g.id} className="py-3 flex items-center justify-between gap-4">
+                            <div>
+                              <p className="font-bold text-[#0b1c30] truncate">{g.title}</p>
+                              <p className="text-[10px] text-[#6e7a73]">{g.category} // Starting {formatPrice(g.price)}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedGig(g)}
+                              className="border border-[#0b1c30] bg-[#eff4ff] px-3 py-1 font-bold text-[#0047bf] hover:bg-[#dae2fd]"
+                            >
+                              INSPECT SPEC
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Recent Audit Logs */}
+                  <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30]">
+                    <h2 className="font-headline text-base font-bold uppercase text-[#0b1c30] border-b border-[#e5e7eb] pb-3">
+                      RECENT GOVERNANCE AUDIT LOGS
+                    </h2>
+                    {auditLogs.length === 0 ? (
+                      <p className="py-6 text-center font-mono text-xs text-[#6e7a73]">
+                        No administrative actions recorded yet.
+                      </p>
+                    ) : (
+                      <div className="mt-4 space-y-2 font-mono text-xs">
+                        {auditLogs.slice(0, 6).map((log) => (
+                          <div key={log._id} className="border border-slate-100 p-2.5 flex items-center justify-between gap-3 bg-slate-50/50">
+                            <div>
+                              <span className="border border-[#0b1c30] bg-[#0b1c30] px-1.5 py-0.2 text-[9px] font-bold text-white uppercase">
+                                {log.action}
+                              </span>
+                              <span className="ml-2 font-bold text-[#0b1c30]">{log.targetResource} #{String(log.targetResourceId).slice(-6)}</span>
+                              <p className="text-[10px] text-[#6e7a73] mt-0.5">{log.reason}</p>
+                            </div>
+                            <span className="text-[10px] text-slate-400 shrink-0">
+                              {new Date(log.createdAt).toLocaleTimeString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 2. MANAGE USERS / FREELANCERS / CLIENTS */}
+              {(activeSection === "users" || activeSection === "freelancers" || activeSection === "clients") && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-4">
+                  {/* Filters Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-xs border-b border-[#e5e7eb] pb-4">
+                    <div className="flex items-center gap-2 flex-1 max-w-sm">
+                      <Search className="h-4 w-4 text-[#6e7a73]" />
+                      <input
+                        type="text"
+                        placeholder="Search by name or email..."
+                        value={userSearch}
+                        onChange={(e) => setUserSearch(e.target.value)}
+                        className="w-full border border-[#0b1c30] px-2.5 py-1.5 focus:outline-none"
                       />
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" aria-label="Top freelancers">
-              <h2 className="text-lg font-semibold text-slate-900">Top freelancers</h2>
-              {topFreelancers.length === 0 ? (
-                <p className="mt-4 text-sm text-slate-500">No completed orders yet.</p>
-              ) : (
-                <ol className="mt-4 space-y-3">
-                  {topFreelancers.map(([id, stats], index) => (
-                    <li key={id} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="flex items-center gap-3">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-xs font-bold text-indigo-700">
-                          {index + 1}
-                        </span>
-                        <span className="font-medium text-slate-900">{nameById.get(id) ?? "Unknown"}</span>
-                      </span>
-                      <span className="text-slate-600">
-                        {stats.orders} {stats.orders === 1 ? "order" : "orders"} · {formatPrice(stats.value)}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </section>
-          </div>
-        </>
-      )}
+                    <div className="flex items-center gap-2">
+                      {activeSection === "users" && (
+                        <select
+                          value={userRoleFilter}
+                          onChange={(e) => setUserRoleFilter(e.target.value)}
+                          className="border border-[#0b1c30] bg-white px-2 py-1.5 font-bold uppercase"
+                        >
+                          <option value="all">ALL ROLES</option>
+                          <option value="client">CLIENTS</option>
+                          <option value="freelancer">FREELANCERS</option>
+                          <option value="admin">ADMINS</option>
+                        </select>
+                      )}
 
-      {/* ---------- Users ---------- */}
-      {tab === "users" && (
-        <section aria-label="Users">
-          <Toolbar onExport={exportUsers}>
-            <input
-              type="search"
-              value={userSearch}
-              onChange={(e) => setUserSearch(e.target.value)}
-              placeholder="Search by name or email"
-              aria-label="Search users"
-              className={cn(inputClass, "max-w-xs")}
-            />
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              aria-label="Filter by role"
-              className={cn(inputClass, "max-w-[170px]")}
-            >
-              <option value="all">All roles</option>
-              <option value="client">Clients</option>
-              <option value="freelancer">Freelancers</option>
-              <option value="admin">Admins</option>
-            </select>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              aria-label="Filter by status"
-              className={cn(inputClass, "max-w-[170px]")}
-            >
-              <option value="all">All statuses</option>
-              <option value="active">Active</option>
-              <option value="suspended">Suspended</option>
-            </select>
-          </Toolbar>
-
-          <TableShell>
-            <thead className="bg-slate-50">
-              <tr>
-                <th className={th}>Name</th>
-                <th className={th}>Email</th>
-                <th className={th}>Role</th>
-                <th className={th}>Joined</th>
-                <th className={th}>Last sign-in</th>
-                <th className={th}>Status</th>
-                <th className={th}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.length === 0 ? (
-                <EmptyRow colSpan={7} text="No users match your filters." />
-              ) : (
-                filteredUsers.slice(0, visible.users).map((u) => {
-                  const isSelf = u.id === user.id;
-                  return (
-                    <tr key={u.id} className="border-t border-slate-100">
-                      <td className={cn(td, "font-medium text-slate-900")}>
-                        {u.full_name}
-                        {isSelf && <span className="ml-2 text-xs text-slate-400">(you)</span>}
-                      </td>
-                      <td className={cn(td, "text-slate-600")}>{u.email}</td>
-                      <td className={td}>
-                        <RoleBadge role={u.role} />
-                      </td>
-                      <td className={cn(td, "text-slate-600")}>{formatDate(u.created_at)}</td>
-                      <td className={cn(td, "text-slate-600")}>
-                        {u.last_sign_in_at ? formatDate(u.last_sign_in_at) : "-"}
-                      </td>
-                      <td className={td}>
-                        {u.suspended ? (
-                          <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-200">
-                            Suspended
-                          </span>
-                        ) : (
-                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">
-                            Active
-                          </span>
-                        )}
-                      </td>
-                      <td className={td}>
-                        {isSelf ? (
-                          <span className="text-slate-400">-</span>
-                        ) : (
-                          <div className="flex flex-wrap gap-2">
-                            {u.role !== "admin" &&
-                              (u.suspended ? (
-                                <ActionButton
-                                  onClick={() =>
-                                    setConfirm({
-                                      title: "Unsuspend this user?",
-                                      message: `${u.full_name} will be able to log in and use GigNest again.`,
-                                      label: "Unsuspend",
-                                      danger: false,
-                                      fn: "admin_set_suspended",
-                                      args: { p_user: u.id, p_suspended: false },
-                                      success: "User unsuspended.",
-                                    })
-                                  }
-                                >
-                                  Unsuspend
-                                </ActionButton>
-                              ) : (
-                                <ActionButton
-                                  tone="danger"
-                                  onClick={() =>
-                                    setConfirm({
-                                      title: "Suspend this user?",
-                                      message: `${u.full_name} will not be able to log in or make any changes until you unsuspend the account.`,
-                                      label: "Suspend",
-                                      danger: true,
-                                      fn: "admin_set_suspended",
-                                      args: { p_user: u.id, p_suspended: true },
-                                      success: "User suspended.",
-                                    })
-                                  }
-                                >
-                                  Suspend
-                                </ActionButton>
-                              ))}
-
-                            {u.role === "admin" ? (
-                              <ActionButton
-                                onClick={() =>
-                                  setConfirm({
-                                    title: "Remove admin access?",
-                                    message: `${u.full_name} will become a regular client account and lose access to the admin panel.`,
-                                    label: "Remove admin",
-                                    danger: true,
-                                    fn: "admin_set_admin",
-                                    args: { p_user: u.id, p_is_admin: false },
-                                    success: "Admin access removed.",
-                                  })
-                                }
-                              >
-                                Remove admin
-                              </ActionButton>
-                            ) : (
-                              <ActionButton
-                                tone="good"
-                                onClick={() =>
-                                  setConfirm({
-                                    title: "Make this user an admin?",
-                                    message: `${u.full_name} will get full control of users, gigs, orders and reviews. Only do this for people you trust.`,
-                                    label: "Make admin",
-                                    danger: false,
-                                    fn: "admin_set_admin",
-                                    args: { p_user: u.id, p_is_admin: true },
-                                    success: "User is now an admin.",
-                                  })
-                                }
-                              >
-                                Make admin
-                              </ActionButton>
-                            )}
-
-                            {u.role !== "admin" && (
-                              <ActionButton
-                                tone="danger"
-                                onClick={() =>
-                                  setConfirm({
-                                    title: "Delete this user permanently?",
-                                    message: `${u.full_name} will be deleted together with their gigs, orders and reviews. Orders shared with other users will disappear for them too. This cannot be undone.`,
-                                    label: "Delete user",
-                                    danger: true,
-                                    fn: "admin_delete_user",
-                                    args: { p_user: u.id },
-                                    success: "User deleted.",
-                                  })
-                                }
-                              >
-                                Delete
-                              </ActionButton>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </TableShell>
-          <ShowMore total={filteredUsers.length} shown={visible.users} onClick={() => showMore("users")} />
-        </section>
-      )}
-
-      {/* ---------- Gigs ---------- */}
-      {tab === "gigs" && (
-        <section aria-label="Gigs">
-          <Toolbar onExport={exportGigs}>
-            <input
-              type="search"
-              value={gigSearch}
-              onChange={(e) => setGigSearch(e.target.value)}
-              placeholder="Search by title or freelancer"
-              aria-label="Search gigs"
-              className={cn(inputClass, "max-w-xs")}
-            />
-            <select
-              value={gigCategory}
-              onChange={(e) => setGigCategory(e.target.value)}
-              aria-label="Filter by category"
-              className={cn(inputClass, "max-w-[220px]")}
-            >
-              <option value="all">All categories</option>
-              {categories.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </Toolbar>
-
-          <TableShell>
-            <thead className="bg-slate-50">
-              <tr>
-                <th className={th}>Gig</th>
-                <th className={th}>Freelancer</th>
-                <th className={th}>Category</th>
-                <th className={th}>Price</th>
-                <th className={th}>Created</th>
-                <th className={th}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredGigs.length === 0 ? (
-                <EmptyRow colSpan={6} text="No gigs match your filters." />
-              ) : (
-                filteredGigs.slice(0, visible.gigs).map((g) => (
-                  <tr key={g.id} className="border-t border-slate-100">
-                    <td className={cn(td, "max-w-xs")}>
-                      <Link
-                        href={`/gigs/${g.id}`}
-                        className="line-clamp-2 font-medium text-slate-900 hover:text-indigo-600"
+                      <select
+                        value={userStatusFilter}
+                        onChange={(e) => setUserStatusFilter(e.target.value)}
+                        className="border border-[#0b1c30] bg-white px-2 py-1.5 font-bold uppercase"
                       >
-                        {g.title}
-                      </Link>
-                    </td>
-                    <td className={cn(td, "text-slate-600")}>{nameById.get(g.freelancer_id) ?? "Unknown"}</td>
-                    <td className={cn(td, "text-slate-600")}>
-                      {categories.find((c) => c.slug === g.category)?.name ?? g.category}
-                    </td>
-                    <td className={td}>{formatPrice(g.price)}</td>
-                    <td className={cn(td, "text-slate-600")}>{formatDate(g.created_at)}</td>
-                    <td className={td}>
-                      <ActionButton
-                        tone="danger"
-                        onClick={() =>
-                          setConfirm({
-                            title: "Delete this gig?",
-                            message: `"${g.title}" will be removed from the marketplace. Existing orders for it stay in their dashboards.`,
-                            label: "Delete gig",
-                            danger: true,
-                            fn: "admin_delete_gig",
-                            args: { p_gig: g.id },
-                            success: "Gig deleted.",
-                          })
-                        }
-                      >
-                        Delete
-                      </ActionButton>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </TableShell>
-          <ShowMore total={filteredGigs.length} shown={visible.gigs} onClick={() => showMore("gigs")} />
-        </section>
-      )}
-
-      {/* ---------- Orders ---------- */}
-      {tab === "orders" && (
-        <section aria-label="Orders">
-          <Toolbar onExport={exportOrders}>
-            <input
-              type="search"
-              value={orderSearch}
-              onChange={(e) => setOrderSearch(e.target.value)}
-              placeholder="Search gig, client, freelancer or order ID"
-              aria-label="Search orders"
-              className={cn(inputClass, "max-w-xs")}
-            />
-            <select
-              value={orderStatus}
-              onChange={(e) => setOrderStatus(e.target.value)}
-              aria-label="Filter by status"
-              className={cn(inputClass, "max-w-[170px]")}
-            >
-              <option value="all">All statuses</option>
-              {ORDER_STATUSES.map((s) => (
-                <option key={s} value={s} className="capitalize">
-                  {s}
-                </option>
-              ))}
-            </select>
-          </Toolbar>
-
-          <TableShell>
-            <thead className="bg-slate-50">
-              <tr>
-                <th className={th}>Order</th>
-                <th className={th}>Client</th>
-                <th className={th}>Freelancer</th>
-                <th className={th}>Price</th>
-                <th className={th}>Status</th>
-                <th className={th}>Placed</th>
-                <th className={th}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.length === 0 ? (
-                <EmptyRow colSpan={7} text="No orders match your filters." />
-              ) : (
-                filteredOrders.slice(0, visible.orders).map((o) => (
-                  <tr key={o.id} className="border-t border-slate-100">
-                    <td className={cn(td, "max-w-xs")}>
-                      <p className="line-clamp-2 font-medium text-slate-900">{o.gig_title}</p>
-                      <p className="text-xs text-slate-500">#{o.id.slice(-6).toUpperCase()}</p>
-                    </td>
-                    <td className={cn(td, "text-slate-600")}>{nameById.get(o.client_id) ?? "Unknown"}</td>
-                    <td className={cn(td, "text-slate-600")}>{nameById.get(o.freelancer_id) ?? "Unknown"}</td>
-                    <td className={td}>{formatPrice(o.price)}</td>
-                    <td className={td}>
-                      <StatusBadge status={o.status} />
-                    </td>
-                    <td className={cn(td, "text-slate-600")}>{formatDate(o.created_at)}</td>
-                    <td className={td}>
-                      <div className="flex flex-wrap gap-2">
-                        <ActionButton onClick={() => setSelectedOrder(o)}>View</ActionButton>
-                        {o.status === "delivered" && (
-                          <ActionButton
-                            tone="good"
-                            onClick={() =>
-                              setConfirm({
-                                title: "Mark this order as completed?",
-                                message:
-                                  "Use this when the client has not responded after delivery. The freelancer's completed orders count will increase.",
-                                label: "Mark completed",
-                                danger: false,
-                                fn: "admin_complete_order",
-                                args: { p_order: o.id },
-                                success: "Order marked as completed.",
-                              })
-                            }
-                          >
-                            Complete
-                          </ActionButton>
-                        )}
-                        {(o.status === "active" || o.status === "delivered") && (
-                          <ActionButton
-                            tone="danger"
-                            onClick={() =>
-                              setConfirm({
-                                title: "Cancel this order?",
-                                message:
-                                  "The order will be cancelled for both the client and the freelancer. This cannot be undone.",
-                                label: "Cancel order",
-                                danger: true,
-                                fn: "admin_cancel_order",
-                                args: { p_order: o.id },
-                                success: "Order cancelled.",
-                              })
-                            }
-                          >
-                            Cancel
-                          </ActionButton>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </TableShell>
-          <ShowMore total={filteredOrders.length} shown={visible.orders} onClick={() => showMore("orders")} />
-        </section>
-      )}
-
-      {/* ---------- Reviews ---------- */}
-      {tab === "reviews" && (
-        <section aria-label="Reviews">
-          <Toolbar>
-            <input
-              type="search"
-              value={reviewSearch}
-              onChange={(e) => setReviewSearch(e.target.value)}
-              placeholder="Search comment, client or freelancer"
-              aria-label="Search reviews"
-              className={cn(inputClass, "max-w-xs")}
-            />
-            <select
-              value={reviewRating}
-              onChange={(e) => setReviewRating(e.target.value)}
-              aria-label="Filter by rating"
-              className={cn(inputClass, "max-w-[170px]")}
-            >
-              <option value="all">All ratings</option>
-              {[5, 4, 3, 2, 1].map((n) => (
-                <option key={n} value={n}>
-                  {n} {n === 1 ? "star" : "stars"}
-                </option>
-              ))}
-            </select>
-          </Toolbar>
-
-          <div className="space-y-4">
-            {filteredReviews.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-600">
-                No reviews match your filters.
-              </p>
-            ) : (
-              filteredReviews.slice(0, visible.reviews).map((r) => (
-                <article key={r.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        {nameById.get(r.client_id) ?? "Unknown"} reviewed {nameById.get(r.freelancer_id) ?? "Unknown"}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {gigTitleById.get(r.gig_id) ?? "Deleted gig"} · {formatDate(r.created_at)}
-                      </p>
+                        <option value="all">ALL STATUSES</option>
+                        <option value="active">ACTIVE</option>
+                        <option value="suspended">SUSPENDED</option>
+                        <option value="blocked">BLOCKED</option>
+                      </select>
                     </div>
-                    <RatingStars rating={r.rating} />
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-700">{r.comment}</p>
-                  <div className="mt-4">
-                    <ActionButton
-                      tone="danger"
-                      onClick={() =>
-                        setConfirm({
-                          title: "Delete this review?",
-                          message: "The review will be removed from the gig and the freelancer's profile.",
-                          label: "Delete review",
-                          danger: true,
-                          fn: "admin_delete_review",
-                          args: { p_review: r.id },
-                          success: "Review deleted.",
-                        })
-                      }
-                    >
-                      Delete review
-                    </ActionButton>
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
-          <ShowMore total={filteredReviews.length} shown={visible.reviews} onClick={() => showMore("reviews")} />
-        </section>
-      )}
 
-      {/* ---------- Activity log ---------- */}
-      {tab === "activity" && (
-        <section aria-label="Activity log">
-          <p className="mb-4 flex items-center gap-2 text-sm text-slate-600">
-            <Activity className="h-4 w-4" /> Every admin action is recorded here (latest 200).
-          </p>
-          <TableShell>
-            <thead className="bg-slate-50">
-              <tr>
-                <th className={th}>When</th>
-                <th className={th}>Admin</th>
-                <th className={th}>Action</th>
-                <th className={th}>Target</th>
-                <th className={th}>Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.length === 0 ? (
-                <EmptyRow colSpan={5} text="No admin actions have been recorded yet." />
-              ) : (
-                logs.slice(0, visible.activity).map((l) => (
-                  <tr key={l.id} className="border-t border-slate-100">
-                    <td className={cn(td, "whitespace-nowrap text-slate-600")}>{formatDateTime(l.created_at)}</td>
-                    <td className={cn(td, "text-slate-900")}>{nameById.get(l.admin_id) ?? "Unknown"}</td>
-                    <td className={cn(td, "font-medium text-slate-900")}>{l.action}</td>
-                    <td className={cn(td, "text-slate-600")}>{l.target}</td>
-                    <td className={cn(td, "text-slate-600")}>{l.details || "-"}</td>
-                  </tr>
-                ))
+                  {/* Users Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left font-mono text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b-2 border-[#0b1c30] bg-slate-50 uppercase text-[#6e7a73]">
+                          <th className="p-3">User</th>
+                          <th className="p-3">Role</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3">Joined</th>
+                          <th className="p-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#e5e7eb]">
+                        {filteredUsers.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="py-8 text-center text-[#6e7a73]">
+                              No user records found matching criteria.
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredUsers.map((u) => (
+                            <tr key={u._id || u.id} className="hover:bg-slate-50 transition">
+                              <td className="p-3">
+                                <p className="font-bold text-[#0b1c30] font-sans text-sm">{u.name}</p>
+                                <p className="text-[11px] text-[#6e7a73]">{u.email}</p>
+                              </td>
+                              <td className="p-3">
+                                <span className="border border-[#0b1c30] px-1.5 py-0.5 text-[10px] font-bold uppercase bg-[#eff4ff] text-[#0047bf]">
+                                  {u.role}
+                                </span>
+                              </td>
+                              <td className="p-3">
+                                <span
+                                  className={`inline-block border px-1.5 py-0.5 text-[10px] font-bold uppercase ${
+                                    u.status === "active"
+                                      ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                                      : "border-red-300 bg-red-50 text-red-800"
+                                  }`}
+                                >
+                                  {u.status || "active"}
+                                </span>
+                              </td>
+                              <td className="p-3 text-slate-500">
+                                {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}
+                              </td>
+                              <td className="p-3 text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedUser(u)}
+                                  className="border border-[#0b1c30] bg-white px-2.5 py-1 font-bold uppercase text-[#0b1c30] hover:bg-[#eff4ff] shadow-[1px_1px_0px_#0b1c30]"
+                                >
+                                  MODERATE
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
-            </tbody>
-          </TableShell>
-          <ShowMore total={logs.length} shown={visible.activity} onClick={() => showMore("activity")} />
-        </section>
+
+              {/* 3. MANAGE GIGS & GIG APPROVALS */}
+              {(activeSection === "gigs" || activeSection === "gig-approvals") && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-xs border-b border-[#e5e7eb] pb-4">
+                    <div className="flex items-center gap-2 flex-1 max-w-sm">
+                      <Search className="h-4 w-4 text-[#6e7a73]" />
+                      <input
+                        type="text"
+                        placeholder="Search specifications by title..."
+                        value={gigSearch}
+                        onChange={(e) => setGigSearch(e.target.value)}
+                        className="w-full border border-[#0b1c30] px-2.5 py-1.5 focus:outline-none"
+                      />
+                    </div>
+
+                    {activeSection === "gigs" && (
+                      <select
+                        value={gigStatusFilter}
+                        onChange={(e) => setGigStatusFilter(e.target.value)}
+                        className="border border-[#0b1c30] bg-white px-2 py-1.5 font-bold uppercase font-mono text-xs"
+                      >
+                        <option value="all">ALL STATUSES</option>
+                        <option value="pending">PENDING AUDIT</option>
+                        <option value="published">PUBLISHED</option>
+                        <option value="rejected">REJECTED</option>
+                        <option value="suspended">SUSPENDED</option>
+                      </select>
+                    )}
+                  </div>
+
+                  {/* Gigs List */}
+                  <div className="divide-y divide-[#e5e7eb] font-mono text-xs">
+                    {(activeSection === "gig-approvals" ? pendingGigsList : filteredGigs).length === 0 ? (
+                      <div className="py-8 text-center text-[#6e7a73]">
+                        No specifications found in this category.
+                      </div>
+                    ) : (
+                      (activeSection === "gig-approvals" ? pendingGigsList : filteredGigs).map((g) => (
+                        <div key={g._id || g.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span
+                                className={`border px-1.5 py-0.2 text-[9px] font-bold uppercase ${
+                                  g.status === "published"
+                                    ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                                    : g.status === "pending"
+                                    ? "border-amber-300 bg-amber-50 text-amber-800"
+                                    : "border-red-300 bg-red-50 text-red-800"
+                                }`}
+                              >
+                                {g.status}
+                              </span>
+                              <span className="text-slate-400 text-[10px]">·</span>
+                              <span className="text-[#6e7a73] uppercase text-[10px]">{g.category}</span>
+                            </div>
+                            <h3 className="font-sans font-bold text-sm text-[#0b1c30] truncate">
+                              {g.title}
+                            </h3>
+                            <p className="text-[#6e7a73] text-[11px] mt-0.5">
+                              Starting {formatPrice(g.price)} · SLA: {g.deliveryDays} Days
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedGig(g)}
+                              className="border border-[#0b1c30] bg-[#eff4ff] px-3 py-1.5 font-bold uppercase text-[#0047bf] hover:bg-[#dae2fd] shadow-[1px_1px_0px_#0b1c30]"
+                            >
+                              INSPECT & AUDIT
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 4. MANAGE CATEGORIES */}
+              {activeSection === "categories" && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
+                    <h2 className="font-headline text-base font-bold uppercase text-[#0b1c30]">
+                      PLATFORM TAXONOMY ({categories.length})
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={() => setCategoryModal(true)}
+                      className="border border-[#005d42] bg-[#005d42] px-3 py-1.5 font-mono text-xs font-bold uppercase text-white hover:bg-[#065f46]"
+                    >
+                      + ADD CATEGORY NODE
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
+                    {categories.map((cat) => (
+                      <div key={cat._id || cat.slug} className="border border-[#0b1c30] p-4 bg-white shadow-[2px_2px_0px_#0b1c30]">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-sm text-[#0b1c30] truncate">{cat.name}</span>
+                          <span className="border border-[#e5e7eb] px-1.5 py-0.5 text-[9px] text-[#6e7a73]">
+                            {cat.gigsCount || 0} GIGS
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[#6e7a73] font-mono mt-1">Slug: {cat.slug}</p>
+                        <p className="text-xs text-[#3e4943] font-sans mt-2 line-clamp-2">{cat.description}</p>
+                        <div className="mt-4 pt-2 border-t border-[#e5e7eb] flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteCategory(cat._id)}
+                            className="text-[#ba1a1a] hover:underline font-bold text-[10px] uppercase"
+                          >
+                            REMOVE NODE
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 5. MANAGE ORDERS */}
+              {activeSection === "orders" && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-xs border-b border-[#e5e7eb] pb-4">
+                    <div className="flex items-center gap-2 flex-1 max-w-sm">
+                      <Search className="h-4 w-4 text-[#6e7a73]" />
+                      <input
+                        type="text"
+                        placeholder="Search contract by code (e.g. GC-123)..."
+                        value={orderSearch}
+                        onChange={(e) => setOrderSearch(e.target.value)}
+                        className="w-full border border-[#0b1c30] px-2.5 py-1.5 focus:outline-none"
+                      />
+                    </div>
+                    <select
+                      value={orderStatusFilter}
+                      onChange={(e) => setOrderStatusFilter(e.target.value)}
+                      className="border border-[#0b1c30] bg-white px-2 py-1.5 font-bold uppercase font-mono text-xs"
+                    >
+                      <option value="all">ALL CONTRACT STATUSES</option>
+                      <option value="active">ACTIVE / IN FLIGHT</option>
+                      <option value="delivered">DELIVERED</option>
+                      <option value="completed">COMPLETED</option>
+                      <option value="cancelled">CANCELLED</option>
+                    </select>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left font-mono text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b-2 border-[#0b1c30] bg-slate-50 uppercase text-[#6e7a73]">
+                          <th className="p-3">Code</th>
+                          <th className="p-3">Specification</th>
+                          <th className="p-3">Amount</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3">Initiated</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#e5e7eb]">
+                        {filteredOrders.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="py-8 text-center text-[#6e7a73]">
+                              No contract orders found.
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredOrders.map((ord) => (
+                            <tr key={ord._id || ord.id} className="hover:bg-slate-50 transition">
+                              <td className="p-3 font-bold text-[#0b1c30]">{ord.code}</td>
+                              <td className="p-3 truncate max-w-xs">{ord.gigId?.title || ord.title || "Custom Contract"}</td>
+                              <td className="p-3 font-bold">₹{(ord.price || 0).toLocaleString("en-IN")}</td>
+                              <td className="p-3">
+                                <span className="border border-[#005d42] bg-[#eff4ff] px-1.5 py-0.5 text-[10px] font-bold uppercase text-[#005d42]">
+                                  {ord.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-slate-500">
+                                {ord.createdAt ? new Date(ord.createdAt).toLocaleDateString() : "Recent"}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 6. MANAGE REVIEWS */}
+              {activeSection === "reviews" && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-4">
+                  <h2 className="font-headline text-base font-bold uppercase text-[#0b1c30] border-b border-[#e5e7eb] pb-3">
+                    AUDITED CLIENT REVIEWS & FEEDBACK ({reviews.length})
+                  </h2>
+
+                  <div className="divide-y divide-[#e5e7eb] font-mono text-xs">
+                    {reviews.length === 0 ? (
+                      <div className="py-8 text-center text-[#6e7a73]">
+                        No client reviews submitted yet.
+                      </div>
+                    ) : (
+                      reviews.map((r) => (
+                        <div key={r._id || r.id} className="py-4 flex flex-col sm:flex-row justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-amber-500 font-bold">{"★".repeat(r.rating || 5)}</span>
+                              <span className="font-bold text-[#0b1c30]">{r.rating}.0</span>
+                              {r.isHidden && (
+                                <span className="border border-red-300 bg-red-50 px-1 text-[9px] font-bold text-red-700 uppercase">
+                                  HIDDEN FROM PUBLIC
+                                </span>
+                              )}
+                            </div>
+                            <p className="font-sans text-xs text-[#0b1c30] mt-1 italic">&ldquo;{r.comment}&rdquo;</p>
+                            <p className="text-[10px] text-[#6e7a73] mt-1">
+                              By {r.clientId?.name || "Client"} for {r.freelancerId?.name || "Specialist"}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleHideReview(r._id || r.id)}
+                              className="border border-[#0b1c30] bg-white px-2.5 py-1 text-[11px] font-bold uppercase text-[#0b1c30] hover:bg-slate-100"
+                            >
+                              {r.isHidden ? "UNHIDE" : "HIDE"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteReview(r._id || r.id)}
+                              className="border border-[#ba1a1a] bg-white px-2.5 py-1 text-[11px] font-bold uppercase text-[#ba1a1a] hover:bg-red-50"
+                            >
+                              DELETE
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 7. MANAGE PAYMENTS */}
+              {activeSection === "payments" && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
+                    <h2 className="font-headline text-base font-bold uppercase text-[#0b1c30]">
+                      SIMULATED ESCROW DISBURSEMENT LEDGER
+                    </h2>
+                    <span className="border border-[#005d42] bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-[#005d42]">
+                      100% AUDITED
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left font-mono text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b-2 border-[#0b1c30] bg-slate-50 uppercase text-[#6e7a73]">
+                          <th className="p-3">Tx ID</th>
+                          <th className="p-3">Amount</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3">Mode</th>
+                          <th className="p-3">Timestamp</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#e5e7eb]">
+                        {payments.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="py-8 text-center text-[#6e7a73]">
+                              No transactions recorded yet in escrow ledger.
+                            </td>
+                          </tr>
+                        ) : (
+                          payments.map((p) => (
+                            <tr key={p._id || p.transactionId} className="hover:bg-slate-50 transition">
+                              <td className="p-3 font-bold text-[#0b1c30]">{p.transactionId}</td>
+                              <td className="p-3 font-bold text-[#005d42]">₹{(p.amount || 0).toLocaleString("en-IN")}</td>
+                              <td className="p-3 uppercase">{p.status}</td>
+                              <td className="p-3 text-[10px] text-amber-700 uppercase font-bold">SIMULATED</td>
+                              <td className="p-3 text-slate-500">
+                                {p.createdAt ? new Date(p.createdAt).toLocaleDateString() : "Recent"}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 8. REPORTS & COMPLAINTS */}
+              {activeSection === "reports" && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-4">
+                  <h2 className="font-headline text-base font-bold uppercase text-[#0b1c30] border-b border-[#e5e7eb] pb-3">
+                    USER COMPLAINTS & SAFETY INCIDENTS ({reports.length})
+                  </h2>
+
+                  <div className="divide-y divide-[#e5e7eb] font-mono text-xs">
+                    {reports.length === 0 ? (
+                      <div className="py-8 text-center text-[#6e7a73]">
+                        <CheckCircle2 className="mx-auto h-8 w-8 text-[#005d42] mb-2" />
+                        NO OPEN INCIDENTS OR USER REPORTS.
+                      </div>
+                    ) : (
+                      reports.map((rep) => (
+                        <div key={rep._id} className="py-4 flex flex-col sm:flex-row justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="border border-[#ba1a1a] bg-red-50 text-red-800 px-1.5 py-0.2 text-[9px] font-bold uppercase">
+                                {rep.targetType}: #{String(rep.targetId).slice(-6)}
+                              </span>
+                              <span className="font-bold text-[#0b1c30]">{rep.reason}</span>
+                            </div>
+                            <p className="font-sans text-xs text-[#3e4943] mt-1">{rep.details || "No additional notes provided"}</p>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleResolveReport(rep._id, "resolved")}
+                              className="border border-[#005d42] bg-[#005d42] px-3 py-1 font-bold uppercase text-white hover:bg-[#065f46]"
+                            >
+                              RESOLVE
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleResolveReport(rep._id, "dismissed")}
+                              className="border border-slate-300 bg-white px-3 py-1 font-bold uppercase text-slate-700 hover:bg-slate-50"
+                            >
+                              DISMISS
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 9. PLATFORM SETTINGS */}
+              {activeSection === "settings" && (
+                <div className="border border-[#e5e7eb] bg-white p-6 shadow-[3px_3px_0px_#0b1c30] space-y-6 font-mono text-xs">
+                  <h2 className="font-headline text-base font-bold uppercase text-[#0b1c30] border-b border-[#e5e7eb] pb-3">
+                    GOVERNANCE & PLATFORM SETTINGS
+                  </h2>
+
+                  <div className="space-y-4 max-w-lg">
+                    <div>
+                      <label className="block text-[#6e7a73] uppercase font-bold">PLATFORM FEE // ESCROW CUT (%)</label>
+                      <input
+                        type="number"
+                        disabled
+                        value="0"
+                        className="mt-1 w-full border border-[#0b1c30] bg-slate-50 p-2 text-xs font-bold"
+                      />
+                      <p className="text-[10px] text-[#6e7a73] mt-1">Zero platform fee configured for college showcase simulation.</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#6e7a73] uppercase font-bold">DISPUTE RESOLUTION WINDOW</label>
+                      <input
+                        type="text"
+                        disabled
+                        value="7 Days Maximum"
+                        className="mt-1 w-full border border-[#0b1c30] bg-slate-50 p-2 text-xs font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[#6e7a73] uppercase font-bold">PRIMARY ADMINISTRATOR IDENTIFIER</label>
+                      <input
+                        type="text"
+                        disabled
+                        value={user?.email || "admin@gigcraft.io"}
+                        className="mt-1 w-full border border-[#0b1c30] bg-slate-50 p-2 text-xs font-bold"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* User Details & Moderation Modal */}
+      <UserDetailsModal
+        user={selectedUser}
+        open={Boolean(selectedUser)}
+        onClose={() => setSelectedUser(null)}
+        onUpdateStatus={handleUpdateUserStatus}
+        onDeleteUser={handleDeleteUser}
+      />
+
+      {/* Gig Specifications & Approval Modal */}
+      <GigDetailsModal
+        gig={selectedGig}
+        open={Boolean(selectedGig)}
+        onClose={() => setSelectedGig(null)}
+        onApprove={handleApproveGig}
+        onReject={handleRejectGig}
+        onSuspend={handleSuspendGig}
+      />
+
+      {/* Category Creation Modal */}
+      {categoryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md border-2 border-[#0b1c30] bg-white p-6 shadow-[6px_6px_0px_#0b1c30]">
+            <div className="flex items-center justify-between border-b border-[#0b1c30] pb-3">
+              <h3 className="font-headline text-base font-bold uppercase text-[#0b1c30]">DEPLOY CATEGORY</h3>
+              <button type="button" onClick={() => setCategoryModal(false)}>
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateCategory} className="mt-4 space-y-3 font-mono text-xs">
+              <div>
+                <label className="block text-[#6e7a73] uppercase">CATEGORY NAME *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Cloud Security"
+                  value={newCatName}
+                  onChange={(e) => {
+                    setNewCatName(e.target.value);
+                    setNewCatSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
+                  }}
+                  className="mt-1 w-full border border-[#0b1c30] p-2 text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-[#6e7a73] uppercase">SLUG *</label>
+                <input
+                  type="text"
+                  required
+                  value={newCatSlug}
+                  onChange={(e) => setNewCatSlug(e.target.value)}
+                  className="mt-1 w-full border border-[#0b1c30] p-2 text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-[#6e7a73] uppercase">DESCRIPTION</label>
+                <textarea
+                  rows={2}
+                  placeholder="Domain summary..."
+                  value={newCatDesc}
+                  onChange={(e) => setNewCatDesc(e.target.value)}
+                  className="mt-1 w-full border border-[#0b1c30] p-2 text-xs"
+                />
+              </div>
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCategoryModal(false)}
+                  className="border border-slate-300 px-3 py-1.5 uppercase font-bold"
+                >
+                  CANCEL
+                </button>
+                <button
+                  type="submit"
+                  className="bg-[#005d42] px-4 py-1.5 font-bold uppercase text-white hover:bg-[#065f46]"
+                >
+                  SAVE NODE
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
-
-      <OrderDetailModal
-        order={selectedOrder}
-        clientName={selectedOrder ? (nameById.get(selectedOrder.client_id) ?? "Unknown") : ""}
-        freelancerName={selectedOrder ? (nameById.get(selectedOrder.freelancer_id) ?? "Unknown") : ""}
-        onClose={() => setSelectedOrder(null)}
-      />
-
-      <ConfirmModal
-        open={Boolean(confirm)}
-        title={confirm?.title ?? ""}
-        message={confirm?.message ?? ""}
-        confirmLabel={confirm?.label}
-        danger={confirm?.danger}
-        onConfirm={handleConfirm}
-        onClose={() => setConfirm(null)}
-      />
     </div>
   );
 }

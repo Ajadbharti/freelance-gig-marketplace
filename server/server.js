@@ -23,6 +23,9 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const authRoutes = require("./routes/authRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
   res.status(200).json({
@@ -31,6 +34,10 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Mount Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Fallback 404 Route
 app.use((req, res) => {
