@@ -120,6 +120,11 @@ export default function Footer() {
                   Community Guidelines
                 </Link>
               </li>
+              <li>
+                <Link href="/admin" className="transition text-[#005d42] font-bold hover:underline">
+                  🛡️ Admin Governance
+                </Link>
+              </li>
             </ul>
           </div>
 

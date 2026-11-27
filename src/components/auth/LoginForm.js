@@ -44,6 +44,7 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -117,12 +118,20 @@ export default function LoginForm() {
           <Link href="/" className="font-headline text-xl font-bold tracking-tight text-[#005d42] uppercase">
             GIGCRAFT
           </Link>
-          <Link
-            href="/gigs"
-            className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] hover:text-[#005d42] transition"
-          >
-            BACK TO MARKETPLACE
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin"
+              className="border border-[#0b1c30] bg-[#eff4ff] px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-[#005d42] hover:bg-[#005d42] hover:text-white transition shadow-[1px_1px_0px_#0b1c30]"
+            >
+              🛡️ ADMIN PORTAL
+            </Link>
+            <Link
+              href="/gigs"
+              className="font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] hover:text-[#005d42] transition"
+            >
+              BACK TO MARKETPLACE
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -162,6 +171,52 @@ export default function LoginForm() {
               <p className="mt-1 text-xs text-[#3e4943] leading-relaxed">
                 Access your digital contracts, active sprints, and milestone disbursements.
               </p>
+
+              {/* Quick Role & Admin Selector Banner */}
+              <div className="mt-5 border border-[#0b1c30] bg-[#eff4ff] p-3 shadow-[2px_2px_0px_#0b1c30]">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#0b1c30] flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5 text-[#005d42]" /> Quick Login Mode / Roles
+                  </span>
+                  <span className="font-mono text-[10px] text-[#005d42] font-bold uppercase tracking-wider bg-white border border-[#005d42]/30 px-1.5 py-0.5">
+                    Auto-Fill
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setValue("email", "client@gigcraft.io");
+                      setValue("password", "ClientPass2026!");
+                    }}
+                    className="flex items-center justify-center gap-1.5 border border-[#0b1c30] bg-white py-2 px-2.5 font-mono text-[11px] font-bold uppercase text-[#0b1c30] hover:bg-[#dce9ff] shadow-[1px_1px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] transition"
+                  >
+                    <span>👤 Client</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setValue("email", "admin@gigcraft.io");
+                      setValue("password", "AdminSecurePass2026!");
+                      const res = await login("admin@gigcraft.io", "AdminSecurePass2026!");
+                      if (res.ok) {
+                        showToast("Admin session authenticated! Loading console...", "success");
+                        window.location.href = "/admin";
+                      } else {
+                        showToast(res.error || "Admin authentication failed", "error");
+                      }
+                    }}
+                    className="flex items-center justify-center gap-1.5 border border-[#005d42] bg-[#005d42] py-2 px-2.5 font-mono text-[11px] font-bold uppercase text-white hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] transition"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5 text-[#9ffdd3]" />
+                    <span>⚡ Admin (Instant)</span>
+                  </button>
+                </div>
+                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1 border-t border-[#0b1c30]/10 pt-1.5 font-mono text-[10px] text-[#6e7a73]">
+                  <span>Admin ID: <strong className="text-[#0b1c30]">admin@gigcraft.io</strong></span>
+                  <span>Pass: <strong className="text-[#0b1c30]">AdminSecurePass2026!</strong></span>
+                </div>
+              </div>
 
               {/* OAuth Providers */}
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -275,6 +330,26 @@ export default function LoginForm() {
                 >
                   <LogIn className="h-4 w-4" />
                   <span>{isSubmitting ? "Authenticating..." : "→ Sign In to Workspace"}</span>
+                </button>
+
+                {/* 1-Click Admin Access Button */}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setValue("email", "admin@gigcraft.io");
+                    setValue("password", "AdminSecurePass2026!");
+                    const res = await login("admin@gigcraft.io", "AdminSecurePass2026!");
+                    if (res.ok) {
+                      showToast("Authenticated as Platform Administrator! Loading Governance Console...", "success");
+                      window.location.href = "/admin";
+                    } else {
+                      showToast(res.error || "Admin authentication failed", "error");
+                    }
+                  }}
+                  className="flex h-11 w-full items-center justify-center gap-2 border border-[#0b1c30] bg-[#0b1c30] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-slate-800 shadow-[2px_2px_0px_#005d42] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition"
+                >
+                  <ShieldCheck className="h-4 w-4 text-[#9ffdd3]" />
+                  <span>⚡ 1-CLICK SIGN IN AS ADMINISTRATOR</span>
                 </button>
 
                 {/* Bottom Register Switch */}

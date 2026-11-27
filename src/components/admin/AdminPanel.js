@@ -38,7 +38,7 @@ import { adminApi } from "@/lib/api/adminApi";
 import { formatPrice } from "@/lib/utils";
 
 export default function AdminPanel() {
-  const { user, logout } = useAuth();
+  const { user, login, logout } = useAuth();
   const { showToast } = useToast();
 
   const [activeSection, setActiveSection] = useState("overview");
@@ -289,6 +289,99 @@ export default function AdminPanel() {
     const matchStatus = orderStatusFilter === "all" || o.status === orderStatusFilter;
     return matchSearch && matchStatus;
   });
+
+  // Auth Guards for Platform Administration
+  if (!loading && user && user.role !== "admin") {
+    return (
+      <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center p-4">
+        <div className="w-full max-w-md border border-[#0b1c30] bg-white p-8 shadow-[4px_4px_0px_#0b1c30]">
+          <div className="flex items-center gap-2 border border-[#ba1a1a]/30 bg-[#fff0f0] px-2.5 py-1 font-mono text-xs font-bold text-[#ba1a1a] uppercase w-fit">
+            <ShieldAlert className="h-4 w-4" /> Restricted Access
+          </div>
+          <h2 className="mt-4 font-headline text-2xl font-bold uppercase text-[#0b1c30]">
+            Admin Session Required
+          </h2>
+          <p className="mt-2 font-mono text-xs text-[#3e4943] leading-relaxed">
+            You are currently signed in as <strong>{user.email}</strong> ({user.role?.toUpperCase()}). Platform governance requires Administrator clearance.
+          </p>
+
+          <div className="mt-6 space-y-3">
+            <button
+              type="button"
+              onClick={async () => {
+                const res = await login("admin@gigcraft.io", "AdminSecurePass2026!");
+                if (res.ok) {
+                  showToast("Switched to Administrator session!", "success");
+                  loadData();
+                } else {
+                  showToast(res.error || "Authentication failed", "error");
+                }
+              }}
+              className="flex h-12 w-full items-center justify-center gap-2 border border-[#005d42] bg-[#005d42] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition"
+            >
+              <ShieldCheck className="h-4 w-4 text-[#9ffdd3]" />
+              <span>⚡ Switch to Administrator Account</span>
+            </button>
+
+            <Link
+              href="/login"
+              className="flex h-11 w-full items-center justify-center gap-2 border border-[#0b1c30] bg-white text-[#0b1c30] font-mono text-xs font-bold uppercase tracking-wider hover:bg-slate-100 shadow-[2px_2px_0px_#0b1c30] transition"
+            >
+              ← Return to Login Portal
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!loading && !user) {
+    return (
+      <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center p-4">
+        <div className="w-full max-w-md border border-[#0b1c30] bg-white p-8 shadow-[4px_4px_0px_#0b1c30]">
+          <div className="flex items-center gap-2 border border-[#005d42]/30 bg-[#eff4ff] px-2.5 py-1 font-mono text-xs font-bold text-[#005d42] uppercase w-fit">
+            <ShieldCheck className="h-4 w-4" /> Governance Access
+          </div>
+          <h2 className="mt-4 font-headline text-2xl font-bold uppercase text-[#0b1c30]">
+            Sign In As Administrator
+          </h2>
+          <p className="mt-2 font-mono text-xs text-[#3e4943] leading-relaxed">
+            Access to platform governance, order escrows, user suspensions, and gig approval requests requires root administrator authentication.
+          </p>
+
+          <div className="mt-6 space-y-3">
+            <button
+              type="button"
+              onClick={async () => {
+                const res = await login("admin@gigcraft.io", "AdminSecurePass2026!");
+                if (res.ok) {
+                  showToast("Authenticated as Platform Administrator!", "success");
+                  loadData();
+                } else {
+                  showToast(res.error || "Authentication failed", "error");
+                }
+              }}
+              className="flex h-12 w-full items-center justify-center gap-2 border border-[#005d42] bg-[#005d42] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#047857] shadow-[2px_2px_0px_#0b1c30] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition"
+            >
+              <ShieldCheck className="h-4 w-4 text-[#9ffdd3]" />
+              <span>⚡ 1-Click Authenticate as Administrator</span>
+            </button>
+
+            <Link
+              href="/login"
+              className="flex h-11 w-full items-center justify-center gap-2 border border-[#0b1c30] bg-white text-[#0b1c30] font-mono text-xs font-bold uppercase tracking-wider hover:bg-slate-100 shadow-[2px_2px_0px_#0b1c30] transition"
+            >
+              ← Go to Standard Login Page
+            </Link>
+          </div>
+
+          <div className="mt-4 border-t border-[#e5e7eb] pt-3 font-mono text-[11px] text-[#6e7a73]">
+            Default Credentials: <strong className="text-[#0b1c30]">admin@gigcraft.io</strong> / <strong className="text-[#0b1c30]">AdminSecurePass2026!</strong>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f9ff]">

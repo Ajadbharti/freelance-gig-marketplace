@@ -176,7 +176,7 @@ export default function Navbar() {
                       <p className="font-sans text-sm font-bold text-[#0b1c30]">{user.name}</p>
                       <p className="font-sans text-xs text-[#6e7a73] mt-0.5">{user.email}</p>
                       <span className="mt-2 inline-block border border-[#005d42]/30 bg-[#eff4ff] px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#005d42]">
-                        {user.role === "freelancer" ? "FREELANCER" : "CLIENT"}
+                        {user.role === "admin" ? "ADMINISTRATOR" : user.role === "freelancer" ? "FREELANCER" : "CLIENT"}
                       </span>
                     </div>
 
@@ -188,7 +188,7 @@ export default function Navbar() {
                       className="flex items-center gap-2 font-sans text-xs font-semibold text-[#0b1c30] hover:text-[#005d42] transition"
                     >
                       <LayoutDashboard className="h-4 w-4" />
-                      <span>Dashboard</span>
+                      <span>{user?.role === "admin" ? "Admin Console" : "Dashboard"}</span>
                     </Link>
 
                     <div className="border-b border-[#e5e7eb] my-3" />
@@ -207,6 +207,12 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-3">
+              <Link
+                href="/admin"
+                className="hidden sm:inline-flex items-center gap-1 border border-[#0b1c30] bg-[#eff4ff] px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-[#005d42] hover:bg-[#005d42] hover:text-white shadow-[1px_1px_0px_#0b1c30] transition"
+              >
+                🛡️ ADMIN
+              </Link>
               <Link
                 href="/login"
                 className="px-2 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#0b1c30] transition hover:text-[#005d42]"
