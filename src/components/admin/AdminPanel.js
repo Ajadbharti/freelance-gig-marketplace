@@ -466,8 +466,8 @@ export default function AdminPanel() {
                       </div>
                     ) : (
                       <div className="mt-4 divide-y divide-slate-100 font-mono text-xs">
-                        {pendingGigsList.slice(0, 3).map((g) => (
-                          <div key={g._id || g.id} className="py-3 flex items-center justify-between gap-4">
+                        {pendingGigsList.slice(0, 3).map((g, idx) => (
+                          <div key={g._id || g.id || `pending-gig-${idx}`} className="py-3 flex items-center justify-between gap-4">
                             <div>
                               <p className="font-bold text-[#0b1c30] truncate">{g.title}</p>
                               <p className="text-[10px] text-[#6e7a73]">{g.category} // Starting {formatPrice(g.price)}</p>
@@ -496,17 +496,17 @@ export default function AdminPanel() {
                       </p>
                     ) : (
                       <div className="mt-4 space-y-2 font-mono text-xs">
-                        {auditLogs.slice(0, 6).map((log) => (
-                          <div key={log._id} className="border border-slate-100 p-2.5 flex items-center justify-between gap-3 bg-slate-50/50">
+                        {auditLogs.slice(0, 6).map((log, idx) => (
+                          <div key={log._id || log.id || `audit-log-${idx}`} className="border border-slate-100 p-2.5 flex items-center justify-between gap-3 bg-slate-50/50">
                             <div>
                               <span className="border border-[#0b1c30] bg-[#0b1c30] px-1.5 py-0.2 text-[9px] font-bold text-white uppercase">
                                 {log.action}
                               </span>
-                              <span className="ml-2 font-bold text-[#0b1c30]">{log.targetResource} #{String(log.targetResourceId).slice(-6)}</span>
+                              <span className="ml-2 font-bold text-[#0b1c30]">{log.targetResource} #{String(log.targetResourceId || "").slice(-6)}</span>
                               <p className="text-[10px] text-[#6e7a73] mt-0.5">{log.reason}</p>
                             </div>
                             <span className="text-[10px] text-slate-400 shrink-0">
-                              {new Date(log.createdAt).toLocaleTimeString()}
+                              {log.createdAt ? new Date(log.createdAt).toLocaleTimeString() : "Recent"}
                             </span>
                           </div>
                         ))}
@@ -579,8 +579,8 @@ export default function AdminPanel() {
                             </td>
                           </tr>
                         ) : (
-                          filteredUsers.map((u) => (
-                            <tr key={u._id || u.id} className="hover:bg-slate-50 transition">
+                          filteredUsers.map((u, idx) => (
+                            <tr key={u._id || u.id || u.email || `user-${idx}`} className="hover:bg-slate-50 transition">
                               <td className="p-3">
                                 <p className="font-bold text-[#0b1c30] font-sans text-sm">{u.name}</p>
                                 <p className="text-[11px] text-[#6e7a73]">{u.email}</p>
@@ -659,8 +659,8 @@ export default function AdminPanel() {
                         No specifications found in this category.
                       </div>
                     ) : (
-                      (activeSection === "gig-approvals" ? pendingGigsList : filteredGigs).map((g) => (
-                        <div key={g._id || g.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      (activeSection === "gig-approvals" ? pendingGigsList : filteredGigs).map((g, idx) => (
+                        <div key={g._id || g.id || `gig-${idx}`} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <span
@@ -718,8 +718,8 @@ export default function AdminPanel() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
-                    {categories.map((cat) => (
-                      <div key={cat._id || cat.slug} className="border border-[#0b1c30] p-4 bg-white shadow-[2px_2px_0px_#0b1c30]">
+                    {categories.map((cat, idx) => (
+                      <div key={cat._id || cat.id || cat.slug || `cat-${idx}`} className="border border-[#0b1c30] p-4 bg-white shadow-[2px_2px_0px_#0b1c30]">
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-sm text-[#0b1c30] truncate">{cat.name}</span>
                           <span className="border border-[#e5e7eb] px-1.5 py-0.5 text-[9px] text-[#6e7a73]">
@@ -731,7 +731,7 @@ export default function AdminPanel() {
                         <div className="mt-4 pt-2 border-t border-[#e5e7eb] flex justify-end">
                           <button
                             type="button"
-                            onClick={() => handleDeleteCategory(cat._id)}
+                            onClick={() => handleDeleteCategory(cat._id || cat.id || cat.slug)}
                             className="text-[#ba1a1a] hover:underline font-bold text-[10px] uppercase"
                           >
                             REMOVE NODE
@@ -789,8 +789,8 @@ export default function AdminPanel() {
                             </td>
                           </tr>
                         ) : (
-                          filteredOrders.map((ord) => (
-                            <tr key={ord._id || ord.id} className="hover:bg-slate-50 transition">
+                          filteredOrders.map((ord, idx) => (
+                            <tr key={ord._id || ord.id || ord.code || `ord-${idx}`} className="hover:bg-slate-50 transition">
                               <td className="p-3 font-bold text-[#0b1c30]">{ord.code}</td>
                               <td className="p-3 truncate max-w-xs">{ord.gigId?.title || ord.title || "Custom Contract"}</td>
                               <td className="p-3 font-bold">₹{(ord.price || 0).toLocaleString("en-IN")}</td>
@@ -824,8 +824,8 @@ export default function AdminPanel() {
                         No client reviews submitted yet.
                       </div>
                     ) : (
-                      reviews.map((r) => (
-                        <div key={r._id || r.id} className="py-4 flex flex-col sm:flex-row justify-between gap-4">
+                      reviews.map((r, idx) => (
+                        <div key={r._id || r.id || `rev-${idx}`} className="py-4 flex flex-col sm:flex-row justify-between gap-4">
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="text-amber-500 font-bold">{"★".repeat(r.rating || 5)}</span>
@@ -896,8 +896,8 @@ export default function AdminPanel() {
                             </td>
                           </tr>
                         ) : (
-                          payments.map((p) => (
-                            <tr key={p._id || p.transactionId} className="hover:bg-slate-50 transition">
+                          payments.map((p, idx) => (
+                            <tr key={p._id || p.id || p.transactionId || `pay-${idx}`} className="hover:bg-slate-50 transition">
                               <td className="p-3 font-bold text-[#0b1c30]">{p.transactionId}</td>
                               <td className="p-3 font-bold text-[#005d42]">₹{(p.amount || 0).toLocaleString("en-IN")}</td>
                               <td className="p-3 uppercase">{p.status}</td>
@@ -928,12 +928,12 @@ export default function AdminPanel() {
                         NO OPEN INCIDENTS OR USER REPORTS.
                       </div>
                     ) : (
-                      reports.map((rep) => (
-                        <div key={rep._id} className="py-4 flex flex-col sm:flex-row justify-between gap-4">
+                      reports.map((rep, idx) => (
+                        <div key={rep._id || rep.id || `rep-${idx}`} className="py-4 flex flex-col sm:flex-row justify-between gap-4">
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="border border-[#ba1a1a] bg-red-50 text-red-800 px-1.5 py-0.2 text-[9px] font-bold uppercase">
-                                {rep.targetType}: #{String(rep.targetId).slice(-6)}
+                                {rep.targetType}: #{String(rep.targetId || "").slice(-6)}
                               </span>
                               <span className="font-bold text-[#0b1c30]">{rep.reason}</span>
                             </div>
@@ -943,14 +943,14 @@ export default function AdminPanel() {
                           <div className="flex items-center gap-2 shrink-0">
                             <button
                               type="button"
-                              onClick={() => handleResolveReport(rep._id, "resolved")}
+                              onClick={() => handleResolveReport(rep._id || rep.id, "resolved")}
                               className="border border-[#005d42] bg-[#005d42] px-3 py-1 font-bold uppercase text-white hover:bg-[#065f46]"
                             >
                               RESOLVE
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleResolveReport(rep._id, "dismissed")}
+                              onClick={() => handleResolveReport(rep._id || rep.id, "dismissed")}
                               className="border border-slate-300 bg-white px-3 py-1 font-bold uppercase text-slate-700 hover:bg-slate-50"
                             >
                               DISMISS
